@@ -23,6 +23,8 @@ struct ImportConclusionKind(ImplicitlyCopyable):
     def boundary_identification_soundness() -> Self: return Self(6)
     @staticmethod
     def tuning_kneading_substitution() -> Self: return Self(7)
+    @staticmethod
+    def harmonic_measure_fibre_triviality() -> Self: return Self(8)
 
 
 struct ImportStrengthClass(ImplicitlyCopyable):
@@ -81,7 +83,7 @@ struct TheoremTagRecord(ImplicitlyCopyable):
 
 
 def allowed_conclusion_kind(kind: ImportConclusionKind) -> Bool:
-    return kind.code >= 0 and kind.code <= 7
+    return kind.code >= 0 and kind.code <= 8
 
 
 def allowed_strength_class(strength_class: ImportStrengthClass) -> Bool:
@@ -175,6 +177,28 @@ def tuning_kneading_substitution_tag_ready() -> TheoremTagRecord:
         ImportStrengthClass.classical_class_specific(),
         ImportStatus.scaffolded(),
     )
+
+
+def harmonic_measure_fibre_triviality_tag_ready() -> TheoremTagRecord:
+    # docs/C1_theorem_tag_import_ledger.md: triviality for harmonic-measure-almost
+    # every boundary parameter. Scaffolded: the payload must name the measure and
+    # show the parameter was not selected from the null exceptional set.
+    return TheoremTagRecord(
+        "HarmonicMeasureAlmostEveryFibreTrivial",
+        True,
+        True,
+        ImportConclusionKind.harmonic_measure_fibre_triviality(),
+        False,
+        True,
+        ImportStrengthClass.classical_class_specific(),
+        ImportStatus.scaffolded(),
+    )
+
+
+def harmonic_measure_tag_discharges_a_named_pair() -> Bool:
+    # A null exceptional set is not an empty one, and it contains the infinitely
+    # renormalizable parameters of docs/C1_residual_directive_carrier.md.
+    return False
 
 
 def generic_mlc_import_admissible() -> Bool:

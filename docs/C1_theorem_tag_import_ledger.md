@@ -41,6 +41,7 @@ YoccozPuzzleLocalConnectivityUnderHypotheses
 RenormalizationWithAprioriBounds
 BoundaryIdentificationSoundness
 TuningKneadingSubstitution
+HarmonicMeasureAlmostEveryFibreTrivial
 ```
 
 Any other conclusion kind is rejected by the final proof checker until added to this ledger with source, scope, assumptions, and strength classification.
@@ -287,6 +288,37 @@ adapter_domain_matches
 Strength class: `CLASSICAL_IMPORTED_CLASS_SPECIFIC`.
 
 Final use: allowed only to read a residual directive carrier as a statement about kneading sequences of tuned parameters. It is not a statement about parameter-plane shrinking, a priori bounds, or fibre triviality, and it cannot be used as a residual exit.
+
+### Harmonic-measure-almost-every fibre triviality
+
+Tag family:
+
+```text
+HarmonicMeasureAlmostEveryFibreTrivial
+```
+
+Source family: harmonic measure and expansion on the boundary of the Mandelbrot set (Graczyk and Świątek), with the Collet-Eckmann symbolic-dynamics route (Smirnov). Both are reported results and must be pinned with their exact statements before any final use.
+
+Covered class: harmonic-measure-almost every parameter of the boundary of `M`, that is, all external angles outside a Lebesgue-null set.
+
+Conclusion kind: `HarmonicMeasureAlmostEveryFibreTrivial`: for almost every boundary parameter with respect to harmonic measure, the fibre is trivial and `M` is locally connected there.
+
+Assumption payload:
+
+```text
+theorem_source
+measure_declared
+exceptional_set_is_null_not_empty
+parameter_not_selected_from_the_exceptional_set
+adapter_domain_matches
+conclusion_scope
+```
+
+Strength class: `CLASSICAL_IMPORTED_CLASS_SPECIFIC`.
+
+Final use: allowed only for statements whose conclusion is itself measure-theoretic, with the null exceptional set named. **It may not discharge `PersistentNonSeparation(A,B)` for any named pair, and it is not a residual exit.** A null set is not an empty one: the infinitely renormalizable parameters carried by `docs/C1_residual_directive_carrier.md` lie inside the exceptional set, and they are exactly the residual class the C1 route must still decide. `harmonic_measure_tag_discharges_a_named_pair()` returns `False`.
+
+Relation to the finite side: `docs/C1_separated_pair_density.md` computes the exact measure of the pairs a finite catalogue prefix decides. That finite density is Lebesgue measure on external angles, not harmonic measure on the boundary; identifying the two is this tag's business, under this tag's hypotheses.
 
 ## Forbidden imports
 
