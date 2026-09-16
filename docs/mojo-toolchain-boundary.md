@@ -46,6 +46,7 @@ The compiler-checked dependency closure currently consists of:
 - `src/substitution_dynamics/substitution.mojo`.
 - `src/substitution_dynamics/tuning.mojo`.
 - `src/C1_residual_directive_carrier.mojo`.
+- `src/C1_separated_density.mojo`.
 - `src/misiurewicz_catalogue.mojo`.
 
 A second compile target, `src/exact_arithmetic_property_probe.mojo`, imports

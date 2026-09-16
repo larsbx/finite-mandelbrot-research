@@ -61,6 +61,22 @@ Use as classical background for the residual directive carrier
 
 Role in this project: sources for the scaffolded theorem tag `TuningKneadingSubstitution` behind the residual directive carrier, a project term registered in `docs/terminology-registry.md`. None of them is a statement about parameter-plane shrinking or fibre triviality.
 
+## Harmonic measure on the boundary of `M`
+
+Use as classical background for the theorem tag
+`HarmonicMeasureAlmostEveryFibreTrivial` and for the finite density of
+`docs/C1_separated_pair_density.md`:
+
+- Graczyk and Świątek, *Harmonic measure and expansion on the boundary of the Mandelbrot set*;
+- Smirnov, *Symbolic dynamics and Collet-Eckmann conditions*.
+
+Role in this project: they are reported to give triviality of the fibre for
+harmonic-measure-almost every boundary parameter. That is a measure-theoretic
+statement with a null exceptional set, and the residual class of
+`docs/C1_residual_directive_carrier.md` lies inside that exceptional set. The
+statements must be pinned exactly before any final import; nothing here decides
+a named pair.
+
 ## Interval / Krawczyk methods
 
 Use for finite localization witnesses.

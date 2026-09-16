@@ -138,6 +138,18 @@ Known leaks: It carries dynamical-plane combinatorics only; parameter-plane shri
 
 Use discipline: Use in C1 files or with a pointer to this registry. Never as evidence of same-fibre membership.
 
+### separated-pair density
+
+Terminology declaration: the `separated-pair density` of a finite separator-catalogue prefix is the exact rational measure of the pairs of external angles that the prefix's rational cut addresses place in different arcs, `1 - sum_j |I_j|^2` for the arcs `I_j` the distinct cuts induce (`docs/C1_separated_pair_density.md`).
+
+Genealogy: It is the product-measure form of the standard coincidence probability of a finite partition, and the parameter-space counterpart of the common fraction `f_m` of the balanced-pair overlap route in `larsbx/pisot-substitution-conjecture-research`.
+
+Bridge claim: Definition-only project term, computed exactly over unbounded rationals. The measure is Lebesgue measure on external angles; identifying it with harmonic measure on the boundary of `M` is the scaffolded theorem tag `HarmonicMeasureAlmostEveryFibreTrivial`.
+
+Known leaks: A density approaching one would make the undecided pairs null, never empty. It says nothing about any named pair, gives no bound on the limit from any finite prefix, and is not a fibre-triviality or local-connectivity statement.
+
+Use discipline: Use in C1 files or with a pointer to this registry, and only for the measure of a prefix. Never as evidence that a particular pair is separated.
+
 ### exact-type catalogue
 
 Terminology declaration: the `exact-type catalogue` of type `(l, k)` is the finite set of rational ray addresses whose exact preperiod under doubling is `l` and whose exact period is `k`, enumerated over the common denominator `2^l (2^k - 1)` (`docs/C1_misiurewicz_catalogue.md`).
