@@ -68,4 +68,8 @@ So an accepted type need not be one this module holds a catalogue of, and each b
 
 ## Next step
 
-Round-two item R5: pair a catalogue's addresses into two-ray separators, measure the prefix with `docs/C1_separated_pair_density.md`, and run the obstruction extractor of `docs/C1_F1_obstruction_extraction.md` on the resulting finite graph, where the imported triviality tag predicts an empty obstruction and so supplies the first executable negative control of the kind the Pisot program uses.
+Round-two item R5 is built: `docs/C1_misiurewicz_prefix_graph.md` runs the obstruction extractor of `docs/C1_F1_obstruction_extraction.md` on the graphs a catalogue supplies.
+
+**Do not pair a catalogue's own addresses into separators.** This section said to, and that recipe is wrong twice over. A separator needs accepted landing tags on both rays and a declared co-landing pair (`docs/C1_admissible_separator_codes.md`), which addresses alone cannot supply; and pairing a catalogue's addresses puts every vertex in its own arc, so the result restates the construction rather than testing the imported triviality tag. The first implementation of R5 did exactly this and the claim was withdrawn in review.
+
+The open step is therefore a genuine negative control for this class, which needs separators whose co-landing is declared rather than derived from the points being separated.
