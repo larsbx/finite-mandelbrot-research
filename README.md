@@ -1,0 +1,1 @@
+# finite-mandlebrot-research
