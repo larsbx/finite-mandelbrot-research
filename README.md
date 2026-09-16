@@ -1,5 +1,7 @@
 # Finite-Regime Mandelbrot Research
 
+**Canonical repository:** this is the sole active development home for the finite-regime Mandelbrot research program. The former `larsbx/NLAP-JT` repository is historical; migration provenance and cutover details are recorded in `MIGRATION.md`.
+
 This repository develops a finite, certificate-carrying formulation of Mandelbrot-set computation.
 
 The project goal is not to replace the classical analytic Mandelbrot set with a false finite exact object. Instead, it formalizes a hierarchy of finite algebraic certificates that reproduce the observable content available at finite resolution while isolating the single generic-boundary obstruction as MLC / fiber triviality.
