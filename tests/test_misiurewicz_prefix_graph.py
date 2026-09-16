@@ -23,8 +23,15 @@ def text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def seps(*pairs: tuple[int, int]) -> list[tuple[int, int]]:
-    return list(pairs)
+TAG = pg.RATIONAL_RAY_LANDING
+
+
+def seps(*pairs: tuple[int, int]) -> list[tuple[int, int, int]]:
+    """Separators with an accepted landing tag, which the caller declares."""
+    return [(low, high, TAG) for low, high in pairs]
+
+
+PERIOD_THREE = pg.period_pair_prefix(3, 14)   # the rays 1/7, 2/7, 4/7
 
 
 # --- documentation and governance ----------------------------------------------
@@ -83,17 +90,72 @@ def test_forward_closure_is_closed_under_doubling_and_contains_the_seed():
             assert closure == sorted(set(closure))
 
 
+def test_a_ray_of_a_separator_is_on_it_and_never_on_a_side():
+    # docs/C1_wake_membership_soundness.md, the strict interval condition, and
+    # docs/C1_side_assignment_witnesses.md: only Left and Right prove separation.
+    for den in (4, 6, 14, 24):
+        for low in range(den):
+            for high in range(den):
+                if low == high:
+                    continue
+                sep = (low, high, TAG)
+                assert pg.side(low, sep, den) == pg.ON_SEPARATOR
+                assert pg.side(high, sep, den) == pg.ON_SEPARATOR
+                assert not pg.separated(low, high, [sep], den)
+
+
 def test_exchanging_a_separators_rays_names_the_complementary_side():
     for point in range(DEN13):
-        assert pg.side(point, (3, 9), DEN13) != pg.side(point, (9, 3), DEN13)
+        first, second = pg.side(point, (3, 9, TAG), DEN13), pg.side(point, (9, 3, TAG), DEN13)
+        if point in (3, 9):
+            assert first == second == pg.ON_SEPARATOR
+        else:
+            assert first != second
 
 
-def test_separation_is_the_side_signature_test():
+def test_separation_needs_two_open_opposite_sides():
     prefix = seps((1, 2), (5, 6))
     for a in range(DEN13):
         for b in range(DEN13):
-            same = pg.signature(a, prefix, DEN13) == pg.signature(b, prefix, DEN13)
-            assert pg.separated(a, b, prefix, DEN13) is not same
+            opposite = any(
+                pg.side(a, s, DEN13) != pg.ON_SEPARATOR
+                and pg.side(b, s, DEN13) != pg.ON_SEPARATOR
+                and pg.side(a, s, DEN13) != pg.side(b, s, DEN13)
+                for s in prefix
+            )
+            assert pg.separated(a, b, prefix, DEN13) is opposite
+
+
+def test_an_untagged_or_unknown_landing_tag_is_refused():
+    # docs/C1_admissible_separator_codes.md forbids a generic landing tag.
+    assert pg.accepted_landing_tag(pg.RATIONAL_RAY_LANDING)
+    assert pg.accepted_landing_tag(pg.PARABOLIC_LANDING)
+    assert pg.accepted_landing_tag(pg.HYPERBOLIC_BOUNDARY_LANDING)
+    for tag in (0, -1, 4, 99):
+        assert not pg.accepted_landing_tag(tag)
+        assert pg.extract(mc.catalogue(1, 3), [(2, 3, tag)], DEN13).rejected
+
+
+def test_no_function_builds_a_prefix_out_of_addresses_alone():
+    # The co-landing evidence admissibility requires cannot come from addresses,
+    # so nothing here generates it; a prefix is declared or there is none.
+    assert not hasattr(pg, "catalogue_separators")
+    src = text(SRC)
+    assert "def catalogue_separator_lows(" not in src
+    assert "def catalogue_separator_highs(" not in src
+
+
+def test_a_period_prefix_never_contains_the_points_it_separates():
+    # Periodic rays against strictly preperiodic addresses.
+    for preperiod in range(1, 5):
+        for period in range(1, 5):
+            den = mc.catalogue_denominator(preperiod, period)
+            if den < 0 or den > pg.MAX_PREFIX_GRAPH_DENOMINATOR:
+                continue
+            prefix = pg.period_pair_prefix(period, den)
+            if not prefix:
+                continue
+            assert not (pg.endpoints(prefix) & set(mc.catalogue(preperiod, period)))
 
 
 def test_a_pair_merges_exactly_when_its_points_differ_by_half():
@@ -146,22 +208,34 @@ def test_sink_cycles_are_cycles_and_partition_no_pair_twice():
         seen |= set(cycle)
 
 
-def test_the_pinned_thin_prefix_instance():
-    found = pg.extract(mc.catalogue(1, 3), seps((2, 3)), DEN13)
-    assert (found.vertices, found.undecided, found.nonproductive) == (12, 55, 17)
-    assert (found.merging, len(found.boundary), len(found.interior)) == (5, 0, 1)
-    # The interior cycle is the period-three orbit 3/7 -> 6/7 -> 5/7.
-    assert found.interior == (((6, 10), (6, 12), (10, 12)),)
+def test_the_pinned_declared_prefix_instance():
+    # The rays 1/7, 2/7, 4/7 as a tagged period-three prefix, on the catalogue of
+    # exact type (1, 3). The prefix is periodic and the catalogue strictly
+    # preperiodic, so this asks a real question rather than restating a
+    # construction: the prefix does not decide the class.
+    found = pg.extract_catalogue(1, 3, PERIOD_THREE)
+    assert (found.vertices, found.undecided, found.nonproductive) == (12, 37, 20)
+    assert (found.merging, len(found.boundary), len(found.interior)) == (2, 2, 0)
     assert not found.obstruction_free
 
 
 def test_the_dichotomy_is_a_property_of_the_prefix_not_of_the_cycle():
     interior = pg.extract(mc.catalogue(1, 3), seps((1, 2), (2, 3), (3, 4)), DEN13)
     boundary = pg.extract(mc.catalogue(1, 3), seps((1, 2), (2, 3), (5, 6)), DEN13)
-    assert interior.cycles == boundary.cycles          # the same cycle
+    shared = ((6, 10), (6, 12), (10, 12))          # the orbit 3/7 -> 6/7 -> 5/7
     assert interior.nonproductive == boundary.nonproductive
-    assert (len(interior.interior), len(interior.boundary)) == (1, 0)
-    assert (len(boundary.boundary), len(boundary.interior)) == (1, 0)
+    assert shared in interior.interior and shared not in interior.boundary
+    assert shared in boundary.boundary and shared not in boundary.interior
+
+
+def test_a_separator_whose_open_arc_is_empty_decides_nothing():
+    # Adjacent rays leave no point strictly inside, and a point on a ray is not
+    # a side, so such a separator cannot discharge any pair. This is why a prefix
+    # of consecutive closure points was worthless as well as inadmissible.
+    bare = pg.extract(mc.catalogue(1, 3), [], DEN13)
+    adjacent = pg.extract(mc.catalogue(1, 3), seps((1, 2)), DEN13)
+    assert adjacent.undecided == bare.undecided
+    assert adjacent.nonproductive == bare.nonproductive
 
 
 def test_a_nonproductive_set_can_be_entirely_transient():
@@ -185,26 +259,37 @@ def test_multiple_sinks_are_all_retained():
 # --- the negative control and fail-closed behaviour ------------------------------
 
 
-def test_the_full_prefix_leaves_no_obstruction_on_every_type_in_range():
+def test_the_reference_regression_replays():
     assert pg.main() == 0
-    checked = 0
-    for preperiod in range(1, 9):
-        for period in range(1, 9):
-            found = pg.extract_catalogue(preperiod, period)
-            if not found.accepted:
+
+
+def test_declared_period_prefixes_give_answers_not_restatements():
+    # No claim that any type is obstruction free. What is checked is that a
+    # declared prefix of periodic rays is accepted and returns a verdict whose
+    # content is not fixed by the construction: some types it leaves undecided.
+    undecided_somewhere = False
+    for preperiod in range(1, 5):
+        for period in range(1, 5):
+            den = mc.catalogue_denominator(preperiod, period)
+            if den < 0 or den > pg.MAX_PREFIX_GRAPH_DENOMINATOR:
                 continue
-            assert found.obstruction_free and found.undecided == 0, (preperiod, period)
-            checked += 1
-    assert checked == 29
+            prefix = pg.period_pair_prefix(period, den)
+            if not prefix:
+                continue
+            found = pg.extract_catalogue(preperiod, period, prefix)
+            assert found.accepted
+            if found.nonproductive:
+                undecided_somewhere = True
+    assert undecided_somewhere, "a prefix that always decides would be a construction artefact"
 
 
 def test_the_smoke_target_pins_the_same_instances():
     src = text(SRC)
-    for fragment in ("if checked != 29 or bounded != 35:",
-                     "if thin.vertices != 12 or thin.undecided != 55 or thin.nonproductive != 17:",
-                     "if thin.merging != 5 or thin.boundary != 0 or thin.interior != 1:",
-                     "if not bare.accepted() or bare.nonproductive != 6 or bare.merging != 2:",
-                     "var expected: List[Int] = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]"):
+    for fragment in ("if found.vertices != 12 or found.undecided != 37 or found.nonproductive != 20:",
+                     "if found.merging != 2 or found.boundary != 2 or found.interior != 0:",
+                     "var expected: List[Int] = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]",
+                     "var orbit_expected: List[Int] = [2, 4, 8]",
+                     "if separated(low, high, one_low, one_high, den):"):
         assert fragment in src
     assert "misiurewicz_prefix_graph_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
 
@@ -225,12 +310,12 @@ def test_malformed_and_out_of_range_inputs_are_refused():
     assert pg.extract([99], [], DEN13).rejected                   # seed out of range
     assert pg.extract([], [], DEN13).rejected                     # empty seed
     assert pg.extract(cat, [], pg.MAX_PREFIX_GRAPH_DENOMINATOR + 1).rejected
-    assert pg.extract_catalogue(4, 5).rejected                    # denominator 496
+    assert pg.extract_catalogue(4, 5, []).rejected                # denominator 496
 
 
 def test_counts_past_the_bound_are_refusals_not_passes():
     bounded = [(l, k) for l in range(1, 9) for k in range(1, 9)
-               if mc.catalogue_denominator(l, k) >= 0 and pg.extract_catalogue(l, k).rejected]
+               if mc.catalogue_denominator(l, k) >= 0 and pg.extract_catalogue(l, k, []).rejected]
     assert len(bounded) == 35
     assert all(mc.catalogue_denominator(l, k) > pg.MAX_PREFIX_GRAPH_DENOMINATOR for l, k in bounded)
 

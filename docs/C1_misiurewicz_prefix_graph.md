@@ -27,7 +27,11 @@ For an exact type `(l, k)` with denominator `den`, the graph is built in `Z/den`
 | sinks | the cycles of the nonproductive set |
 | dichotomy | each cycle is a boundary or an interior obstruction |
 
-Two points are separated by the prefix exactly when some two-ray separator puts them on opposite sides, which is the side-signature test of `docs/C1_separated_pair_density.md`.
+Two points are separated by the prefix exactly when some two-ray separator puts them on **open** sides that are opposite.
+
+A point equal to either ray of a separator is `OnSeparator`, not a side. `docs/C1_wake_membership_soundness.md` states the strict interval condition, that a probe equal to a separator boundary is a structural equality case and not a separation proof, and `docs/C1_side_assignment_witnesses.md` says only `Left` and `Right` may prove separation. So a pair one of whose points lies on the ray stays undecided by that separator. A half-open convention, which would put the two rays on opposite sides and report them as separated, manufactures evidence both documents forbid.
+
+One consequence is worth stating because it is easy to mistake for a bug: a separator whose two rays are adjacent has an empty open arc, so it decides nothing at all.
 
 Productivity is computed backwards from the separated pairs, exactly as the overlap route computes it backwards from its coincidences. **Forward closedness of the nonproductive set is then a lemma rather than a computation**: a nonproductive pair cannot have a productive successor, because a separation reached from the successor is reached from the pair one step earlier. Computing a forward closure instead would be wrong, since it would admit images that the prefix does separate.
 
@@ -52,17 +56,34 @@ The dichotomy is a property of the prefix, not of the cycle. Over the denominato
 
 No PF-critical or full-rank check appears here, for the same reason it appears nowhere in the overlap route: those are proved invariants of what the extractor returns, not filters the extractor applies.
 
-## The negative control
+## Where the prefix comes from
 
-With its full separator prefix, consecutive points of the forward closure, every exact type within the bound leaves nothing undecided and no obstruction. That is the executable negative control section N3 promises, and it is checked for all 29 types within the bound in both the Mojo smoke target and the Python reference.
+`docs/C1_admissible_separator_codes.md` requires both rays of a separator to be landed by accepted theorem tags and the pair to be declared co-landing, and it forbids a generic landing tag. Addresses alone cannot supply that evidence, so **nothing here builds a prefix out of addresses**. A separator arrives with a landing tag or it is refused, and the tag is the caller's declared hypothesis rather than a fact computed here. That is the division of labour the same document states: the finite core checks that a code has the correct finite shape and attaches theorem tags for the classical landing facts.
 
-It is a negative control and not a theorem: it says the finest prefix this catalogue supplies decides every pair on that class, which is what the imported tag `KnownTrivialFiberClass` would lead one to expect, and it is evidence of nothing about a class that tag does not cover.
+An earlier draft of this module generated a prefix by pairing consecutive points of the forward closure. That was wrong twice over. It invented co-landing evidence it had no basis for, and because every vertex became a cut, every vertex fell in its own arc, so the result restated the construction instead of testing anything. No sweep of that kind appears here or in the reference.
+
+`period_orbit` offers one honest source of rays: the periodic orbits of doubling. Those rays are periodic and the addresses of a Misiurewicz catalogue are strictly preperiodic, so such a prefix never contains a point it is asked to separate. The landing tag is still the caller's to declare.
+
+## What the extractor actually reports
+
+On the catalogue of exact type `(1, 3)` over the denominator `14`, under the declared period-three prefix of the rays `1/7, 2/7, 4/7`:
+
+| Quantity | Value |
+| --- | --- |
+| vertices | 12 |
+| undecided at the prefix | 37 |
+| nonproductive | 20 |
+| merging | 2 |
+| boundary obstructions | 2 |
+| interior obstructions | 0 |
+
+That prefix does not decide this class, and the module says so rather than reading as clean. This is a report about one declared prefix. It is not a negative control for the class, and nothing here is evidence about the imported tag `KnownTrivialFiberClass`.
 
 ## Bounds and fail-closed behaviour
 
 One constant governs the graph. Vertices live in `Z/den`, so `MAX_PREFIX_GRAPH_DENOMINATOR` caps the vertex count and the pair count together, and the Python reference carries the same constant so the two agree on every refusal. Of the 64 exact types with both indices at most eight, 29 are within the bound and 35 are past it.
 
-A denominator past the bound, a mismatched or malformed separator list, and an out-of-range point are refused before any graph is built. **A refusal is never an empty answer.** An empty obstruction set is a positive verdict about a complete graph, so `obstruction_free` requires acceptance, and a bounded search that failed never reads as a clean verdict. This is UW-2: a bounded failed search is not persistent evidence.
+A denominator past the bound, a mismatched or malformed separator list, an untagged or unknown landing tag, and an out-of-range point are all refused before any graph is built. **A refusal is never an empty answer.** An empty obstruction set is a positive verdict about a complete graph, so `obstruction_free` requires acceptance, and a bounded search that failed never reads as a clean verdict. This is UW-2: a bounded failed search is not persistent evidence.
 
 ## Non-claims
 
@@ -70,6 +91,7 @@ A denominator past the bound, a mismatched or malformed separator list, and an o
 
 - that C1 is proved, or that any fibre is trivial;
 - that an empty obstruction set at one prefix implies one at a finer prefix;
+- that any ray pair co-lands; every landing tag here is a declared hypothesis;
 - that a prefix obstruction locates a parameter or identifies a fibre;
 - that the extractor decides persistent non-separation, which quantifies over every prefix.
 

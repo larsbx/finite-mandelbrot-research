@@ -59,6 +59,22 @@ from misiurewicz_catalogue import catalogue, catalogue_denominator
 
 comptime MAX_PREFIX_GRAPH_DENOMINATOR = 256
 
+# A point is on an open side of a separator, or it is one of the two rays.
+comptime LEFT_SIDE = 0
+comptime RIGHT_SIDE = 1
+comptime ON_SEPARATOR = -1
+
+# docs/C1_admissible_separator_codes.md: LandingTag ::= RationalRayLanding
+# | ParabolicLanding | HyperbolicBoundaryLanding. A generic landing tag is
+# forbidden, so an untagged or unknown code is refused rather than assumed.
+comptime RATIONAL_RAY_LANDING = 1
+comptime PARABOLIC_LANDING = 2
+comptime HYPERBOLIC_BOUNDARY_LANDING = 3
+
+
+def accepted_landing_tag(tag: Int) -> Bool:
+    return tag == RATIONAL_RAY_LANDING or tag == PARABOLIC_LANDING or tag == HYPERBOLIC_BOUNDARY_LANDING
+
 
 struct PrefixExtraction(Copyable, Movable):
     """The result of one extraction. `boundary` and `interior` count sink cycles
@@ -136,21 +152,32 @@ def forward_closure(seed: List[Int], den: Int) -> List[Int]:
 
 
 def side(point: Int, low: Int, high: Int, den: Int) -> Int:
-    """Which side of the two-ray separator `(low, high)` a point falls on: `1` on
-    the arc running counterclockwise from the first ray to the second, `0` on the
-    complement. Exchanging the two rays names the complementary side."""
+    """`RIGHT_SIDE` on the arc running counterclockwise from the first ray to the
+    second, `LEFT_SIDE` on the complement, and `ON_SEPARATOR` when the point *is*
+    one of the two rays. Exchanging the rays names the complementary side and
+    leaves the two `ON_SEPARATOR` cases alone."""
+    if point == low or point == high:
+        return ON_SEPARATOR
     var offset = ((point - low) % den + den) % den
     var width = ((high - low) % den + den) % den
     if offset < width:
-        return 1
-    return 0
+        return RIGHT_SIDE
+    return LEFT_SIDE
 
 
 def separated(a: Int, b: Int, lows: List[Int], highs: List[Int], den: Int) -> Bool:
-    """Separated by the prefix exactly when some separator puts the two points on
-    opposite sides, that is when their side signatures differ."""
+    """Separated exactly when some separator puts both points on *open* sides and
+    those sides are opposite.
+
+    Differing labels are not enough. A point equal to either ray is a structural
+    equality case and never a separation proof, which is the strict interval
+    condition of docs/C1_wake_membership_soundness.md and the rule of
+    docs/C1_side_assignment_witnesses.md that only Left and Right may prove
+    separation. A pair one of whose points lies on the ray stays undecided."""
     for i in range(len(lows)):
-        if side(a, lows[i], highs[i], den) != side(b, lows[i], highs[i], den):
+        var first = side(a, lows[i], highs[i], den)
+        var second = side(b, lows[i], highs[i], den)
+        if first != ON_SEPARATOR and second != ON_SEPARATOR and first != second:
             return True
     return False
 
@@ -183,18 +210,21 @@ def _successor_code(code: Int, den: Int) -> Int:
 
 
 # Regime correspondence: misiurewicz-prefix-obstruction
-def extract(seed: List[Int], lows: List[Int], highs: List[Int], den: Int) -> PrefixExtraction:
-    """Run the pipeline on the forward closure of `seed` in `Z/den`. Fails closed
-    on a mismatched or malformed separator list, an out-of-range point, and a
-    denominator past the bound."""
+def extract(seed: List[Int], lows: List[Int], highs: List[Int], tags: List[Int], den: Int) -> PrefixExtraction:
+    """Run the pipeline on the forward closure of `seed` in `Z/den` under a
+    declared separator prefix. Fails closed on a mismatched or malformed
+    separator list, an untagged or unknown landing tag, an out-of-range point,
+    and a denominator past the bound."""
     if den <= 0 or den > MAX_PREFIX_GRAPH_DENOMINATOR or len(seed) == 0:
         return rejected_extraction()
-    if len(lows) != len(highs):
+    if len(lows) != len(highs) or len(lows) != len(tags):
         return rejected_extraction()
     for i in range(len(lows)):
         if lows[i] < 0 or highs[i] < 0 or lows[i] >= den or highs[i] >= den:
             return rejected_extraction()
         if lows[i] == highs[i]:
+            return rejected_extraction()
+        if not accepted_landing_tag(tags[i]):
             return rejected_extraction()
     var vertices = forward_closure(seed, den)
     if len(vertices) == 0:
@@ -290,45 +320,45 @@ def extract(seed: List[Int], lows: List[Int], highs: List[Int], den: Int) -> Pre
                             boundary, interior, False)
 
 
-def catalogue_separator_lows(preperiod: Int, period: Int) -> List[Int]:
-    """The full separator prefix of an exact type pairs consecutive points of the
-    forward closure; this is its list of first rays."""
-    var out = List[Int]()
-    var den = catalogue_denominator(preperiod, period)
-    if den < 0 or den > MAX_PREFIX_GRAPH_DENOMINATOR:
-        return out^
-    var vertices = forward_closure(catalogue(preperiod, period), den)
-    if len(vertices) < 2:
-        return out^
-    for i in range(len(vertices)):
-        out.append(vertices[i])
-    return out^
-
-
-def catalogue_separator_highs(preperiod: Int, period: Int) -> List[Int]:
-    """The matching list of second rays."""
-    var out = List[Int]()
-    var den = catalogue_denominator(preperiod, period)
-    if den < 0 or den > MAX_PREFIX_GRAPH_DENOMINATOR:
-        return out^
-    var vertices = forward_closure(catalogue(preperiod, period), den)
-    if len(vertices) < 2:
-        return out^
-    for i in range(len(vertices)):
-        out.append(vertices[(i + 1) % len(vertices)])
-    return out^
-
-
 # Regime correspondence: misiurewicz-prefix-obstruction
-def extract_catalogue(preperiod: Int, period: Int) -> PrefixExtraction:
-    """The extractor on an exact type with its full separator prefix: the
-    negative control this module exists to run."""
+def extract_catalogue(preperiod: Int, period: Int, lows: List[Int], highs: List[Int],
+                      tags: List[Int]) -> PrefixExtraction:
+    """The extractor on the catalogue of an exact type under a *declared* prefix.
+
+    There is deliberately no default prefix and no function that builds one from
+    the catalogue's addresses. Pairing consecutive points of the closure would
+    invent the co-landing evidence admissibility requires, and would also make
+    every vertex its own arc, so the result would restate the construction rather
+    than test anything."""
     var den = catalogue_denominator(preperiod, period)
     if den < 0 or den > MAX_PREFIX_GRAPH_DENOMINATOR:
         return rejected_extraction()
-    return extract(catalogue(preperiod, period),
-                   catalogue_separator_lows(preperiod, period),
-                   catalogue_separator_highs(preperiod, period), den)
+    return extract(catalogue(preperiod, period), lows, highs, tags, den)
+
+
+def period_orbit(period: Int, den: Int) -> List[Int]:
+    """The period-`period` orbit of doubling in `Z/den`, ascending, when the
+    denominator admits one. These rays are periodic, and the addresses of a
+    Misiurewicz catalogue are strictly preperiodic, so an orbit here never
+    contains a point the catalogue is asked to separate."""
+    var out = List[Int]()
+    if den <= 0 or period < 1 or period > 30:
+        return out^
+    var odd = (1 << period) - 1
+    if odd <= 0 or den % odd != 0:
+        return out^
+    var scale = den // odd
+    var present = List[Bool]()
+    for _ in range(den):
+        present.append(False)
+    var point = scale % den
+    for _ in range(period):
+        present[point] = True
+        point = (2 * point) % den
+    for value in range(den):
+        if present[value]:
+            out.append(value)
+    return out^
 
 
 # --- non-claims ---------------------------------------------------------------
@@ -355,28 +385,25 @@ def bounded_refusal_is_evidence_of_no_obstruction() -> Bool:
 
 
 def misiurewicz_prefix_graph_smoke() -> Bool:
-    # The negative control: with its full separator prefix, every exact type
-    # within the bound leaves nothing undecided and no obstruction.
-    var checked = 0
-    var bounded = 0
-    for l in range(1, 9):
-        for k in range(1, 9):
-            if catalogue_denominator(l, k) < 0:
-                continue
-            var found = extract_catalogue(l, k)
-            if not found.accepted():
-                bounded += 1
-                continue
-            if not found.obstruction_free():
-                return False
-            if found.undecided != 0 or found.cycles() != 0:
-                return False
-            checked += 1
-    if checked != 29 or bounded != 35:
-        return False
+    # A point on a ray is never separation evidence, at any denominator. This is
+    # the strict interval condition, checked exhaustively on small circles.
+    var dens: List[Int] = [4, 6, 14, 24]
+    for d in range(len(dens)):
+        var den = dens[d]
+        for low in range(den):
+            for high in range(den):
+                if low == high:
+                    continue
+                if side(low, low, high, den) != ON_SEPARATOR:
+                    return False
+                if side(high, low, high, den) != ON_SEPARATOR:
+                    return False
+                var one_low: List[Int] = [low]
+                var one_high: List[Int] = [high]
+                if separated(low, high, one_low, one_high, den):
+                    return False
 
-    # The forward closure of the catalogue of type (1, 3) over the denominator
-    # 14, and the exact-type structure it rests on.
+    # The forward closure of the catalogue of type (1, 3) over the denominator 14.
     var closure = forward_closure(catalogue(1, 3), 14)
     var expected: List[Int] = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]
     if len(closure) != len(expected):
@@ -385,65 +412,72 @@ def misiurewicz_prefix_graph_smoke() -> Bool:
         if closure[i] != expected[i]:
             return False
 
-    # A single separator leaves a genuine obstruction. The interior cycle is the
-    # period-three orbit 3/7 -> 6/7 -> 5/7, that is 6, 12, 10 over 14: three
-    # periodic points this prefix never separates and never touches.
-    var one_low: List[Int] = [2]
-    var one_high: List[Int] = [3]
-    var thin = extract(catalogue(1, 3), one_low, one_high, 14)
-    if not thin.accepted():
+    # A declared period-three prefix: the rays 2/14, 4/14, 8/14, which are the
+    # periodic addresses 1/7, 2/7, 4/7. They are periodic and the catalogue is
+    # strictly preperiodic, so the prefix is not built from the points it is
+    # asked to separate.
+    var orbit = period_orbit(3, 14)
+    var orbit_expected: List[Int] = [2, 4, 8]
+    if len(orbit) != 3:
         return False
-    if thin.vertices != 12 or thin.undecided != 55 or thin.nonproductive != 17:
+    for i in range(3):
+        if orbit[i] != orbit_expected[i]:
+            return False
+    var cat = catalogue(1, 3)
+    for i in range(len(orbit)):
+        for j in range(len(cat)):
+            if orbit[i] == cat[j]:
+                return False
+
+    var lows: List[Int] = [2, 4, 8]
+    var highs: List[Int] = [4, 8, 2]
+    var tags: List[Int] = [RATIONAL_RAY_LANDING, RATIONAL_RAY_LANDING, RATIONAL_RAY_LANDING]
+    var found = extract_catalogue(1, 3, lows, highs, tags)
+    if not found.accepted():
         return False
-    if thin.merging != 5 or thin.boundary != 0 or thin.interior != 1:
+    if found.vertices != 12 or found.undecided != 37 or found.nonproductive != 20:
         return False
-    if thin.obstruction_free():
+    if found.merging != 2 or found.boundary != 2 or found.interior != 0:
+        return False
+    # This prefix does not decide the class, and must not read as if it did.
+    if found.obstruction_free():
         return False
 
-    # The dichotomy is a property of the prefix, not of the cycle. Adding the
-    # separator (5, 6) makes 6 an endpoint, and the same cycle becomes a
-    # boundary obstruction.
-    var interior_lows: List[Int] = [1, 2, 3]
-    var interior_highs: List[Int] = [2, 3, 4]
-    var interior_case = extract(catalogue(1, 3), interior_lows, interior_highs, 14)
-    var boundary_lows: List[Int] = [1, 2, 5]
-    var boundary_highs: List[Int] = [2, 3, 6]
-    var boundary_case = extract(catalogue(1, 3), boundary_lows, boundary_highs, 14)
-    if interior_case.interior != 1 or interior_case.boundary != 0:
+    # Fail closed. Each of these is a refusal, never an empty obstruction set.
+    var empty = List[Int]()
+    var pair_low: List[Int] = [2]
+    var pair_high: List[Int] = [3]
+    var untagged: List[Int] = [0]
+    var unknown_tag: List[Int] = [99]
+    var good_tag: List[Int] = [RATIONAL_RAY_LANDING]
+    var same_ray: List[Int] = [3]
+    var out_of_range: List[Int] = [14]
+    if extract(cat, pair_low, pair_high, untagged, 14).accepted():
         return False
-    if boundary_case.boundary != 1 or boundary_case.interior != 0:
+    if extract(cat, pair_low, pair_high, unknown_tag, 14).accepted():
         return False
-    if interior_case.nonproductive != boundary_case.nonproductive:
+    if extract(cat, same_ray, same_ray, good_tag, 14).accepted():
         return False
-
-    # A nonproductive set can be entirely transient and merging, with no sink at
-    # all. Type (2, 1) over the denominator 4 with no separator has six
-    # nonproductive pairs, two of them merging, and no cycle; obstruction_free
-    # must still be false, which is why it tests the whole set.
-    var no_lows = List[Int]()
-    var no_highs = List[Int]()
-    var bare = extract(catalogue(2, 1), no_lows, no_highs, 4)
-    if not bare.accepted() or bare.nonproductive != 6 or bare.merging != 2:
+    if extract(cat, pair_low, out_of_range, good_tag, 14).accepted():
         return False
-    if bare.cycles() != 0 or bare.obstruction_free():
+    if extract(cat, pair_low, pair_high, empty, 14).accepted():
         return False
-
-    # Fail closed, and a refusal is never an empty answer.
-    var bad_sep_low: List[Int] = [3]
-    var bad_sep_high: List[Int] = [3]
-    var mismatched: List[Int] = [1, 2]
-    var one: List[Int] = [1]
-    if extract(catalogue(1, 3), bad_sep_low, bad_sep_high, 14).accepted():
+    if extract(cat, empty, empty, empty, 0).accepted():
         return False
-    if extract(catalogue(1, 3), mismatched, one, 14).accepted():
+    if extract(cat, empty, empty, empty, MAX_PREFIX_GRAPH_DENOMINATOR + 1).accepted():
         return False
-    if extract(one, no_lows, no_highs, 0).accepted():
-        return False
-    if extract(one, no_lows, no_highs, MAX_PREFIX_GRAPH_DENOMINATOR + 1).accepted():
-        return False
-    if extract_catalogue(4, 5).accepted():
+    if extract_catalogue(4, 5, empty, empty, empty).accepted():
         return False
     if rejected_extraction().obstruction_free():
+        return False
+
+    # A tagged separator is accepted; an untagged one is not, and the tag is the
+    # caller's declared hypothesis rather than anything computed here.
+    if not accepted_landing_tag(RATIONAL_RAY_LANDING):
+        return False
+    if not accepted_landing_tag(PARABOLIC_LANDING) or not accepted_landing_tag(HYPERBOLIC_BOUNDARY_LANDING):
+        return False
+    if accepted_landing_tag(0) or accepted_landing_tag(99) or accepted_landing_tag(-1):
         return False
 
     return (
