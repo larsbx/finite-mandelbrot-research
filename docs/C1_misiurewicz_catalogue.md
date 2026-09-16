@@ -10,7 +10,7 @@ Genealogy: Misiurewicz parameters and their exact preperiod and period are stand
 
 Bridge claim: definition-only project term. The catalogue holds ray addresses, which are finite symbolic objects, not parameters and not points. Associating a parameter with an address needs a landing tag and an adapter; triviality of the corresponding fibres is the imported tag `KnownTrivialFiberClass` under its own hypotheses.
 
-Known leaks: A catalogue is finite by construction and bounded by `MAX_CATALOGUE_DENOMINATOR`; it is not a statement about all types, and an exhausted small type says nothing about a larger one. The counting identity is exact arithmetic, not evidence about the parameter plane.
+Known leaks: A catalogue is finite by construction and bounded by `MAX_CATALOGUE_DENOMINATOR`, a bound strictly stronger than the one `exact_type` enforces, so an accepted exact type may have no catalogue here; it is not a statement about all types, and an exhausted small type says nothing about a larger one. The counting identity is exact arithmetic, not evidence about the parameter plane.
 
 Use discipline: Use in C1 files or with a pointer to this declaration, and only for sets of addresses. A catalogue does not locate a parameter, decide a fibre, or settle C1, and must not be written as if it did.
 
@@ -49,7 +49,18 @@ Pinned catalogues, asserted identically on both sides:
 
 ## Bounds and fail-closed behaviour
 
-Types are refused beyond `MAX_TYPE_INDEX` and denominators beyond `MAX_CATALOGUE_DENOMINATOR`, before any arithmetic, so no computation here can overflow its fixed-width integers; `catalogue_denominator` returns `-1` and `catalogue` the empty list. A bound reached is a refusal, never an answer.
+Every bound is checked before any arithmetic, so no computation here can overflow its fixed-width integers, and a bound reached is a refusal, never an answer: `catalogue_denominator` returns `-1` and `catalogue` the empty list.
+
+The two bounds govern different things, and conflating them is the trap this section exists to close. `exact_type` reads a type off any address whose denominator is at most `MAX_CATALOGUE_DENOMINATOR`, and refuses every other address; its loop is bounded by that denominator. A catalogue of type `(l, k)` needs more: both indices at most `MAX_TYPE_INDEX`, *and* its own denominator `2^l (2^k - 1)` within the same bound, which is far more restrictive.
+
+So an accepted type need not be one this module holds a catalogue of, and each bound has a witness well inside the denominator limit:
+
+| Address | Exact type | Why no catalogue |
+| --- | --- | --- |
+| `1/58` | `(1, 28)` | the period exceeds `MAX_TYPE_INDEX` |
+| `1/50` | `(1, 20)` | both indices are inside the index bound, but `2 (2^20 - 1)` exceeds `MAX_CATALOGUE_DENOMINATOR` |
+
+`catalogueable_type(l, k)` answers the catalogue question directly. Read catalogueability off it, never off `exact_type` accepting an address.
 
 ## Non-claims
 

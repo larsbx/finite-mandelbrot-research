@@ -28,7 +28,9 @@ REGRESSION = 7
 
 
 def exact_type(num: int, den: int) -> tuple[int, int] | None:
-    """`(preperiod, period)`, or None for an address outside `[0, 1)` or beyond the bound."""
+    """`(preperiod, period)`, or None for an address outside `[0, 1)` or beyond the
+    denominator bound.  An accepted type is a true fact about the address, not a
+    promise that a catalogue of that type exists here: see `catalogueable_type`."""
     if den <= 0 or num < 0 or num >= den or den > MAX_CATALOGUE_DENOMINATOR:
         return None
     reduced = den // gcd(num, den)
@@ -43,6 +45,14 @@ def exact_type(num: int, den: int) -> tuple[int, int] | None:
         power = (power * 2) % reduced
         period += 1
     return (preperiod, period)
+
+
+def catalogueable_type(preperiod: int, period: int) -> bool:
+    """Whether a catalogue of exact type `(l, k)` exists here.  Strictly stronger
+    than `exact_type` accepting an address of that type: `1/58` is of type
+    `(1, 28)`, past the index bound, and `1/50` is of type `(1, 20)`, whose
+    indices are inside it while `2 (2^20 - 1)` is past the denominator bound."""
+    return catalogue_denominator(preperiod, period) > 0
 
 
 def misiurewicz(num: int, den: int) -> bool:

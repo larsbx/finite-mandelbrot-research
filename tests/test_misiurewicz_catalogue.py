@@ -66,7 +66,6 @@ def test_exact_type_is_read_off_the_reduced_denominator():
 def test_the_type_agrees_with_iterating_the_doubling_map():
     for den in range(1, 120):
         for num in range(den):
-            expected = mc.exact_type(num, den)
             # Doubling is well defined on Z/den, and two states are the same
             # angle exactly when their numerators agree, so the first repeat
             # gives the preperiod and the period directly.
@@ -75,7 +74,25 @@ def test_the_type_agrees_with_iterating_the_doubling_map():
             while point not in seen:
                 seen[point] = step
                 point, step = (2 * point) % den, step + 1
-            assert expected == (seen[point], step - seen[point]), (num, den)
+            assert mc.exact_type(num, den) == (seen[point], step - seen[point]), (num, den)
+
+
+def test_an_accepted_type_is_not_a_promise_that_a_catalogue_holds_it():
+    # The two bounds govern different things, and catalogueability is the
+    # strictly stronger one. Both ways of failing it have a witness inside the
+    # denominator bound, so acceptance must never be read as catalogueability.
+    assert mc.exact_type(1, 58) == (1, 28) and not mc.catalogueable_type(1, 28)  # past the index bound
+    assert mc.exact_type(1, 50) == (1, 20) and not mc.catalogueable_type(1, 20)  # past the denominator bound
+    assert mc.catalogueable_type(1, 3) and mc.catalogue_denominator(1, 3) == 14
+    # Wherever a catalogue does exist, every address it lists is accepted with
+    # exactly that type: the reader and the enumeration agree on their overlap.
+    for preperiod in range(1, 5):
+        for period in range(1, 5):
+            if not mc.catalogueable_type(preperiod, period):
+                continue
+            den = mc.catalogue_denominator(preperiod, period)
+            for num in mc.catalogue(preperiod, period):
+                assert mc.exact_type(num, den) == (preperiod, period), (num, den)
 
 
 def test_out_of_range_addresses_are_refused():
@@ -122,6 +139,8 @@ def test_types_and_denominators_beyond_the_bounds_are_refused():
 def test_mojo_smoke_pins_the_same_instances():
     src = text(SRC)
     for fragment in ("var one_three: List[Int] = [1, 3, 5, 9, 11, 13]", "catalogue_denominator(1, 3) != 14",
-                     "catalogue_count(2, 3) != 12", "catalogue_count(3, 3) != 24", "catalogue_matches_count(l, k)"):
+                     "catalogue_count(2, 3) != 12", "catalogue_count(3, 3) != 24", "catalogue_matches_count(l, k)",
+                     "var past_index = exact_type(1, 58)", "var past_denominator = exact_type(1, 50)",
+                     "if catalogueable_type(1, 28) or catalogueable_type(1, 20) or not catalogueable_type(1, 3):"):
         assert fragment in src
     assert "misiurewicz_catalogue_smoke" in text(ROOT / "src" / "smoke_tests.mojo")

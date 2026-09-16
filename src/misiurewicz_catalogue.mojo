@@ -20,10 +20,19 @@
 # the divisors of `2^k - 1`. `catalogue_matches_count` checks the identity
 # against the enumeration, which is the round-one angle-count regression.
 #
-# All arithmetic is fixed-width integer arithmetic bounded before use: types
-# beyond `MAX_TYPE_INDEX` and denominators beyond `MAX_CATALOGUE_DENOMINATOR`
-# are refused rather than computed, so nothing here can overflow. No floating
-# point and no measured angle appears; these are finite symbolic addresses.
+# All arithmetic is fixed-width integer arithmetic bounded before use, and the
+# two bounds govern different things. `exact_type` reads a type off any
+# address whose denominator is at most `MAX_CATALOGUE_DENOMINATOR` and refuses
+# every other address; its loop is bounded by that denominator. A catalogue of
+# type `(l, k)` additionally needs both indices at most `MAX_TYPE_INDEX` and
+# needs its own denominator `2^l (2^k - 1)` to stay within the same bound,
+# which is far more restrictive. So an accepted type need not be one this
+# module holds a catalogue of: `1/58` is of type `(1, 28)`, whose period is
+# past the index bound, and `1/50` is of type `(1, 20)`, whose indices are both
+# inside it while `2 (2^20 - 1)` is past the denominator bound. Ask
+# `catalogueable_type` rather than reading catalogueability off acceptance.
+# Nothing here can overflow. No floating point and no measured angle appears;
+# these are finite symbolic addresses.
 #
 # Scope: the catalogue is a finite set of addresses. It is not a set of
 # parameters, it locates nothing in the plane, and the triviality of the
@@ -65,7 +74,9 @@ def rejected_type() -> MisiurewiczType:
 def exact_type(num: Int, den: Int) -> MisiurewiczType:
     """Exact preperiod and period of `num/den` under doubling modulo one.
     Refuses an address outside `[0, 1)`, a non-positive denominator, and a
-    denominator beyond the catalogue bound."""
+    denominator beyond the catalogue bound. An accepted type is a true fact
+    about the address; it is not a promise that this module holds a catalogue
+    of that type, which is `catalogueable_type`."""
     if den <= 0 or num < 0 or num >= den or den > MAX_CATALOGUE_DENOMINATOR:
         return rejected_type()
     var divisor = gcd_int(num, den)
@@ -120,6 +131,13 @@ def catalogue_denominator(preperiod: Int, period: Int) -> Int:
     if odd_part > MAX_CATALOGUE_DENOMINATOR // scale:
         return -1
     return scale * odd_part
+
+
+def catalogueable_type(preperiod: Int, period: Int) -> Bool:
+    """Whether this module holds a catalogue of exact type `(l, k)`: strictly
+    stronger than `exact_type` accepting an address of that type, because the
+    catalogue denominator must also stay within the bound."""
+    return catalogue_denominator(preperiod, period) > 0
 
 
 # Regime correspondence: misiurewicz-exact-type
@@ -229,6 +247,17 @@ def misiurewicz_catalogue_smoke() -> Bool:
         return False
     # Fail closed: out-of-range addresses, types, and denominators.
     if exact_type(1, 0).accepted() or exact_type(5, 3).accepted() or exact_type(-1, 4).accepted():
+        return False
+    # An accepted type need not be catalogueable, by either bound: 1/58 is of
+    # type (1, 28), past the index bound, and 1/50 is of type (1, 20), whose
+    # indices are inside it while its catalogue denominator is not.
+    var past_index = exact_type(1, 58)
+    var past_denominator = exact_type(1, 50)
+    if not (past_index.accepted() and past_index.preperiod == 1 and past_index.period == 28):
+        return False
+    if not (past_denominator.accepted() and past_denominator.preperiod == 1 and past_denominator.period == 20):
+        return False
+    if catalogueable_type(1, 28) or catalogueable_type(1, 20) or not catalogueable_type(1, 3):
         return False
     if catalogue_denominator(0, 2) >= 0 or catalogue_denominator(1, 0) >= 0:
         return False
