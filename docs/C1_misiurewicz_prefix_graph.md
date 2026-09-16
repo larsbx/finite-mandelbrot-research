@@ -24,8 +24,8 @@ For an exact type `(l, k)` with denominator `den`, the graph is built in `Z/den`
 | pairs | the unordered non-diagonal pairs of vertices |
 | productive | separated by the prefix now, or with a productive successor |
 | nonproductive | the rest: the pairs no iterate ever separates |
-| sinks | the cycles of the nonproductive set |
-| dichotomy | each cycle is a boundary or an interior obstruction |
+| sinks | the sink components of the nonproductive set, of two kinds |
+| dichotomy | each *cyclic* sink is a boundary or an interior obstruction |
 
 Two points are separated by the prefix exactly when some two-ray separator puts them on **open** sides that are opposite.
 
@@ -35,13 +35,17 @@ One consequence is worth stating because it is easy to mistake for a bug: a sepa
 
 Productivity is computed backwards from the separated pairs, exactly as the overlap route computes it backwards from its coincidences. **Forward closedness of the nonproductive set is then a lemma rather than a computation**: a nonproductive pair cannot have a productive successor, because a separation reached from the successor is reached from the pair one step earlier. Computing a forward closure instead would be wrong, since it would admit images that the prefix does separate.
 
-Doubling is a function, so the pair graph has out-degree at most one and every component falls into exactly one cycle. The sink components are therefore the cycles, and no strongly-connected-component search is needed. This is the one place the mirror is simpler than the overlap route, whose graph branches and which runs an iterative Tarjan pass.
+Doubling is a function, so the pair graph has out-degree at most one and every component either falls into one cycle or ends at a merging pair. No strongly-connected-component search is needed, which is the one place the mirror is simpler than the overlap route, whose graph branches and which runs an iterative Tarjan pass.
 
 ## Merging pairs
 
 Two points with the same image, that is differing by `den / 2`, give a pair with no successor. Such a pair is never separated, so it is nonproductive. Counting it productive would be the substantive error available here: those two addresses are precisely the ones doubling can never tell apart, so they are an obstruction and not a discharge.
 
-Merging pairs are transient and never sinks, and they are counted separately. They are also why the obstruction-free test is the whole nonproductive set rather than its sinks: over the denominator `4`, the type `(2, 1)` with no separator at all has six nonproductive pairs, two of them merging, and no cycle whatsoever.
+A merging pair has no outgoing edge, so its component is a singleton nothing leaves: it is a **terminal sink**, not a transient vertex. The nonproductive set therefore has sinks of two kinds, and `merging` counts the terminal ones exactly, `sink_components` the total.
+
+Terminal sinks are deliberately kept out of the boundary and interior counts. That dichotomy asks whether a *cycle* meets a separator boundary, and a terminal pair has no cycle to ask about; putting it in either bucket would report a third phenomenon, two addresses with a common image, as one of the two the overlap route named.
+
+They are also why the obstruction-free test is the whole nonproductive set rather than its cyclic sinks: over the denominator `4`, the type `(2, 1)` with no separator at all has six nonproductive pairs, two of them terminal sinks, and no cycle whatsoever.
 
 ## The dichotomy
 

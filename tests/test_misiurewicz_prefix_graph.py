@@ -246,6 +246,23 @@ def test_a_nonproductive_set_can_be_entirely_transient():
     assert not bare.obstruction_free
 
 
+def test_the_nonproductive_set_has_sinks_of_two_kinds():
+    # A merging pair has no outgoing edge, so its component is a singleton
+    # nothing leaves: a terminal sink, not a transient vertex. Terminal sinks
+    # and cyclic sinks are disjoint, and `merging` counts the terminal ones.
+    for preperiod, period, prefix in ((2, 1, []), (1, 3, []), (2, 2, []),
+                                      (1, 3, PERIOD_THREE)):
+        den = mc.catalogue_denominator(preperiod, period)
+        vertices = pg.forward_closure(mc.catalogue(preperiod, period), den)
+        bad = pg.nonproductive(vertices, prefix, den)
+        terminal = {p for p in bad if pg.successor(p, den) is None}
+        on_cycle = {p for c in pg.sink_cycles(bad, den) for p in c}
+        assert not (terminal & on_cycle)
+        found = pg.extract(mc.catalogue(preperiod, period), prefix, den)
+        assert found.terminal_sinks == len(terminal)
+        assert found.sink_components == len(found.cycles) + len(terminal)
+
+
 def test_multiple_sinks_are_all_retained():
     # The case the overlap route's Python oracle covers and its Mojo suite does
     # not: several disjoint cycles must each be reported.
@@ -289,7 +306,8 @@ def test_the_smoke_target_pins_the_same_instances():
                      "if found.merging != 2 or found.boundary != 2 or found.interior != 0:",
                      "var expected: List[Int] = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]",
                      "var orbit_expected: List[Int] = [2, 4, 8]",
-                     "if separated(low, high, one_low, one_high, den):"):
+                     "if separated(low, high, one_low, one_high, den):",
+                     "if bare.cycles() != 0 or bare.terminal_sinks() != 2 or bare.sink_components() != 2:"):
         assert fragment in src
     assert "misiurewicz_prefix_graph_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
 

@@ -13,8 +13,8 @@
 #   pairs         the unordered non-diagonal pairs of vertices
 #   productive    separated by the prefix now, or with a productive successor
 #   nonproductive the rest: the pairs no iterate ever separates
-#   sinks         the cycles of the nonproductive set
-#   dichotomy     each cycle is a boundary or an interior obstruction
+#   sinks         the sink components of the nonproductive set, of two kinds
+#   dichotomy     each *cyclic* sink is a boundary or an interior obstruction
 #
 # Productivity is computed backwards from the separated pairs, exactly as the
 # overlap route computes it backwards from the coincidences. Forward closedness
@@ -30,7 +30,16 @@
 # A merging pair, whose two points share an image, has no successor and is never
 # separated, so it is nonproductive. Counting it productive would be the
 # substantive error: those two addresses are precisely the ones doubling can
-# never tell apart. They are transient, never sinks, and are counted separately.
+# never tell apart.
+#
+# A merging pair has no outgoing edge, so its component is a singleton nothing
+# leaves: it is a **terminal sink**, not a transient vertex. The nonproductive
+# set therefore has sinks of two kinds, and `merging` counts the terminal ones
+# exactly. They are kept out of the boundary and interior counts on purpose,
+# because that dichotomy asks whether a *cycle* meets a separator boundary and a
+# terminal pair has no cycle to ask about. Forcing it into either bucket would
+# report a third phenomenon, two addresses with a common image, as one of the
+# two the overlap route named.
 #
 # The dichotomy transfers term by term from the overlap route. A cycle is a
 # boundary obstruction when some point on it is a separator endpoint, so the
@@ -77,9 +86,14 @@ def accepted_landing_tag(tag: Int) -> Bool:
 
 
 struct PrefixExtraction(Copyable, Movable):
-    """The result of one extraction. `boundary` and `interior` count sink cycles
-    by the dichotomy; `merging` counts the nonproductive pairs whose two points
-    share an image. A rejected extraction carries no counts."""
+    """The result of one extraction.
+
+    The nonproductive set has sink components of two kinds. `boundary` and
+    `interior` count the cyclic sinks, split by the dichotomy. `merging` counts
+    the terminal sinks, the pairs whose two points share an image and which
+    therefore have no outgoing edge. `sink_components` is the total.
+
+    A rejected extraction carries no counts."""
 
     var vertices: Int
     var undecided: Int
@@ -103,7 +117,17 @@ struct PrefixExtraction(Copyable, Movable):
         return not self.rejected
 
     def cycles(self) -> Int:
+        """The cyclic sinks, the ones the dichotomy classifies."""
         return self.boundary + self.interior
+
+    def terminal_sinks(self) -> Int:
+        """The sinks with no outgoing edge. A merging pair is exactly such a
+        component, so this is `merging`, named for what it is in the graph."""
+        return self.merging
+
+    def sink_components(self) -> Int:
+        """Every sink component of the nonproductive set, of both kinds."""
+        return self.cycles() + self.terminal_sinks()
 
     def obstruction_free(self) -> Bool:
         """No pair survives doubling undecided. Only an accepted extraction can
@@ -443,8 +467,28 @@ def misiurewicz_prefix_graph_smoke() -> Bool:
     if found.obstruction_free():
         return False
 
-    # Fail closed. Each of these is a refusal, never an empty obstruction set.
+    # The nonproductive set has sinks of two kinds, and `merging` counts the
+    # terminal ones exactly.
+    if found.terminal_sinks() != found.merging:
+        return False
+    if found.sink_components() != found.cycles() + found.merging:
+        return False
+
     var empty = List[Int]()
+
+    # Type (2, 1) over the denominator 4 with no separator: six nonproductive
+    # pairs, two of them terminal sinks, and no cycle at all. obstruction_free
+    # must still be false, which is why it tests the whole nonproductive set
+    # rather than only the cyclic sinks.
+    var bare = extract(catalogue(2, 1), empty, empty, empty, 4)
+    if not bare.accepted() or bare.nonproductive != 6 or bare.merging != 2:
+        return False
+    if bare.cycles() != 0 or bare.terminal_sinks() != 2 or bare.sink_components() != 2:
+        return False
+    if bare.obstruction_free():
+        return False
+
+    # Fail closed. Each of these is a refusal, never an empty obstruction set.
     var pair_low: List[Int] = [2]
     var pair_high: List[Int] = [3]
     var untagged: List[Int] = [0]

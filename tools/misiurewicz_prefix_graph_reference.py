@@ -11,8 +11,8 @@ abstractly in `docs/C1_F1_obstruction_extraction.md`:
     vertices   forward orbit closure of a catalogue under doubling
     pairs      the unordered non-diagonal pairs of vertices
     nonprod    the pairs no iterate of doubling ever separates
-    sinks      the cycles of the nonproductive set, its sink components
-    dichotomy  each cycle is a boundary or an interior obstruction
+    sinks      the sink components of the nonproductive set, of two kinds
+    dichotomy  each *cyclic* sink is a boundary or an interior obstruction
 
 A separator is a pair of distinct rays *with a landing tag*. Admissibility
 (`docs/C1_admissible_separator_codes.md`) requires both rays to be landed by
@@ -27,8 +27,11 @@ both forbid using that case as separation evidence, so it can never discharge a
 pair.
 
 Doubling is a function, so the pair graph has out-degree at most one and each
-component falls into exactly one cycle: the sink components are the cycles, and
-no strongly-connected-component search is needed.
+component either falls into one cycle or ends at a merging pair; no
+strongly-connected-component search is needed. A merging pair has no outgoing
+edge, so it is a terminal sink rather than a transient vertex, and it is counted
+by `merging` instead of being forced into the boundary/interior dichotomy, which
+asks whether a cycle meets a separator boundary.
 
 `main` replays the pinned declared prefixes and the refusal battery.
 Usage: misiurewicz_prefix_graph_reference.py
@@ -103,10 +106,9 @@ def separated(a: int, b: int, separators: list[tuple[int, int, int]], den: int) 
 
 
 def successor(pair: tuple[int, int], den: int) -> tuple[int, int] | None:
-    """The image of an unordered pair under doubling, or None when the two
-    points share an image. A collapsing pair leaves the graph: it has no
-    successor, so it cannot witness persistent non-separation here, and the
-    finite fact that decides it is `b - a == den / 2`."""
+    """The image of an unordered pair under doubling, or None when the two points
+    share an image. Such a pair has no outgoing edge, so it is a terminal sink of
+    the graph; the finite fact that decides it is `b - a == den / 2`."""
     a, b = (2 * pair[0]) % den, (2 * pair[1]) % den
     return None if a == b else (min(a, b), max(a, b))
 
@@ -145,11 +147,11 @@ def nonproductive(vertices: list[int], separators: list[tuple[int, int]], den: i
 
 
 def sink_cycles(invariant: set[tuple[int, int]], den: int) -> list[tuple[tuple[int, int], ...]]:
-    """The sink components of the nonproductive set. Doubling is a function, so
-    the pair graph has out-degree at most one and each component falls into
-    exactly one cycle; the cycles are therefore the sink components and no
-    strongly-connected-component search is needed. A merging pair has no
-    successor, so it is a transient nonproductive pair, never a sink.
+    """The *cyclic* sink components of the nonproductive set. Doubling is a
+    function, so the pair graph has out-degree at most one and each component
+    either falls into one cycle or ends at a merging pair; no
+    strongly-connected-component search is needed. A merging pair is a terminal
+    sink, counted by `merging`, since it has no cycle for the dichotomy.
 
     Each cycle is rotated to start at its least pair and the list is sorted, so
     the answer does not depend on traversal order."""
@@ -212,6 +214,16 @@ class Extraction:
     @property
     def accepted(self) -> bool:
         return not self.rejected
+
+    @property
+    def terminal_sinks(self) -> int:
+        """Sinks with no outgoing edge: exactly the merging pairs."""
+        return self.merging
+
+    @property
+    def sink_components(self) -> int:
+        """Every sink component, cyclic and terminal."""
+        return len(self.cycles) + self.terminal_sinks
 
     @property
     def obstruction_free(self) -> bool:
