@@ -42,6 +42,10 @@ jobs:
 
           root = Path('.')
           skip_parts = {'.git', '.pixi', '__pycache__'}
+          vendored_prefixes = (
+              Path('src/finite_exact'),
+              Path('tools/claim_governance'),
+          )
           replacements = (
               ('larsbx/NLAP-JT', 'larsbx/finite-mandlebrot-research'),
               ('NLAP-JT', 'finite-mandlebrot-research'),
@@ -49,12 +53,18 @@ jobs:
           )
           text_suffixes = {
               '.md', '.toml', '.py', '.mojo', '.yml', '.yaml', '.tex', '.bib',
-              '.txt', '.json', '.ini', '.cfg', '.lock', '.gitignore', '.gitattributes'
+              '.txt', '.json', '.ini', '.cfg', '.lock'
           }
-          exact_names = {'README.md', 'ROADMAP.md', 'pixi.toml', 'pixi.lock', 'backend.toml', 'vendored.toml', 'claim_governance.toml', '.gitignore', '.gitattributes'}
+          exact_names = {
+              'README.md', 'ROADMAP.md', 'pixi.toml', 'pixi.lock', 'backend.toml',
+              'vendored.toml', 'claim_governance.toml', '.gitignore', '.gitattributes'
+          }
+
+          def is_vendored(path: Path) -> bool:
+              return any(path == prefix or prefix in path.parents for prefix in vendored_prefixes)
 
           for path in root.rglob('*'):
-              if not path.is_file() or any(part in skip_parts for part in path.parts):
+              if not path.is_file() or any(part in skip_parts for part in path.parts) or is_vendored(path):
                   continue
               if path.name not in exact_names and path.suffix not in text_suffixes:
                   continue
@@ -73,14 +83,23 @@ jobs:
           if old_bridge.exists() and not new_bridge.exists():
               old_bridge.rename(new_bridge)
 
-          Path('MIGRATION.md').write_text('''# Repository migration provenance\n\nThis repository was initialized as the dedicated home for the finite-regime Mandelbrot research program.\n\nThe migration imports the complete Git history of `larsbx/NLAP-JT` through source commit `d00c64d4ec703564a2d8ceb606279d2025f2352a` and joins that history to the initial commit of `larsbx/finite-mandlebrot-research` with an unrelated-history merge. The source commit is therefore a direct ancestor of the migration branch rather than an untraceable file copy.\n\nAfter the history import, current-tree repository identity is migrated to `larsbx/finite-mandlebrot-research`. Mathematical claims and proof status are unchanged by the repository move. In particular, the exact rational/interval arithmetic boundary, no-transcendental-trigonometry policy, no-circle/rank-2 rule, no-ideal-point rule, Mojo-first theorem-kernel policy, theorem-tag imports, and C1 open-frontier status remain binding.\n\nThe original `larsbx/NLAP-JT` name is retained only here as provenance for the imported history.\n''', encoding='utf-8')
+          Path('MIGRATION.md').write_text('''# Repository migration provenance\n\nThis repository was initialized as the dedicated home for the finite-regime Mandelbrot research program.\n\nThe migration imports the complete Git history of `larsbx/NLAP-JT` through source commit `d00c64d4ec703564a2d8ceb606279d2025f2352a` and joins that history to the initial commit of `larsbx/finite-mandlebrot-research` with an unrelated-history merge. The source commit is therefore a direct ancestor of the migration branch rather than an untraceable file copy.\n\nAfter the history import, consumer-owned current-tree repository identity is migrated to `larsbx/finite-mandlebrot-research`. Mathematical claims and proof status are unchanged by the repository move. In particular, the exact rational/interval arithmetic boundary, no-transcendental-trigonometry policy, no-circle/rank-2 rule, no-ideal-point rule, Mojo-first theorem-kernel policy, theorem-tag imports, and C1 open-frontier status remain binding.\n\nVendored code under `src/finite_exact/` and `tools/claim_governance/` is intentionally byte-for-byte preserved so that the SHA-256 pins in `vendored.toml` remain valid. A vendored upstream comment may therefore retain the former consumer name until the upstream `finite-math-kernels` package is revised and re-pinned.\n\nThe original `larsbx/NLAP-JT` name is otherwise retained only here as provenance for the imported history.\n''', encoding='utf-8')
+
+          offenders = []
+          for path in root.rglob('*'):
+              if not path.is_file() or path == Path('MIGRATION.md') or is_vendored(path) or '.git' in path.parts:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              if 'NLAP-JT' in text:
+                  offenders.append(str(path))
+          if offenders:
+              raise SystemExit('legacy repository identity remains in consumer-owned files: ' + ', '.join(offenders))
           PY
 
-          # The legacy repository name may remain only in the provenance file.
-          if git grep -n 'NLAP-JT' -- ':!MIGRATION.md'; then
-            echo 'legacy repository identity remains outside MIGRATION.md' >&2
-            exit 1
-          fi
+          git diff --exit-code HEAD -- src/finite_exact tools/claim_governance vendored.toml
 
       - name: Set up Pixi
         uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
