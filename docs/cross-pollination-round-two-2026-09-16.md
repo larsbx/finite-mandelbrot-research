@@ -1,6 +1,6 @@
 # Cross-pollination, round two: PSC, NLAP-JT, finite-math-kernels, and four adjacent repositories
 
-**Status:** comparative audit dated 2026-09-16, continuing `docs/cross-program-bridge-psc-nlapjt-2026-09-12.md`. It records what round one produced, what the overlap route now makes visible between the two research programs, and which of the user's other repositories share structure with them. It proves nothing, promotes no claim, and changes no ledger. Status labels follow section 0.2 of the round-one document. Project terms are governed by `docs/terminology-registry.md` in NLAP-JT and by `claim_governance.toml` in PSC.
+**Status:** comparative audit dated 2026-09-16, continuing `docs/cross-program-bridge-psc-nlapjt-2026-09-12.md`. It records what round one produced, what the overlap route now makes visible between the two research programs, and which of the user's other repositories share structure with them. It proves nothing, promotes no claim, and changes no ledger. Status labels follow section 0.2 of the round-one document. Project terms are governed by `docs/terminology-registry.md` in the Mandelbrot program and by `claim_governance.toml` in PSC. That program moved from `larsbx/NLAP-JT` to `larsbx/finite-mandlebrot-research` on 2026-09-16; the prefix `NLAP:` below is kept as this document's path prefix for it, and the old repository receives no new work.
 
 Repositories read in this session, all at their `main` heads on 2026-09-16:
 
@@ -25,7 +25,7 @@ Repositories read in this session, all at their `main` heads on 2026-09-16:
 | B3 TLA+ ledger port to NLAP | not done; NLAP built Mojo ledgers (`C1_final_proof_block_ledger`, theorem-tag import ledger, payload instances) and FMK shipped `proof_records` instead | see R2: generate every ledger from proof records |
 | B4 NLAP Mojo toolchain and CI | done: Mojo 1.0.0 pinned, compiled closure of 36 modules, smoke, property probe, all audits, full pytest; CI green | modules outside the closure remain (`mojo_theorem_kernel.mojo`, `canonical_serialization.mojo`) |
 | B5 per-instance certificates and import metadata | partial: `claim_governance.toml` gives PSC a status vocabulary with an `imported` class enforced across five surfaces; `tla/ProofArchitecture.tla` still has no `Imported` set; issue #2 (deterministic census export) still open | R2 |
-| B6 exact-type catalogue and counting identity | not done: the rationale was corrected, the catalogue object and the angle-count regression were not built | R7 |
+| B6 exact-type catalogue and counting identity | done 2026-09-16 (`NLAP: 5a2f404`): `src/misiurewicz_catalogue.mojo` reads the exact type off the reduced denominator, enumerates the catalogue of each type, and checks it against the angle-count identity, with a Python oracle and a doubling-map cross-check | none; it was the prerequisite R5 had been waiting on |
 | B7 shared real times 2-adic box kernel | partial: `PSC: mojo/psc/finite_cokernel_address.mojo` computes `Z^3 / M^k Z^3` classes; no p-adic module in FMK | R7 |
 | B8 Hubbard-tree core-entropy census | not done | R7 |
 | B9 PSC firewall linter and terminology registry | partial: `claim_governance` runs in CI with risky-phrase and no-float rules; PSC deliberately keeps no terminology registry (`claim_governance.toml` comment) | R6 |
@@ -77,7 +77,7 @@ Deliverable: one theorem-tag record `HarmonicMeasureAlmostEveryFibreTrivial` wit
 | `common_child_start_count` exact boundary-hit test | side-assignment witness extraction |
 | `nonproductive_sink_sccs` fails closed on capped graphs | `UW-2`: a bounded failed search is not persistent evidence |
 
-The transfer is concrete because NLAP now has finite graphs to run it on: for the Misiurewicz class, the exact-type catalogue of round-one B6 gives a finite set of parameters per `(l,k)`, their rational-angle separators form a finite catalogue prefix, and the extractor can be run verbatim. On that class every obstruction must be empty by the imported triviality tag, which gives NLAP its first executable negative control of the PSC kind. Status: DEFINITION for the table; executable target.
+The transfer is concrete because NLAP now has finite graphs to run it on: for the Misiurewicz class, the exact-type catalogue of round-one B6, built on 2026-09-16, gives a finite set of ray addresses per `(l,k)`, their rational-angle separators form a finite catalogue prefix, and the extractor can be run verbatim. On that class every obstruction must be empty by the imported triviality tag, which gives NLAP its first executable negative control of the PSC kind. Status: DEFINITION for the table; executable target.
 
 ### N4. Krawczyk for Perron enclosures `[V]`
 
@@ -135,12 +135,28 @@ PSC's `ProofArchitecture.tla` is a generic typed-DAG dependency-closure specific
 | R2 | Generate every ledger from proof records: `tla/Ledger.tla`, the `[claims]` table of `claim_governance.toml`, NLAP's Mojo ledgers, the docs index | FMK, PSC, NLAP | infrastructure | `FMK: tools/` new generator; closes PSC issue #3 and NLAP audit F5 by construction |
 | R3 | Harmonic-measure island and a `density` carrier field (N2) | NLAP | ledger, mathematics | `NLAP: docs/C1_theorem_tag_import_ledger.md` |
 | R4 | One canonical encoding and one outcome vocabulary across SG, FMK, CC, NLAP (A1 items 1–2) | SG, FMK, CC, NLAP | infrastructure | `FMK: docs/canonical-encoding.md`, `SG: docs/release-provenance.md` |
-| R5 | Obstruction extractor and boundary/interior dichotomy on NLAP's Misiurewicz prefix graphs (N3), which requires the exact-type catalogue (round-one B6) | NLAP | executable, negative control | new `NLAP: src/misiurewicz_catalogue.mojo` |
+| R5 | Obstruction extractor and boundary/interior dichotomy on NLAP's Misiurewicz prefix graphs (N3); its prerequisite, the exact-type catalogue of round-one B6, is now built | NLAP | executable, negative control | `NLAP: src/misiurewicz_catalogue.mojo` (built), then a new extractor module |
 | R6 | Research-hygiene manifesto in ORM with `claim_governance` as reference implementation; Vale port of the prose rules (A4) | ORM, FMK, NLAP, TS | tooling | `ORM:` new manifesto directory; `FMK: audit/docs/policy-format.md` |
 | R7 | Remaining round-one items: Lean lemma for irreducibility of the exterior-square characteristic polynomial (the statement PSC now actually uses); degree-`n` Pisot screen; Hubbard-tree core-entropy census; p-adic module | PSC, FMK | mathematics | `PSC: PscVerif/PscVerif/Spectral.lean`; `PSC: mojo/psc/pisot.mojo` |
 | R8 | `claim_id` on every Mojo test and a "proved claims have passing tests" check (A2); typed-graph export of the registries (A3) | PSC, NLAP, CC, TS | tooling | `PSC: mojo/tests/`, `NLAP: spec/regime_correspondences.toml` |
 
 R1 is ranked first because it is the only item that changes what NLAP's residual object *is*, and it consumes a library both programs already vendor. R2 is ranked second because every audit since 2026-09-10 in both repositories has found status drift between hand-maintained surfaces, and FMK now has the record type that makes generation possible.
+
+### 3.1 Delivery, as of 2026-09-16
+
+This subsection exists because of B6. That item sat unbuilt through a whole round for no reason other than a status line reading "not done" and routing it to R7, where it ranked behind three larger items; nothing about it was hard. A ranking without a delivery column reproduces exactly that failure, so the merges are recorded here as they land.
+
+| Item | State | Merged as |
+| --- | --- | --- |
+| R1 | delivered. Tuning patterns and the star product in FMK; then the continuation twist, after the parity twist of Derrida, Gervois, and Pomeau was found to be the real-line convention only and to fail on the rabbit. Consumed in NLAP as the residual directive carrier | `FMK: 007e40f`, `FMK: 9d6299e`; `NLAP: a1e7e15` |
+| R2 | delivered. `proof_records` generates the TLA+ ledger, the per-assumption-set TLC models, the `[[claim]]` entries, and the docs index from one record table; PSC's sixty records now derive every surface from it | `FMK: dc8bee9`, `FMK: 5854797`; `PSC: 1506e67` |
+| R3 | delivered. Separated-pair density over exact rationals, and the scaffolded tag `HarmonicMeasureAlmostEveryFibreTrivial` with its leak stated: a null exceptional set is not an empty one, and it contains the infinitely renormalizable parameters R1 carries | `NLAP: 3417a66` |
+| R4 | delivered. `proof_records/vocabularies.py` maps the sprucegoose and crypto-composer evidence classes onto record kinds under the rule that translation preserves or lowers authority, never raises it | `FMK: 2d29f1d` |
+| B6 | delivered, out of rank order, because R5 could not start without it | `NLAP: 5a2f404` |
+| R5 | next. Unblocked by B6 | |
+| R6, R7, R8 | not started | |
+
+Two corrections were forced by review during this round and are worth keeping visible, since both were cases where a plausible statement was wrong rather than merely imprecise. The separated-pair density first flattened separator endpoints into one cut set, which counts every arc as its own class; two atoms outside every separator are not separated from each other, so disjoint separators were overcounted. The exact-type catalogue first claimed a uniform index bound that its type reader did not enforce, and the proposed remedy of enforcing it would not have closed the gap either, because catalogueability is strictly stronger than either bound alone.
 
 ## 4. Non-claims
 
