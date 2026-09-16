@@ -132,3 +132,15 @@ symbols = ["src/C1_separated_density.mojo::separated_pair_density"]
 evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "tools/separated_density_reference.py"]
 proof_boundary = "A finite prefix density is a measure of decided pairs; a null undecided set is not an empty one and no named pair is thereby separated."
 
+[[correspondence]]
+id = "misiurewicz-exact-type"
+analytic_concepts = ["Misiurewicz parameter", "exact preperiod and period", "external angle"]
+finite_term = "exact-type catalogue"
+class = "symbolic_encoding"
+status = "implemented_tested"
+preserves = ["exact preperiod and period of a rational address under doubling", "the angle-count identity for each exact type"]
+does_not_inherit = ["parameter location", "landing theorem", "theorem-tag acceptance", "fibre triviality", "MLC", "measured angle"]
+domain_conditions = ["rational address in lowest terms with numerator below denominator", "denominator at most 2^20 for the exact type", "preperiod and period at most twenty and catalogue denominator at most 2^20 for the catalogue, which is strictly stronger"]
+symbols = ["src/misiurewicz_catalogue.mojo::exact_type", "src/misiurewicz_catalogue.mojo::catalogue", "src/misiurewicz_catalogue.mojo::catalogue_count"]
+evidence = ["tests/test_misiurewicz_catalogue.py", "docs/C1_misiurewicz_catalogue.md", "tools/misiurewicz_catalogue_reference.py"]
+proof_boundary = "The catalogue enumerates ray addresses; associating a parameter with an address needs a landing tag, and the triviality of the corresponding fibres is the imported tag KnownTrivialFiberClass."

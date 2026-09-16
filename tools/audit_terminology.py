@@ -90,6 +90,7 @@ REGISTRY_REQUIRED_TERMS = [
     "persistent non-separation",
     "persistent wake ambiguity",
     "Mojo theorem kernel",
+    "exact-type catalogue",
 ]
 
 C1_SCOPED_TERMS = [
@@ -102,6 +103,7 @@ C1_SCOPED_TERMS = [
     "SeparatorCatalogueCompleteness",
     "side-assignment witness",
     "separator code",
+    "exact-type catalogue",
 ]
 
 DEPRECATED_TERMS = [
