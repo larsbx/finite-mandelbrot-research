@@ -35,6 +35,7 @@ def test_allowed_conclusion_kinds_are_explicit_in_doc_and_mojo():
         "RenormalizationWithAprioriBounds",
         "BoundaryIdentificationSoundness",
         "TuningKneadingSubstitution",
+        "HarmonicMeasureAlmostEveryFibreTrivial",
     ]:
         assert kind in text
     assert "allowed_conclusion_kind" in text

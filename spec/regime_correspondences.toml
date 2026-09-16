@@ -118,3 +118,17 @@ domain_conditions = ["periodic address in the open interval from zero to one wit
 symbols = ["src/C1_residual_directive_carrier.mojo::checked_kneading_prefix", "src/C1_residual_directive_carrier.mojo::continuation_last_letter", "src/C1_residual_directive_carrier.mojo::checked_directive_level"]
 evidence = ["tests/test_C1_residual_directive_carrier.py", "docs/C1_residual_directive_carrier.md", "tools/kneading_reference.py"]
 proof_boundary = "A directive prefix encodes finitely many renormalization levels; it does not decide residual membership or same-fibre relations."
+
+[[correspondence]]
+id = "separated-pair-density"
+analytic_concepts = ["Lebesgue measure on external angles", "harmonic measure", "density of a decided set"]
+finite_term = "separated-pair density"
+class = "finite_certificate_surrogate"
+status = "implemented_tested"
+preserves = ["exact rational atom lengths of a finite separator set", "side signatures and their classes", "monotonicity under refinement", "orientation independence", "total measure one"]
+does_not_inherit = ["harmonic measure on the boundary", "the limit over all prefixes", "fibre triviality", "local connectivity", "separation of a named pair"]
+domain_conditions = ["normalized rational cut addresses in the half-open interval from zero to one", "accepted exact rational arithmetic"]
+symbols = ["src/C1_separated_density.mojo::separated_pair_density"]
+evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "tools/separated_density_reference.py"]
+proof_boundary = "A finite prefix density is a measure of decided pairs; a null undecided set is not an empty one and no named pair is thereby separated."
+
