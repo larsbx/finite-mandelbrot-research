@@ -138,6 +138,18 @@ Known leaks: It carries dynamical-plane combinatorics only; parameter-plane shri
 
 Use discipline: Use in C1 files or with a pointer to this registry. Never as evidence of same-fibre membership.
 
+### exact-type catalogue
+
+Terminology declaration: the `exact-type catalogue` of type `(l, k)` is the finite set of rational ray addresses whose exact preperiod under doubling is `l` and whose exact period is `k`, enumerated over the common denominator `2^l (2^k - 1)` (`docs/C1_misiurewicz_catalogue.md`).
+
+Genealogy: Misiurewicz parameters with their exact preperiod and period are standard in complex dynamics, and reading both off the denominator of a rational external angle is the standard symbolic fact about the doubling map. The catalogue names the finite set, not a new invariant.
+
+Bridge claim: Definition-only project term. The catalogue holds finite symbolic addresses. Associating a parameter with an address needs a landing tag and an adapter, and triviality of the corresponding fibres is the imported tag `KnownTrivialFiberClass`.
+
+Known leaks: A catalogue is finite and bounded by construction; an exhausted small type says nothing about a larger one, and the counting identity is exact arithmetic rather than evidence about the parameter plane.
+
+Use discipline: Use in C1 files or with a pointer to this registry, and only for sets of addresses. Never as a statement that a parameter is located or a fibre decided.
+
 ## Deprecated project terms
 
 - `catalogue extensionality`: deprecated. Use `SeparatorCatalogueAdequacy`, `SeparatorCatalogueSoundness`, or `SeparatorCatalogueCompleteness`.
