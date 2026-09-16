@@ -91,6 +91,7 @@ REGISTRY_REQUIRED_TERMS = [
     "persistent wake ambiguity",
     "Mojo theorem kernel",
     "exact-type catalogue",
+    "prefix obstruction",
 ]
 
 C1_SCOPED_TERMS = [
@@ -104,6 +105,7 @@ C1_SCOPED_TERMS = [
     "side-assignment witness",
     "separator code",
     "exact-type catalogue",
+    "prefix obstruction",
 ]
 
 DEPRECATED_TERMS = [

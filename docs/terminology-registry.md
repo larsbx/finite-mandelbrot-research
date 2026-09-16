@@ -162,6 +162,18 @@ Known leaks: A catalogue is finite and bounded by construction; an exhausted sma
 
 Use discipline: Use in C1 files or with a pointer to this registry, and only for sets of addresses. Never as a statement that a parameter is located or a fibre decided.
 
+### prefix obstruction
+
+Terminology declaration: a `prefix obstruction` of a separator prefix is a sink component of the pairs of ray addresses that no iterate of doubling separates (`docs/C1_misiurewicz_prefix_graph.md`).
+
+Genealogy: It is the recurrent-core normal form the Pisot overlap route extracts from its overlap graph, and abstractly the finite obstruction object route F1 asks for. A backward productivity fixpoint followed by sink components is standard graph theory.
+
+Bridge claim: Definition-only project term. It is a statement about one finite prefix graph, not about any parameter and not about any fibre. The boundary and interior kinds are the aligned and strict-zipper cases of the overlap route.
+
+Known leaks: One prefix is not every prefix; an empty obstruction set at a prefix says nothing about a finer one, and persistent non-separation quantifies over all of them. A refusal at the bound is not an empty obstruction set.
+
+Use discipline: Use in C1 files or with a pointer to this registry, and only for sink components of one named prefix. Never as a statement that a parameter is located, a fibre decided, or C1 settled.
+
 ## Deprecated project terms
 
 - `catalogue extensionality`: deprecated. Use `SeparatorCatalogueAdequacy`, `SeparatorCatalogueSoundness`, or `SeparatorCatalogueCompleteness`.
