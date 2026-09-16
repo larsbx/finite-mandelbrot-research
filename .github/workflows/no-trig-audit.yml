@@ -1,0 +1,46 @@
+name: finite-regime-core-audit
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
+        with:
+          cache: true
+      - name: Build the canonical Mojo smoke binary
+        run: pixi run mojo-build
+      - name: Verify vendored package digests
+        run: pixi run vendored
+      - name: Run the canonical Mojo finite-core smoke suite
+        run: pixi run mojo-smoke
+      - name: Run exact-arithmetic property oracle
+        run: pixi run property
+      - name: Audit executable core for forbidden analytic primitives
+        run: python3 tools/audit_no_trig.py
+      - name: Audit executable core for forbidden analytic point APIs
+        run: python3 tools/audit_no_points.py
+      - name: Run full tests
+        run: pixi run test
+      - name: Audit governed terminology
+        run: python3 tools/audit_terminology.py
+      - name: Recheck vendored package digests after tests
+        run: python3 tools/check_vendored_sync.py
+      - name: Audit governed theorem/claim usage
+        env:
+          PYTHONPATH: tools
+        run: python3 -m claim_governance.cli --root .
+      - name: Audit manuscript claim language
+        run: python3 tools/audit_paper_language.py
+      - name: Audit backend manifest and proof-grade boundary
+        run: python3 tools/audit_backend_manifest.py
+      - name: Audit exact arithmetic boundary
+        run: python3 tools/audit_exact_arithmetic.py
+      - name: Validate exact polynomial reference identities
+        run: python3 tools/poly_reference.py
+      - name: Validate interval exclusion reference checks
+        run: python3 tools/interval_exclusion_reference.py
