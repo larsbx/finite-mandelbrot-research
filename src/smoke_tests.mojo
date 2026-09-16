@@ -26,6 +26,7 @@ from C1_theorem_tag_import_ledger import ImportConclusionKind, ImportStrengthCla
 from C1_residual_directive_carrier import residual_directive_carrier_smoke
 from C1_separated_density import separated_density_smoke
 from misiurewicz_catalogue import misiurewicz_catalogue_smoke
+from C1_misiurewicz_prefix_graph import misiurewicz_prefix_graph_smoke
 from integer_gcd import gcd_int, gcd_i64, gcd_i64_or_one
 from ray_address import RayAddr, RayAddr64, same_ray_addr, ray_addr_before
 from rational_trig import demo_spread_orthogonal_axes, demo_ray_addr_doubling_half
@@ -346,6 +347,8 @@ def run_smoke_tests() -> Bool:
     if not separated_density_smoke():
         return False
     if not misiurewicz_catalogue_smoke():
+        return False
+    if not misiurewicz_prefix_graph_smoke():
         return False
     if not checked_landing_target_adapter_smoke():
         return False

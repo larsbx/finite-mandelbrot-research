@@ -34,6 +34,7 @@ The following terms may appear without a full local declaration only because the
 - `residual directive carrier`
 - `separated-pair density`
 - `exact-type catalogue`
+- `prefix obstruction`
 
 ## Terms requiring local declaration outside C1 files
 
@@ -50,6 +51,7 @@ These terms are allowed freely only inside files whose path begins with `docs/C1
 - `SeparatorCatalogueCompleteness`
 - `side-assignment witness`
 - `separator code`
+- `prefix obstruction`
 - `exact-type catalogue` — home files also include `src/misiurewicz_catalogue.mojo`, `tools/misiurewicz_catalogue_reference.py`, and `spec/regime_correspondences.toml`.
 
 Deprecated migration-only term:
