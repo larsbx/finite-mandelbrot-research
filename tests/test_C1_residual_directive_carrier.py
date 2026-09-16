@@ -92,6 +92,7 @@ def test_period_limit_is_sixty_two_in_reference_and_mojo():
     src = text(SRC)
     assert "comptime MAX_CARRIER_PERIOD = 62" in src and "for k in range(MAX_CARRIER_PERIOD):" in src
     assert "checked_kneading_prefix(1, 92737).accepted()" in src and "checked_mul_i64(p.value" in src
+    assert "comptime MAX_KNEADING_WORD = 1048576" in src and "period.value > MAX_KNEADING_WORD" in src
 
 
 def test_every_periodic_angle_has_a_kneading_prefix_of_length_period_minus_one():

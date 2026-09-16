@@ -18,6 +18,7 @@ from checked_ray_address import checked_double_ray_addr, make_checked_ray_addr
 from substitution_dynamics.tuning import TuningPattern, kneading_prefix
 
 comptime MAX_CARRIER_PERIOD = 62
+comptime MAX_KNEADING_WORD = 1048576
 
 
 struct KneadingPrefixResult(Copyable, Movable):
@@ -213,7 +214,12 @@ struct ResidualDirectiveCarrier(Copyable, Movable):
 
     def kneading_word(self) raises -> List[Int]:
         """The kneading prefix of `A_1 * ... * A_n`: the first `p_1 ... p_n - 1`
-        letters shared by every tuning of these levels (vendored kernel)."""
+        letters shared by every tuning of these levels (vendored kernel). Fails
+        closed before expanding when the period overflows or exceeds
+        `MAX_KNEADING_WORD` letters."""
+        var period = self.checked_period()
+        if period.overflowed or period.value > MAX_KNEADING_WORD:
+            raise Error("carrier period exceeds the kneading word bound")
         var patterns = List[TuningPattern]()
         for i in range(len(self.levels)):
             patterns.append(self.levels[i].pattern.copy())
@@ -342,6 +348,13 @@ def residual_directive_carrier_smoke() -> Bool:
     for _ in range(63):
         wide = wide.refined(doubling_level.level)
     if not (wide.depth() == 63 and wide.checked_period().overflowed):
+        return False
+    var refused = False
+    try:
+        _ = wide.kneading_word()
+    except:
+        refused = True
+    if not refused:
         return False
     # Period 63 lies beyond MAX_CARRIER_PERIOD: 92737 divides 2^63 - 1.
     if checked_kneading_prefix(1, 92737).accepted():
