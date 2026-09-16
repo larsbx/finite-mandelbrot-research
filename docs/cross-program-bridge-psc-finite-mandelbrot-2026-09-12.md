@@ -1,13 +1,13 @@
-# Cross-program bridge audit: PSC balanced-pair route and NLAP-JT finite Mandelbrot fibers
+# Cross-program bridge audit: PSC balanced-pair route and finite-mandlebrot-research finite Mandelbrot fibers
 
-**Status:** comparative audit of two repositories, dated 2026-09-12. It records structural correspondences, corrections found by comparison, capability gaps, and ranked bridging contributions. It proves neither the Pisot Substitution Conjecture (PSC) nor Mandelbrot local connectivity (MLC), and it promotes no correspondence to a theorem. Everything below is labelled with one of the status values in section 0.2. Project terms used here are governed by `docs/terminology-registry.md` in NLAP-JT and by `docs/conjecture-ledger.md` in PSC.
+**Status:** comparative audit of two repositories, dated 2026-09-12. It records structural correspondences, corrections found by comparison, capability gaps, and ranked bridging contributions. It proves neither the Pisot Substitution Conjecture (PSC) nor Mandelbrot local connectivity (MLC), and it promotes no correspondence to a theorem. Everything below is labelled with one of the status values in section 0.2. Project terms used here are governed by `docs/terminology-registry.md` in finite-mandlebrot-research and by `docs/conjecture-ledger.md` in PSC.
 
 Repositories compared, at the heads on the shared branch `claude/isomorphisms-gaps-analysis-jkvo3f`:
 
 | Tag | Repository | Head | Conjecture | Finite object |
 | --- | --- | --- | --- | --- |
 | `PSC:` | `larsbx/pisot-substitution-conjecture-research` | `f2afa9e` | pure discrete spectrum for primitive irreducible Pisot substitutions | balanced-pair automaton `B_sigma` |
-| `NLAP:` | `larsbx/NLAP-JT` | `652f7b9` | triviality of all Mandelbrot fibers (MLC, Schleicher form) | separator-catalogue prefixes `Cat_k` |
+| `NLAP:` | `larsbx/finite-mandlebrot-research` | `652f7b9` | triviality of all Mandelbrot fibers (MLC, Schleicher form) | separator-catalogue prefixes `Cat_k` |
 
 Verified-here markers: `[V]` means the statement was checked in this session by reading or executing the repository; `[L]` means it rests on a literature statement that must be pinned to an exact theorem before any ledger uses it.
 

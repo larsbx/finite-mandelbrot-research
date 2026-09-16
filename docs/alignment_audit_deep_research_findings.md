@@ -8,7 +8,7 @@ This document records the findings from the deep literature and terminology audi
 
 ## Executive outcome
 
-NLAP-JT is well aligned in one major respect: it distinguishes finite certificate vocabulary from classical analytic claims. The project already has a strong Genealogy / Bridge Claim / Known Leaks / Use Discipline discipline.
+finite-mandlebrot-research is well aligned in one major respect: it distinguishes finite certificate vocabulary from classical analytic claims. The project already has a strong Genealogy / Bridge Claim / Known Leaks / Use Discipline discipline.
 
 The critical correction is that several C1 proof-state terms describe statements whose mathematical strength is much larger than their finite bookkeeping presentation suggests.
 

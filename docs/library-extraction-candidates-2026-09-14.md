@@ -1,21 +1,21 @@
-# Library extraction candidates across PSC and NLAP-JT
+# Library extraction candidates across PSC and finite-mandlebrot-research
 
-**Status:** cross-repository engineering audit, dated 2026-09-14. It ranks code that could be lifted out of the two research repositories into shared libraries, states what must happen before each lift, and fixes the order. It is not a mathematical document: no row below discharges or weakens any theorem obligation, certificate gate, or conjecture status in either repository. Project terms follow `docs/terminology-registry.md` in NLAP-JT and `docs/conjecture-ledger.md` in PSC.
+**Status:** cross-repository engineering audit, dated 2026-09-14. It ranks code that could be lifted out of the two research repositories into shared libraries, states what must happen before each lift, and fixes the order. It is not a mathematical document: no row below discharges or weakens any theorem obligation, certificate gate, or conjecture status in either repository. Project terms follow `docs/terminology-registry.md` in finite-mandlebrot-research and `docs/conjecture-ledger.md` in PSC.
 
 Heads audited, on the shared branch `claude/library-extraction-candidates-d9lp6i`:
 
 | Tag | Repository | Head | Executable surface |
 | --- | --- | --- | --- |
-| `NLAP:` | `larsbx/NLAP-JT` | `ac7f8f9` | Mojo `src/`, compiled by CI through the closure of `src/smoke_tests.mojo`; Python `tools/` audits and `tests/` |
+| `NLAP:` | `larsbx/finite-mandlebrot-research` | `ac7f8f9` | Mojo `src/`, compiled by CI through the closure of `src/smoke_tests.mojo`; Python `tools/` audits and `tests/` |
 | `PSC:` | `larsbx/pisot-substitution-conjecture-research` | `970f214` | Mojo `mojo/psc/`, compiled and tested by CI (`pixi run test`, `verify`, censuses); Python `src/psc_research/` oracle |
 
-Markers: `[V]` was checked in this session by reading or executing the repository; `[U]` could not be checked here. Both CI workflows are green on their `main` heads `[V]` (NLAP run 679, PSC runs 884/721/665). Locally, PSC's Python suite passes in full and NLAP-JT's passes except the one test that requires a `mojo` binary, which this container lacks `[V]`.
+Markers: `[V]` was checked in this session by reading or executing the repository; `[U]` could not be checked here. Both CI workflows are green on their `main` heads `[V]` (NLAP run 679, PSC runs 884/721/665). Locally, PSC's Python suite passes in full and finite-mandlebrot-research's passes except the one test that requires a `mojo` binary, which this container lacks `[V]`.
 
 ## 0. Summary
 
 | Priority | Candidate | Source of truth today | Consumers | Readiness |
 | --- | --- | --- | --- | --- |
-| P0 | Exact integers and rationals (`finite_exact`) | `NLAP: src/bigint_z.mojo`, `src/rat_q.mojo` | PSC, NLAP-JT, later certificate projects | after the hardening list in section 1.3 |
+| P0 | Exact integers and rationals (`finite_exact`) | `NLAP: src/bigint_z.mojo`, `src/rat_q.mojo` | PSC, finite-mandlebrot-research, later certificate projects | after the hardening list in section 1.3 |
 | P0 | Substitution-dynamics kernel (`substitution_dynamics`) | `PSC: mojo/psc/{words,bpa,derived_system,...}.mojo` | PSC censuses, other symbolic-dynamics work | after alphabet generalization and uniform symbol validation |
 | P1 | Closed rational intervals (`interval/closed_q`) | `NLAP: src/interval_q.mojo` (+ PSC checked-operation tests) | both programs | after `finite_exact`; spec hook already exists |
 | P1 | Exact finite-dimensional linear algebra (`finite_linear_algebra`) | `PSC: mojo/psc/{mat3,qlinalg,tensor3,w3}.mojo` | spectral, wedge, incidence experiments | after moving scalars onto `finite_exact` |
@@ -28,7 +28,7 @@ Three arithmetic authorities exist today `[V]`: PSC's unchecked machine-width `R
 
 ### 1.1 What exists
 
-| Layer | NLAP-JT | PSC |
+| Layer | finite-mandlebrot-research | PSC |
 | --- | --- | --- |
 | integers | `BigZ`: dynamic little-endian limbs in base `10^9`, sign in `{-1,0,1}`, add/sub/mul, order, quotient/remainder, exact division with rejection, Euclidean gcd, canonical `Z(sign, byte_len, big_endian_magnitude)` bytes, and `bigz_is_canonical` `[V]` | machine `Int` only |
 | rationals | `Q`: normalized `BigZ` fraction, `den > 0`, `gcd = 1`, `rejected` flag propagated through every operation and through `q_canonical_bytes` `[V]` | `Rat` in `mojo/psc/rational.mojo`: normalized machine `Int`, unchecked overflow, `abort` on zero denominator `[V]`; `CheckedRat` in `mojo/psc/rational_interval.mojo`: normalized machine `Int` with overflow checks that `raise` `[V]` |
@@ -54,7 +54,7 @@ Rat (Int)  -->  qlinalg / tensor3 / w3 ;  CheckedRat (Int)  -->  RatInterval  --
 1. Randomized algebraic-identity tests for `BigZ` and `Q` against an independent oracle (Python `int` and `fractions.Fraction`, driven through the canonical byte encoding so no parser is trusted): ring axioms, `divmod` identity, `gcd` divisibility, order transitivity, normalization idempotence, and encode/decode round trips.
 2. Replace shift-and-subtract with schoolbook long division on limbs (Knuth Algorithm D or the base-`10^9` equivalent). Keep the current routine as the oracle for the new one until the property tests cover both.
 3. Port denominator-gcd addition, cross-cancelled multiplication, and gcd-reduced comparison from `checked_q.mojo` into `rat_q.mojo`.
-4. Split canonical encoding: the integer and rational encodings (`bigz_canonical_bytes`, `q_canonical_bytes`) belong to the library; the certificate schemas in `canonical_serialization.mojo` stay in NLAP-JT.
+4. Split canonical encoding: the integer and rational encodings (`bigz_canonical_bytes`, `q_canonical_bytes`) belong to the library; the certificate schemas in `canonical_serialization.mojo` stay in finite-mandlebrot-research.
 5. Rename `IQ.point` and `ComplexIQ.point` to `singleton`, update the five call sites, and delete the stale allowlist lines.
 6. Keep every certificate-acceptance or proof-grade predicate out of the package. Arithmetic readiness (`allows_certificate_acceptance`) is a consumer decision, as `docs/bigint-migration-handoff.md` already states.
 7. Move `PolyZ` onto `BigZ` coefficients and unbounded degree, or document that the library ships `poly_z` as a bounded-degree specialization.
@@ -140,7 +140,7 @@ The `crypto-composer` repository (catalogs, schemas, constraint checking, failur
 
 ## 8. Extraction sequence
 
-1. Harden `finite_exact` inside NLAP-JT (section 1.3) and extract it.
+1. Harden `finite_exact` inside finite-mandlebrot-research (section 1.3) and extract it.
 2. Migrate PSC's `Rat` and `CheckedRat` consumers onto it; delete both.
 3. Extract `substitution_dynamics` (section 2.3).
 4. Separate exact linear algebra from PSC certificate logic (section 4).
@@ -149,7 +149,7 @@ The `crypto-composer` repository (catalogs, schemas, constraint checking, failur
 
 ## 9. The first pull request
 
-It stays inside NLAP-JT and does not create a shared repository:
+It stays inside finite-mandlebrot-research and does not create a shared repository:
 
 - declare the public boundary of `BigZ`, `Q`, `IQ`, `ComplexIQ` (names, rejection semantics, canonical encodings, stability promise);
 - add the oracle and property tests of section 1.3 item 1, run in CI next to `poly_reference.py`;

@@ -1,8 +1,8 @@
 # Rational and interval arithmetic: canonical exactness specification
 
-**Status:** cross-program arithmetic contract, implemented canonically in `larsbx/finite-math-kernels`. NLAP-JT and `larsbx/pisot-substitution-conjecture-research` each vendor the same pinned monorepo commit and enforce per-file digests. Sections 0 to 5 are repository-independent; section 6 records the consumer binding rows. Exact arithmetic does not decide certificate acceptance or settle C1.
+**Status:** cross-program arithmetic contract, implemented canonically in `larsbx/finite-math-kernels`. finite-mandlebrot-research and `larsbx/pisot-substitution-conjecture-research` each vendor the same pinned monorepo commit and enforce per-file digests. Sections 0 to 5 are repository-independent; section 6 records the consumer binding rows. Exact arithmetic does not decide certificate acceptance or settle C1.
 
-Terminology in this file is field-recognizable (rational arithmetic, interval arithmetic, natural interval extension, dependency problem, floating-point filter). No novel bridge term is introduced. Where NLAP-JT terminology governance applies, every term here is Route A.
+Terminology in this file is field-recognizable (rational arithmetic, interval arithmetic, natural interval extension, dependency problem, floating-point filter). No novel bridge term is introduced. Where finite-mandlebrot-research terminology governance applies, every term here is Route A.
 
 ## 0. The problem being solved
 
@@ -219,7 +219,7 @@ The binding table lists every module that instantiates a layer, its conformance 
 
 | Spec item | Module | Class | Notes |
 | --- | --- | --- | --- |
-| 1.1 integer backend, 1.1–1.3 ℚ, 2.1–2.5 I_Q | `mojo/finite_exact/bigint_z.mojo`, `mojo/finite_exact/rat_q.mojo`, `mojo/finite_exact/interval_q.mojo` | CONFORMS | copies of the three NLAP-JT modules of 6.2, identical up to the package qualification of their intra-package import lines; `scripts/check_finite_exact_sync.py` undoes that rewrite and compares SHA-256 digests with the upstream digests pinned in `mojo/finite_exact/UPSTREAM.md`, so any other local edit fails PSC CI |
+| 1.1 integer backend, 1.1–1.3 ℚ, 2.1–2.5 I_Q | `mojo/finite_exact/bigint_z.mojo`, `mojo/finite_exact/rat_q.mojo`, `mojo/finite_exact/interval_q.mojo` | CONFORMS | copies of the three finite-mandlebrot-research modules of 6.2, identical up to the package qualification of their intra-package import lines; `scripts/check_finite_exact_sync.py` undoes that rewrite and compares SHA-256 digests with the upstream digests pinned in `mojo/finite_exact/UPSTREAM.md`, so any other local edit fails PSC CI |
 | PSC conventions over the package | `mojo/psc/exact.mojo` | CONFORMS | a rejected enclosure raises, a rejected scalar in integer-seeded polynomial arithmetic aborts as an impossible state; integer lifts, Horner helpers, midpoint, diagnostic rendering |
 | 1–2 direct consumers | `mojo/psc/qlinalg.mojo`, `mojo/psc/pisot.mojo`, `mojo/psc/tensor3.mojo`, `mojo/psc/w3.mojo` | CONFORMS | exact linear algebra, Sturm sequences, and the PIP screen over unbounded rationals; the former machine-width `Rat` is retired |
 | 2.3 enclosure of `β ∉ ℚ` | `mojo/psc/perron_interval.mojo` (`perron_root_interval`) | CONFORMS | integer bracket by exact sign changes, then bisection with unbounded endpoints |
@@ -228,7 +228,7 @@ The binding table lists every module that instantiates a layer, its conformance 
 
 The earlier `CheckedRat`/`RatInterval` layer (`mojo/psc/rational_interval.mojo`, CONFORMS-CHECKED) and the unchecked `Rat` (`mojo/psc/rational.mojo`, DEMO) are deleted; their tests were carried over to `mojo/tests/test_exact_interval.mojo`.
 
-### 6.2 `larsbx/NLAP-JT`
+### 6.2 `larsbx/finite-mandlebrot-research`
 
 | Spec item | Module | Class | Notes |
 | --- | --- | --- | --- |
@@ -257,11 +257,11 @@ Promotion of any DEMO row to CONFORMS requires the unbounded backend gate in `ba
 
 The specification is a hook, not a note. Each repository wires it into its control surfaces as follows; the regression tests fail if any wire is removed.
 
-1. **Audit script** (`tools/audit_exact_arithmetic.py` in NLAP-JT, `scripts/audit_exact_arithmetic.py` in PSC). Lexically scans the executable kernel scope for floating-point type tokens and decimal literal forms outside comments and strings, fails on any hit not in the allowlist, discovers direct arithmetic consumers and requires a binding row for each, and verifies that every module named in section 6 exists and cites this file (C7), including quarantined modules. Run in CI.
-2. **Allowlist** (`tools/exact_arithmetic_allowlist.md` in NLAP-JT, `scripts/exact_arithmetic_allowlist.md` in PSC). The only place QUARANTINED files may be named. Adding a file here requires a matching QUARANTINED row in section 6.
-3. **Law tests.** Executable checks of 1.3 (normalization, decidable equality, `1/10 + 2/10 = 3/10`, order-independence), 2.2 to 2.5 (inclusion, three-valued sign, `X − X ≠ [0,0]`, subdistributivity, fail-closed reciprocal and J1), and 3.2 (filter agrees with oracle; fallthrough on `0`). They exist in Mojo against the canonical kernels and in Python against the secondary oracle. NLAP-JT additionally runs the randomized property probe of `src/exact_arithmetic_property_probe.mojo` against `tools/exact_arithmetic_property_oracle.py` in CI (`pixi run property`); a disagreement on any canonical byte fails the build.
-4. **Policy pointers.** `README.md` and the implementation policy file (`AGENTS.md` in PSC, `docs/mojo_first_execution_policy.md` in NLAP-JT) name this file as the arithmetic policy; `backend.toml` in NLAP-JT carries `exact_arithmetic_spec` and `no_float_certificate_arithmetic = true`.
-5. **Cross-repository rule.** PSC consumes the NLAP-JT modules by pinned vendoring, not by mirroring this file. A change to `src/finite_exact/bigint_z.mojo`, `src/finite_exact/rat_q.mojo`, or `src/finite_exact/closed_q.mojo` here is picked up by PSC only when PSC re-vendors and updates `mojo/finite_exact/UPSTREAM.md`; a change to sections 0 to 5 must keep the public boundary of `docs/exact-arithmetic-public-boundary.md`. No NLAP-JT check or document may claim that a mirror of this file exists in PSC.
+1. **Audit script** (`tools/audit_exact_arithmetic.py` in finite-mandlebrot-research, `scripts/audit_exact_arithmetic.py` in PSC). Lexically scans the executable kernel scope for floating-point type tokens and decimal literal forms outside comments and strings, fails on any hit not in the allowlist, discovers direct arithmetic consumers and requires a binding row for each, and verifies that every module named in section 6 exists and cites this file (C7), including quarantined modules. Run in CI.
+2. **Allowlist** (`tools/exact_arithmetic_allowlist.md` in finite-mandlebrot-research, `scripts/exact_arithmetic_allowlist.md` in PSC). The only place QUARANTINED files may be named. Adding a file here requires a matching QUARANTINED row in section 6.
+3. **Law tests.** Executable checks of 1.3 (normalization, decidable equality, `1/10 + 2/10 = 3/10`, order-independence), 2.2 to 2.5 (inclusion, three-valued sign, `X − X ≠ [0,0]`, subdistributivity, fail-closed reciprocal and J1), and 3.2 (filter agrees with oracle; fallthrough on `0`). They exist in Mojo against the canonical kernels and in Python against the secondary oracle. finite-mandlebrot-research additionally runs the randomized property probe of `src/exact_arithmetic_property_probe.mojo` against `tools/exact_arithmetic_property_oracle.py` in CI (`pixi run property`); a disagreement on any canonical byte fails the build.
+4. **Policy pointers.** `README.md` and the implementation policy file (`AGENTS.md` in PSC, `docs/mojo_first_execution_policy.md` in finite-mandlebrot-research) name this file as the arithmetic policy; `backend.toml` in finite-mandlebrot-research carries `exact_arithmetic_spec` and `no_float_certificate_arithmetic = true`.
+5. **Cross-repository rule.** PSC consumes the finite-mandlebrot-research modules by pinned vendoring, not by mirroring this file. A change to `src/finite_exact/bigint_z.mojo`, `src/finite_exact/rat_q.mojo`, or `src/finite_exact/closed_q.mojo` here is picked up by PSC only when PSC re-vendors and updates `mojo/finite_exact/UPSTREAM.md`; a change to sections 0 to 5 must keep the public boundary of `docs/exact-arithmetic-public-boundary.md`. No finite-mandlebrot-research check or document may claim that a mirror of this file exists in PSC.
 
 ## 8. Non-goals
 

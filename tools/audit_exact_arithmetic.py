@@ -25,7 +25,7 @@ SPEC_REL = "docs/rational-interval-arithmetic-spec.md"
 SPEC = ROOT / SPEC_REL
 ALLOWLIST = ROOT / "tools" / "exact_arithmetic_allowlist.md"
 SCAN_ROOTS = [ROOT / "src"]
-BINDING_HEADING = "### 6.2 `larsbx/NLAP-JT`"
+BINDING_HEADING = "### 6.2 `larsbx/finite-mandlebrot-research`"
 
 REQUIRED_SECTIONS = [
     "## 0. The problem being solved",
@@ -40,7 +40,7 @@ REQUIRED_SECTIONS = [
     "## 5. Conformance criteria",
     "## 6. Repository binding",
     "### 6.1 `larsbx/pisot-substitution-conjecture-research`",
-    "### 6.2 `larsbx/NLAP-JT`",
+    "### 6.2 `larsbx/finite-mandlebrot-research`",
     "## 7. Hook: how the specification is enforced",
 ]
 

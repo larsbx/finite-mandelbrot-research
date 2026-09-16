@@ -22,7 +22,7 @@ def test_linter_bans_project_internal_terms_from_manuscripts():
     body = text(LINTER)
     for term in [
         "C1",
-        "NLAP-JT",
+        "finite-mandlebrot-research",
         "Mojo",
         "theorem kernel",
         "separator-catalogue",
@@ -84,7 +84,7 @@ def test_skill_scope_is_paper_only():
 def test_current_manuscript_has_no_banned_terms_named_by_policy():
     manuscript = text(PAPER)
     for banned in [
-        "NLAP-JT",
+        "finite-mandlebrot-research",
         "Mojo",
         "theorem kernel",
         "separator-catalogue",

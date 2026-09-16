@@ -3,7 +3,7 @@
 Status: proposed reusable infrastructure contract. This document defines records
 for finite computations, imported theorems, bounded experiments, open
 dependencies, and dependency closure. It proves no mathematical statement,
-accepts no NLAP-JT certificate, and does not discharge C1 or
+accepts no finite-mandlebrot-research certificate, and does not discharge C1 or
 `ResidualClosureNoMissingLinks`.
 
 The intended future package name is `finite_proof_records`. The first
@@ -33,8 +33,8 @@ Consumers own:
 - hash-suite selection and commitment construction;
 - whether a validated record is sufficient for a theorem or release decision.
 
-In particular, the NLAP-JT restrictions on circle primitives and global
-MLC-strength claims remain NLAP-JT policy. PSC's G1, concentration, renewal,
+In particular, the finite-mandlebrot-research restrictions on circle primitives and global
+MLC-strength claims remain finite-mandlebrot-research policy. PSC's G1, concentration, renewal,
 realization, and productivity boundaries remain PSC policy.
 
 ## 2. Record kinds
@@ -274,7 +274,7 @@ The first Mojo implementation includes:
 
 It excludes:
 
-- NLAP-JT theorem names and prohibited primitive lists;
+- finite-mandlebrot-research theorem names and prohibited primitive lists;
 - PSC conjecture names;
 - cryptographic hash selection;
 - certificate acceptance;
@@ -291,7 +291,7 @@ Extraction into its own repository is allowed only after:
 3. dependency cycles and missing links fail closed;
 4. bounded evidence cannot satisfy a general claim;
 5. imported theorem use requires a checked hypothesis match;
-6. NLAP-JT and PSC each supply a distinct policy adapter in consumer code;
+6. finite-mandlebrot-research and PSC each supply a distinct policy adapter in consumer code;
 7. neither consumer changes any mathematical claim status during migration.
 
 Until then, `src/mojo_theorem_kernel.mojo` remains a scaffold and must not be

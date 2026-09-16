@@ -1,4 +1,4 @@
-# Claim-governance policy for larsbx/NLAP-JT.
+# Claim-governance policy for larsbx/finite-mandlebrot-research.
 #
 # Read by the vendored `tools/claim_governance` package (audit/claim_governance in larsbx/finite-math-kernels,
 # pinned in vendored.toml).  It restates, as configuration, the repository
@@ -12,7 +12,7 @@
 # Run: PYTHONPATH=tools python -m claim_governance.cli --root .
 
 [repository]
-name = "larsbx/NLAP-JT"
+name = "larsbx/finite-mandlebrot-research"
 
 [scan]
 prose = ["README.md", "docs/**/*.md", "src/**/*.md"]
@@ -135,7 +135,7 @@ negating_context = ["not ", "no ", "without ", "unless ", "forbidden", "disallow
 
 [[numerics.rule]]
 name = "paper-internal-terms"
-pattern = '\bC1\b|(?i:NLAP-JT|Mojo|theorem kernel|separator-catalogue|separator catalogue|catalogue extensionality|carrier|ResidualClosureNoMissingLinks|ExitClosureForC1|ResidualFrontierRefinement|ResidualDescentContradiction|PRIORITY_ZERO|OPEN_FRONTIER)'
+pattern = '\bC1\b|(?i:finite-mandlebrot-research|Mojo|theorem kernel|separator-catalogue|separator catalogue|catalogue extensionality|carrier|ResidualClosureNoMissingLinks|ExitClosureForC1|ResidualFrontierRefinement|ResidualDescentContradiction|PRIORITY_ZERO|OPEN_FRONTIER)'
 paths = ["paper/*.tex"]
 message = "project-internal term in the field-facing manuscript (tools/audit_paper_language.py lists the replacements)"
 

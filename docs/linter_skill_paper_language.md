@@ -23,7 +23,7 @@ Run this before committing any manuscript change.
 The audit rejects project-internal language in `paper/*.tex`, including:
 
 - private conjecture labels such as `C1`;
-- repository names such as `NLAP-JT`;
+- repository names such as `finite-mandlebrot-research`;
 - implementation-language names such as `Mojo`;
 - proof-engineering phrases such as `theorem kernel`;
 - repository compounds such as `separator-catalogue`;

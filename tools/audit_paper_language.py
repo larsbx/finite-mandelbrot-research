@@ -39,7 +39,7 @@ BANNED_TERMS = [
         True,
     ),
     BannedTerm(
-        "NLAP-JT",
+        "finite-mandlebrot-research",
         "this paper or this program",
         "repository name, not mathematical terminology",
     ),

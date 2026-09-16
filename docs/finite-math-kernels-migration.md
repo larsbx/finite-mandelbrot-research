@@ -2,7 +2,7 @@
 
 Status: implemented consumer migration; no theorem-status change.
 
-NLAP-JT vendors `finite_exact/` from `larsbx/finite-math-kernels` at the full
+finite-mandlebrot-research vendors `finite_exact/` from `larsbx/finite-math-kernels` at the full
 commit recorded in `vendored.toml`. `tools/check_vendored_sync.py` verifies
 every vendored Mojo file by SHA-256 in CI. Arithmetic consumers import the
 package-qualified modules under `src/finite_exact/`; the former root-level

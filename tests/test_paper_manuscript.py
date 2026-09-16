@@ -38,7 +38,7 @@ def test_manuscript_has_no_project_internal_terminology():
         "ResidualClosureNoMissingLinks",
         "ExitClosureForC1",
         "PRIORITY_ZERO",
-        "NLAP-JT",
+        "finite-mandlebrot-research",
         "catalogue extensionality",
     ]
     for term in forbidden:

@@ -11,7 +11,7 @@ def text() -> str:
 def test_spec_declares_non_theorem_boundary():
     body = text()
     assert "It proves no mathematical statement" in body
-    assert "accepts no NLAP-JT certificate" in body
+    assert "accepts no finite-mandlebrot-research certificate" in body
     assert "does not discharge C1" in body
     assert "ResidualClosureNoMissingLinks" in body
 
@@ -51,11 +51,11 @@ def test_fail_closed_dependency_rules_are_explicit():
 
 def test_domain_policy_stays_outside_portable_kernel():
     body = text()
-    assert "NLAP-JT policy" in body
+    assert "finite-mandlebrot-research policy" in body
     assert "PSC policy" in body
     assert "consumer-policy result carriers" in body
     assert "ships no default that silently permits imported theorems" in body
-    assert "NLAP-JT theorem names and prohibited primitive lists" in body
+    assert "finite-mandlebrot-research theorem names and prohibited primitive lists" in body
     assert "PSC conjecture names" in body
 
 

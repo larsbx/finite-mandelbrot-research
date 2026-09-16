@@ -2,7 +2,7 @@
 
 Status: PRIORITY_ZERO.
 
-This document defines what counts as a proof of the highest-priority conjecture C1 in NLAP-JT. It is the repository source of truth for C1 completion criteria.
+This document defines what counts as a proof of the highest-priority conjecture C1 in finite-mandlebrot-research. It is the repository source of truth for C1 completion criteria.
 
 ## Terminology declaration: C1 proof criterion
 

@@ -1,4 +1,4 @@
-# Mojo optimization contract for NLAP-JT finite computations and proof objects.
+# Mojo optimization contract for finite-mandlebrot-research finite computations and proof objects.
 #
 # Policy values are stored in explicit data and validated by the smoke kernel.
 
