@@ -1,0 +1,117 @@
+name: bootstrap-nlap-jt-migration
+
+on:
+  push:
+    branches:
+      - migration/nlap-jt-foundation
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out target migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: migration/nlap-jt-foundation
+          fetch-depth: 0
+
+      - name: Import pinned NLAP-JT history
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='d00c64d4ec703564a2d8ceb606279d2025f2352a'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch --no-tags https://github.com/larsbx/NLAP-JT.git main:refs/remotes/nlap-jt/main
+          actual="$(git rev-parse refs/remotes/nlap-jt/main)"
+          test "$actual" = "$expected"
+          git merge --allow-unrelated-histories --no-commit -X theirs refs/remotes/nlap-jt/main
+          git rm -f .github/workflows/bootstrap-from-nlap-jt.yml
+          git commit -m "Import NLAP-JT history at ${expected}"
+
+      - name: Migrate repository identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+          skip_parts = {'.git', '.pixi', '__pycache__'}
+          replacements = (
+              ('larsbx/NLAP-JT', 'larsbx/finite-mandlebrot-research'),
+              ('NLAP-JT', 'finite-mandlebrot-research'),
+              ('.pixi/nlap-smoke', '.pixi/finite-mandelbrot-smoke'),
+          )
+          text_suffixes = {
+              '.md', '.toml', '.py', '.mojo', '.yml', '.yaml', '.tex', '.bib',
+              '.txt', '.json', '.ini', '.cfg', '.lock', '.gitignore', '.gitattributes'
+          }
+          exact_names = {'README.md', 'ROADMAP.md', 'pixi.toml', 'pixi.lock', 'backend.toml', 'vendored.toml', 'claim_governance.toml', '.gitignore', '.gitattributes'}
+
+          for path in root.rglob('*'):
+              if not path.is_file() or any(part in skip_parts for part in path.parts):
+                  continue
+              if path.name not in exact_names and path.suffix not in text_suffixes:
+                  continue
+              try:
+                  original = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              updated = original
+              for old, new in replacements:
+                  updated = updated.replace(old, new)
+              if updated != original:
+                  path.write_text(updated, encoding='utf-8')
+
+          old_bridge = Path('docs/cross-program-bridge-psc-nlapjt-2026-09-12.md')
+          new_bridge = Path('docs/cross-program-bridge-psc-finite-mandelbrot-2026-09-12.md')
+          if old_bridge.exists() and not new_bridge.exists():
+              old_bridge.rename(new_bridge)
+
+          Path('MIGRATION.md').write_text('''# Repository migration provenance\n\nThis repository was initialized as the dedicated home for the finite-regime Mandelbrot research program.\n\nThe migration imports the complete Git history of `larsbx/NLAP-JT` through source commit `d00c64d4ec703564a2d8ceb606279d2025f2352a` and joins that history to the initial commit of `larsbx/finite-mandlebrot-research` with an unrelated-history merge. The source commit is therefore a direct ancestor of the migration branch rather than an untraceable file copy.\n\nAfter the history import, current-tree repository identity is migrated to `larsbx/finite-mandlebrot-research`. Mathematical claims and proof status are unchanged by the repository move. In particular, the exact rational/interval arithmetic boundary, no-transcendental-trigonometry policy, no-circle/rank-2 rule, no-ideal-point rule, Mojo-first theorem-kernel policy, theorem-tag imports, and C1 open-frontier status remain binding.\n\nThe original `larsbx/NLAP-JT` name is retained only here as provenance for the imported history.\n''', encoding='utf-8')
+          PY
+
+          # The legacy repository name may remain only in the provenance file.
+          if git grep -n 'NLAP-JT' -- ':!MIGRATION.md'; then
+            echo 'legacy repository identity remains outside MIGRATION.md' >&2
+            exit 1
+          fi
+
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
+        with:
+          cache: true
+
+      - name: Run migrated canonical gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          pixi run mojo-build
+          pixi run vendored
+          pixi run mojo-smoke
+          pixi run property
+          python3 tools/audit_no_trig.py
+          python3 tools/audit_no_points.py
+          pixi run test
+          python3 tools/audit_terminology.py
+          python3 tools/check_vendored_sync.py
+          PYTHONPATH=tools python3 -m claim_governance.cli --root .
+          python3 tools/audit_paper_language.py
+          python3 tools/audit_backend_manifest.py
+          python3 tools/audit_exact_arithmetic.py
+          python3 tools/poly_reference.py
+          python3 tools/interval_exclusion_reference.py
+
+      - name: Commit migrated identity and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          git diff --cached --check
+          git commit -m 'Migrate repository identity to finite-mandlebrot-research'
+          git push origin HEAD:migration/nlap-jt-foundation
