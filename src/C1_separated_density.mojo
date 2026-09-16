@@ -23,9 +23,12 @@ from checked_ray_address import make_checked_ray_addr
 from finite_exact.rat_q import Q
 
 
-struct SeparatedDensityResult(ImplicitlyCopyable):
+struct SeparatedDensityResult(Copyable, Movable):
     """`density` and `residue` sum to one; `arcs` is the number of arcs the
-    distinct cuts induce. A rejected result carries no measure."""
+    distinct cuts induce. A rejected result carries no measure.
+
+    `Q` is `Copyable` but not `ImplicitlyCopyable`, so every field assignment
+    below copies explicitly."""
 
     var density: Q
     var residue: Q
@@ -33,8 +36,8 @@ struct SeparatedDensityResult(ImplicitlyCopyable):
     var rejected: Bool
 
     def __init__(out self, density: Q, residue: Q, arcs: Int, rejected: Bool):
-        self.density = density
-        self.residue = residue
+        self.density = density.copy()
+        self.residue = residue.copy()
         self.arcs = arcs
         self.rejected = rejected
 
