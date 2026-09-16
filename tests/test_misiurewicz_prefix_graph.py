@@ -273,7 +273,7 @@ def test_multiple_sinks_are_all_retained():
     assert len(found.boundary) == 4 and len(found.interior) == 1
 
 
-# --- the negative control and fail-closed behaviour ------------------------------
+# --- declared prefixes and fail-closed behaviour ---------------------------------
 
 
 def test_the_reference_regression_replays():

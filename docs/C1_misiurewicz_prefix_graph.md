@@ -1,6 +1,6 @@
 # C1 Misiurewicz prefix graphs and the obstruction extractor
 
-Status: definition-level finite extractor with an executable negative control; no theorem-status change.
+Status: definition-level finite extractor reporting obstructions on declared prefixes; no negative control for the Misiurewicz class, and no theorem-status change.
 
 This note delivers round-two item R5 of `docs/cross-pollination-round-two-2026-09-16.md`, section N3. It runs the obstruction extractor of the Pisot overlap route on the finite graphs the exact-type catalogue of `docs/C1_misiurewicz_catalogue.md` supplies, and it is what round-one B6 was the prerequisite for.
 
