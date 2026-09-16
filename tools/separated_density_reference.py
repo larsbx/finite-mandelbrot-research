@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """Python reference for src/C1_separated_density.mojo.
 
-Exact rational arithmetic only. `density(cuts)` is the measure of the pairs of
-external angles that a finite set of rational cut angles separates:
+Exact rational arithmetic only. A catalogue prefix is a finite list of two-ray
+separators; each assigns every external angle a side, and two angles are
+separated exactly when some separator puts them on opposite sides, that is,
+when their side signatures differ. The endpoints cut the circle into atoms,
+atoms sharing a signature form one undecided class, and
 
-    density = 1 - sum_j |I_j|^2 = sum_{i != j} |I_i| |I_j|,
+    density = 1 - sum_c |C_c|^2,
 
 the parameter-space analogue of the common fraction `f_m` of the PSC overlap
-route. Usage: separated_density_reference.py
+route. Endpoints must not be flattened into one cut set: with the disjoint
+separators (0, 1/4) and (1/2, 3/4) the two outside atoms stay one class, so the
+density is 5/8 and not the 3/4 a flat cut set reports.
+Usage: separated_density_reference.py
 """
 
 from __future__ import annotations
@@ -16,65 +22,87 @@ import sys
 from fractions import Fraction
 from itertools import combinations
 
-PINNED = {  # cuts -> density; the Mojo smoke target asserts the same instances
-    ((1, 3), (2, 3)): Fraction(4, 9),
-    ((1, 7), (2, 7), (4, 7)): Fraction(4, 7),
-    ((0, 1), (1, 3), (2, 3)): Fraction(2, 3),
-    ((1, 3), (2, 3), (1, 3)): Fraction(4, 9),
-    ((1, 3),): Fraction(0),
+Address = tuple[int, int]
+Separator = tuple[Address, Address]
+
+PINNED: dict[tuple[Separator, ...], Fraction] = {  # the Mojo smoke target asserts the same instances
+    ((((1, 3)), ((2, 3))),): Fraction(4, 9),
+    ((((2, 3)), ((1, 3))),): Fraction(4, 9),
+    ((((0, 1)), ((1, 4))), (((1, 2)), ((3, 4)))): Fraction(5, 8),
+    ((((1, 7)), ((2, 7))), (((2, 7)), ((4, 7)))): Fraction(4, 7),
+    ((((1, 3)), ((2, 3))), (((0, 1)), ((1, 3)))): Fraction(2, 3),
+    ((((1, 3)), ((2, 3))), (((1, 3)), ((2, 3)))): Fraction(4, 9),
     (): Fraction(0),
 }
 
 
-def normalized(cuts) -> list[Fraction]:
-    """Distinct cut angles in [0, 1), ascending; raises on a malformed address."""
-    out = set()
-    for num, den in cuts:
-        if den <= 0 or num < 0 or num >= den:
-            raise ValueError(f"cut angle {num}/{den} is not a normalized ray address")
-        out.add(Fraction(num, den))
-    return sorted(out)
+def address(pair: Address) -> Fraction:
+    num, den = pair
+    if den <= 0 or num < 0 or num >= den:
+        raise ValueError(f"endpoint {num}/{den} is not a normalized ray address")
+    return Fraction(num, den)
 
 
-def arcs(cuts) -> list[Fraction]:
-    """Lengths of the arcs the distinct cuts induce; one arc of length 1 below two cuts."""
-    points = normalized(cuts)
-    if len(points) < 2:
-        return [Fraction(1)]
-    lengths = [b - a for a, b in zip(points, points[1:])]
-    lengths.append(1 - points[-1] + points[0])
-    return lengths
+def normalized(separators) -> list[tuple[Fraction, Fraction]]:
+    """Each separator as `(low, high)`; which side is inside is a convention that
+    complements one bit of every signature and leaves the classes alone."""
+    out = []
+    for left, right in separators:
+        a, b = address(left), address(right)
+        if a == b:
+            raise ValueError("a two-ray separator needs two distinct rays")
+        out.append((a, b) if a < b else (b, a))
+    return out
 
 
-def density(cuts) -> Fraction:
-    lengths = arcs(cuts)
-    assert sum(lengths) == 1
-    return 1 - sum(x * x for x in lengths)
+def atoms(separators) -> list[tuple[Fraction, tuple[int, ...]]]:
+    """`(length, side signature)` for each arc the endpoints cut."""
+    pairs = normalized(separators)
+    cuts = sorted({x for pair in pairs for x in pair})
+    if len(cuts) < 2:
+        return [(Fraction(1), ())]
+    out = []
+    for i, low in enumerate(cuts):
+        high = cuts[i + 1] if i + 1 < len(cuts) else cuts[0] + 1
+        mid = ((low + high) / 2) % 1
+        out.append((high - low, tuple(int(a < mid < b) for a, b in pairs)))
+    return out
 
 
-def pair_sum(cuts) -> Fraction:
-    """The same quantity as an explicit sum over ordered pairs of distinct arcs."""
-    lengths = arcs(cuts)
-    return sum(2 * a * b for a, b in combinations(lengths, 2))
+def classes(separators) -> dict[tuple[int, ...], Fraction]:
+    out: dict[tuple[int, ...], Fraction] = {}
+    for length, signature in atoms(separators):
+        out[signature] = out.get(signature, Fraction(0)) + length
+    assert sum(out.values()) == 1
+    return out
+
+
+def density(separators) -> Fraction:
+    return 1 - sum(length * length for length in classes(separators).values())
+
+
+def flattened_density(separators) -> Fraction:
+    """The quantity a flat cut set would report; it overstates the decided
+    measure whenever two atoms share a signature. Kept only as a negative
+    control for the tests."""
+    lengths = [length for length, _ in atoms(separators)]
+    return 1 - sum(length * length for length in lengths)
 
 
 def main() -> int:
-    for cuts, expected in PINNED.items():
-        assert density(cuts) == expected, cuts
-        assert pair_sum(cuts) == expected, cuts
-    # Refinement never lowers the density, and only a partition into equal arcs
-    # attains the maximum 1 - 1/n for n arcs.
-    base = [(k, 12) for k in range(1, 12)]
-    for size in range(2, 7):
-        for cuts in combinations(base, size):
-            here = density(cuts)
-            assert 0 <= here <= 1 - Fraction(1, size)
-            for extra in base:
-                if extra not in cuts:
-                    assert density(cuts + (extra,)) >= here, (cuts, extra)
-    equal = [(k, 6) for k in range(6)]
-    assert density(equal) == 1 - Fraction(1, 6)
-    print(f"OK: {len(PINNED)} pinned densities and the refinement bound hold.")
+    for separators, expected in PINNED.items():
+        assert density(separators) == expected, separators
+    disjoint = PINNED and ((((0, 1)), ((1, 4))), (((1, 2)), ((3, 4))))
+    assert density(disjoint) == Fraction(5, 8) and flattened_density(disjoint) == Fraction(3, 4)
+    # Refinement never lowers the density, and the classes bound it by 1 - 1/n.
+    base = [((k, 12), (j, 12)) for k, j in combinations(range(12), 2)]
+    for size in (1, 2, 3):
+        for chosen in combinations(base[:9], size):
+            here = density(chosen)
+            assert 0 <= here <= 1 - Fraction(1, len(classes(chosen)))
+            for extra in base[:9]:
+                assert density(chosen + (extra,)) >= here, (chosen, extra)
+    print(f"OK: {len(PINNED)} pinned densities, the disjoint counterexample, and the refinement bound hold.")
     return 0
 
 

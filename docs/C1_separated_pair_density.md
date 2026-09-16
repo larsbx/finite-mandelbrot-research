@@ -16,29 +16,36 @@ Use discipline: Use only in C1 files, or with a pointer to this declaration. Nev
 
 ## Objects
 
-A catalogue prefix contributes finitely many rational ray addresses, its **cuts**. The distinct cuts, taken in cyclic order, split the circle of external angles into arcs `I_1, ..., I_n` with exact rational lengths summing to one. Two parameters whose angles lie in different arcs are separated at that prefix, so under the product of Lebesgue measure the decided pairs have measure
+A catalogue prefix contributes finitely many **two-ray separators**, each a pair of distinct rational ray addresses. A separator splits the circle of external angles into the arc between its endpoints and the complement of that arc, so it assigns every angle a side; which side is called inside is a convention that complements one bit of every signature and leaves everything below unchanged. Two parameters are separated at the prefix exactly when some separator puts them on opposite sides, that is, when their **side signatures** differ.
+
+The endpoints cut the circle into **atoms**. Atoms sharing a signature are one undecided class `C_c`, and under the product of Lebesgue measure the decided pairs have measure
 
 ```text
-density = 1 - sum_j |I_j|^2 = sum_{i != j} |I_i| |I_j|,     residue = sum_j |I_j|^2.
+density = 1 - sum_c |C_c|^2,     residue = sum_c |C_c|^2.
 ```
 
-`separated_pair_density(nums, dens)` returns both, with the number of arcs. Fewer than two distinct cuts leave the circle a single arc, so the density is `0` and the residue `1`: one ray is not a separation. Repetition is not refinement; duplicate addresses collapse. The computation fails closed on a length mismatch, a malformed or out-of-range address, and on arcs whose exact lengths do not sum to one, which no accepted input can produce and which is therefore a kernel self-check.
+`separated_pair_density(lefts_n, lefts_d, rights_n, rights_d)` returns both, with the class and atom counts. No separator leaves the circle one atom, so the density is `0` and the residue `1`. Repetition is not refinement. The computation fails closed on a length mismatch, a malformed or out-of-range endpoint, a separator whose two rays coincide, and on atoms whose exact lengths do not sum to one, which no accepted input can produce and which is therefore a kernel self-check.
+
+**Endpoints may not be flattened into one cut set.** Two atoms outside every separator are not separated from each other, however many separators there are, so they stay one class. With the disjoint separators `(0, 1/4)` and `(1/2, 3/4)` the four atoms fall into three classes of `1/4`, `1/2`, `1/4` and the density is `5/8`; a flat cut set would treat all four as distinct and report `3/4`, overstating the decided measure. `flattened_density` in the reference keeps that wrong quantity only as a negative control.
 
 ## Properties
 
-- **Range.** `0 <= density <= 1 - 1/n` for `n` arcs, with equality exactly for `n` arcs of equal length.
-- **Refinement monotonicity.** Adding a cut never lowers the density. The reference checks this exhaustively over every subset of the twelfth roots of size at most six.
-- **Exactness.** Every length, square, and sum is an unbounded rational; no floating point appears, as `docs/rational-interval-arithmetic-spec.md` requires of certificate-relevant numbers.
+- **Range.** `0 <= density <= 1 - 1/n` for `n` signature classes, with equality exactly for classes of equal measure.
+- **Refinement monotonicity.** Adding a separator refines the signature partition, so it never lowers the density.
+- **Orientation independence.** Exchanging a separator's two endpoints leaves the density and the class measures unchanged.
+- **Exactness.** Every length, midpoint, square, and sum is an unbounded rational; no floating point appears, as `docs/rational-interval-arithmetic-spec.md` requires of certificate-relevant numbers.
 
 Pinned instances, asserted identically by the Mojo smoke target and by `tools/separated_density_reference.py`:
 
-| Cuts | Arcs | Density |
+| Separators | Classes | Density |
 | --- | --- | --- |
-| `1/3, 2/3` | `1/3, 2/3` | `4/9` |
-| `1/7, 2/7, 4/7` | `1/7, 2/7, 4/7` | `4/7` |
-| `0, 1/3, 2/3` | three thirds | `2/3` |
-| `1/3, 2/3, 1/3` | as `1/3, 2/3` | `4/9` |
-| `1/3` or none | one arc | `0` |
+| `(1/3, 2/3)` | `1/3, 2/3` | `4/9` |
+| `(2/3, 1/3)` | the same, reversed | `4/9` |
+| `(0, 1/4)` and `(1/2, 3/4)` | `1/4, 1/2, 1/4` | `5/8` |
+| `(1/7, 2/7)` and `(2/7, 4/7)` | `1/7, 2/7, 4/7` | `4/7` |
+| `(1/3, 2/3)` and `(0, 1/3)` | three thirds | `2/3` |
+| `(1/3, 2/3)` twice | `1/3, 2/3` | `4/9` |
+| none | one class | `0` |
 
 ## Non-claims
 

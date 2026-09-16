@@ -81,51 +81,58 @@ def test_regime_correspondence_binds_the_density_symbol():
 
 # --- the reference model --------------------------------------------------------
 
+SEP_13_23 = ((((1, 3)), ((2, 3))),)
+DISJOINT = ((((0, 1)), ((1, 4))), (((1, 2)), ((3, 4))))
+
 
 def test_pinned_densities():
     assert sd.main() == 0
-    assert sd.density(((1, 3), (2, 3))) == Fraction(4, 9)
-    assert sd.density(((1, 7), (2, 7), (4, 7))) == Fraction(4, 7)
-    assert sd.arcs(((1, 7), (2, 7), (4, 7))) == [Fraction(1, 7), Fraction(2, 7), Fraction(4, 7)]
+    assert sd.density(SEP_13_23) == Fraction(4, 9)
+    assert sd.density(((((1, 7)), ((2, 7))), (((2, 7)), ((4, 7))))) == Fraction(4, 7)
 
 
-def test_fewer_than_two_distinct_cuts_decide_nothing():
-    for cuts in ((), ((1, 3),), ((1, 3), (2, 6))):
-        assert sd.density(cuts) == 0 and sd.arcs(cuts) == [Fraction(1)]
+def test_disjoint_separators_keep_their_outside_atoms_in_one_class():
+    # The finding of the review on PR #3: flattening endpoints into one cut set
+    # counts the two outside atoms as distinct and overstates the measure.
+    assert sd.density(DISJOINT) == Fraction(5, 8)
+    assert sd.flattened_density(DISJOINT) == Fraction(3, 4)
+    assert len(sd.classes(DISJOINT)) == 3 and len(sd.atoms(DISJOINT)) == 4
+    assert sorted(sd.classes(DISJOINT).values()) == [Fraction(1, 4), Fraction(1, 4), Fraction(1, 2)]
 
 
-def test_malformed_addresses_are_refused():
-    for cuts in (((1, 0),), ((7, 5),), ((-1, 3),), ((3, 3),)):
+def test_which_side_is_inside_is_a_convention():
+    for separators in (SEP_13_23, DISJOINT):
+        flipped = tuple((right, left) for left, right in separators)
+        assert sd.density(flipped) == sd.density(separators)
+        assert sorted(sd.classes(flipped).values()) == sorted(sd.classes(separators).values())
+
+
+def test_no_separator_decides_nothing_and_repetition_is_not_refinement():
+    assert sd.density(()) == 0 and sd.atoms(()) == [(Fraction(1), ())]
+    assert sd.density(SEP_13_23 + SEP_13_23) == sd.density(SEP_13_23)
+
+
+def test_malformed_separators_are_refused():
+    for separators in (((((1, 0)), ((1, 3))),), ((((7, 5)), ((1, 3))),), ((((-1, 3)), ((1, 3))),),
+                       ((((1, 3)), ((1, 3))),), ((((1, 3)), ((2, 6))),)):
         with pytest.raises(ValueError):
-            sd.density(cuts)
+            sd.density(separators)
 
 
-def test_density_equals_the_ordered_pair_sum_and_respects_the_arc_bound():
-    base = [(k, 10) for k in range(10)]
-    for size in range(2, 6):
-        for cuts in combinations(base, size):
-            here = sd.density(cuts)
-            assert here == sd.pair_sum(cuts)
-            assert 0 <= here <= 1 - Fraction(1, size)
-
-
-def test_refinement_never_lowers_the_density():
-    base = [(k, 9) for k in range(9)]
-    for size in range(1, 5):
-        for cuts in combinations(base, size):
-            for extra in base:
-                if extra not in cuts:
-                    assert sd.density(cuts + (extra,)) >= sd.density(cuts)
-
-
-def test_equal_arcs_attain_the_maximum():
-    for n in range(2, 13):
-        assert sd.density(tuple((k, n) for k in range(n))) == 1 - Fraction(1, n)
+def test_classes_bound_the_density_and_refinement_never_lowers_it():
+    base = [((k, 8), (j, 8)) for k, j in combinations(range(8), 2)]
+    for size in (1, 2, 3):
+        for chosen in combinations(base[:7], size):
+            here = sd.density(chosen)
+            assert here == 1 - sum(x * x for x in sd.classes(chosen).values())
+            assert 0 <= here <= 1 - Fraction(1, len(sd.classes(chosen)))
+            for extra in base[:7]:
+                assert sd.density(chosen + (extra,)) >= here
 
 
 def test_mojo_smoke_pins_the_same_instances():
     src = text(SRC)
-    for fragment in ('var thirds_d: List[Int64] = [3, 3]', 'var rabbit_d: List[Int64] = [7, 7, 7]',
-                     '_is(thirds, 4, 9)', '_is(rabbit, 4, 7)', '_is(refined, 2, 3)', '_is(repeated, 4, 9)'):
+    for fragment in ('_is(single, 4, 9)', '_is(disjoint, 5, 8)', '_is(nested, 4, 7)', '_is(refined, 2, 3)',
+                     'disjoint.atoms == 4 and disjoint.classes == 3', 'disjoint.density.lt(Q(3, 4))'):
         assert fragment in src
     assert "separated_density_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
