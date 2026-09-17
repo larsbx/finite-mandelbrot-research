@@ -123,6 +123,7 @@ src/
   substitution_dynamics/     # vendored tuning, directive-prefix, and coincidence kernels, same pin
 tools/
   audit_*.py
+  atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md
   claim_governance/          # vendored from larsbx/finite-math-kernels audit/, pinned in vendored.toml
   check_vendored_sync.py

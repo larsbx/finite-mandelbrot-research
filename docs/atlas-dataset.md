@@ -1,4 +1,4 @@
-# The atlas dataset: every exact object, printed once
+# The atlas: every exact object, printed once, and the page built from it
 
 **Scope.** An engineering change. No mathematical claim changes and no verdict
 moves: `src/atlas_dataset.mojo` asks each module for the answer it already
@@ -59,7 +59,38 @@ and its digests are checked; a renderer is a consumer of the kernel's public
 accessors, not part of the kernel. Binding row in
 `docs/rational-interval-arithmetic-spec.md` section 6.2.
 
-## 4. Verification
+## 4. The page
+
+`tools/atlas/build_page.py` writes one self-contained HTML file from two
+sources, and the split above is exactly the seam:
+
+- the exact sections, from one run of the emitter;
+- the positions, from `tools/atlas/trace_positions.py`, which traces a
+  parameter ray by Newton down a decreasing potential and finishes it on the
+  equation the object satisfies.
+
+`trace_positions.py` is floating point and uses the analytic machinery the core
+refuses. That is why it sits in `tools/`, why nothing under `src/` imports it,
+and why the audits that police the core need no exception for it. It computes a
+placement, not an association: tying a ray address to a parameter is the
+imported landing theorem, which this repository does not compute and does not
+claim.
+
+The page shows three views:
+
+| View | What it draws |
+| --- | --- |
+| the parameter plane | each catalogued address at its traced position, and each exclusion certificate as the dyadic rectangle it actually is |
+| the circle of addresses | `Z/den` with the separator prefix as chords, the nonproductive pairs as arcs, and the cyclic sinks heavy |
+| the incidence package | the three carrier vertices, the `PointVertex` they are the carrier of, and the chain of gates, with the two at the end that do not pass |
+
+Rebuild with `pixi run atlas-page`. The HTML is generated and is not committed;
+the templates beside the builder are the source.
+
+A page is a picture of finite evidence. It proves nothing by itself, and the
+boundary of claims in `README.md` applies to it unchanged.
+
+## 5. Verification
 
 - `tests/test_atlas_dataset.py` runs the emitter and checks every section
   against the independent Python oracles: counts and catalogues, kneading
@@ -74,3 +105,6 @@ accessors, not part of the kernel. Binding row in
   emitted, the theorem import is **not** accepted, and `proves_c1` is false.
 - The Mojo smoke suite carries the three additions as named cases and stays at
   59 cases, all passing.
+- Every traced position is checked against the equation its exact type states:
+  the builder reports how many disagree and exits nonzero if any do. At the
+  time of writing that is 0 of 357.
