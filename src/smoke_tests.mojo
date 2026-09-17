@@ -51,6 +51,7 @@ from checked_ray_address import checked_ray_address_smoke
 from checked_finite_certificate_gate import checked_finite_certificate_gate_smoke
 from C1_theorem_tag_payload_instances import theorem_tag_payload_instances_smoke
 from checked_landing_target_adapter import checked_landing_target_adapter_smoke
+from exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
 from rat_backend_plan import q_backend_migration_smoke
@@ -329,6 +330,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("bigint adapter phase two", bigint_adapter_phase_two_smoke())
     _ = report.record("bigint Z phase three", bigint_z_phase_three_smoke())
     _ = report.record("bigint adapter complete", bigint_adapter_complete_smoke())
+    _ = report.record("exact decimal", exact_decimal_smoke())
     _ = report.record("bigz long division", bigz_long_division_smoke())
     _ = report.record("Q cancellation", q_cancellation_smoke())
     _ = report.record("smoke reporter", smoke_report_smoke())

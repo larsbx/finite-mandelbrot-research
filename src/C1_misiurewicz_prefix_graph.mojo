@@ -93,7 +93,14 @@ struct PrefixExtraction(Copyable, Movable):
     the terminal sinks, the pairs whose two points share an image and which
     therefore have no outgoing edge. `sink_components` is the total.
 
-    A rejected extraction carries no counts."""
+    `nonproductive_codes` is the set the counts summarise, and `cycle_codes`
+    the pairs lying on a cyclic sink, both as pair codes: `_code` packs an
+    unordered pair into one Int, so a reader decodes a code as
+    `(code // den, code % den)`. They are the same objects the counts are taken
+    from, computed in the same pass, so a caller that wants the pairs does not
+    re-run the pipeline to get them.
+
+    A rejected extraction carries no counts and no pairs."""
 
     var vertices: Int
     var undecided: Int
@@ -102,9 +109,12 @@ struct PrefixExtraction(Copyable, Movable):
     var boundary: Int
     var interior: Int
     var rejected: Bool
+    var nonproductive_codes: List[Int]
+    var cycle_codes: List[Int]
 
     def __init__(out self, vertices: Int, undecided: Int, nonproductive: Int,
-                 merging: Int, boundary: Int, interior: Int, rejected: Bool):
+                 merging: Int, boundary: Int, interior: Int, rejected: Bool,
+                 nonproductive_codes: List[Int], cycle_codes: List[Int]):
         self.vertices = vertices
         self.undecided = undecided
         self.nonproductive = nonproductive
@@ -112,6 +122,8 @@ struct PrefixExtraction(Copyable, Movable):
         self.boundary = boundary
         self.interior = interior
         self.rejected = rejected
+        self.nonproductive_codes = nonproductive_codes.copy()
+        self.cycle_codes = cycle_codes.copy()
 
     def accepted(self) -> Bool:
         return not self.rejected
@@ -138,7 +150,7 @@ struct PrefixExtraction(Copyable, Movable):
 
 
 def rejected_extraction() -> PrefixExtraction:
-    return PrefixExtraction(0, 0, 0, 0, 0, 0, True)
+    return PrefixExtraction(0, 0, 0, 0, 0, 0, True, List[Int](), List[Int]())
 
 
 # --- the finite objects ---------------------------------------------------------
@@ -290,9 +302,11 @@ def extract(seed: List[Int], lows: List[Int], highs: List[Int], tags: List[Int],
     # The nonproductive set, its merging pairs, and its sink cycles.
     var nonproductive = 0
     var merging = 0
+    var nonproductive_codes = List[Int]()
     for i in range(len(codes)):
         if not productive[codes[i]]:
             nonproductive += 1
+            nonproductive_codes.append(codes[i])
             if _successor_code(codes[i], den) < 0:
                 merging += 1
 
@@ -303,6 +317,7 @@ def extract(seed: List[Int], lows: List[Int], highs: List[Int], tags: List[Int],
         on_walk.append(False)
     var boundary = 0
     var interior = 0
+    var cycle_codes = List[Int]()
     for i in range(len(codes)):
         var start = codes[i]
         if productive[start] or seen[start]:
@@ -331,6 +346,7 @@ def extract(seed: List[Int], lows: List[Int], highs: List[Int], tags: List[Int],
             var touches = False
             for k in range(at, len(walk)):
                 var pair_code = walk[k]
+                cycle_codes.append(pair_code)
                 if hits_endpoint(pair_code // den, lows, highs):
                     touches = True
                 if hits_endpoint(pair_code % den, lows, highs):
@@ -341,7 +357,7 @@ def extract(seed: List[Int], lows: List[Int], highs: List[Int], tags: List[Int],
                 interior += 1
 
     return PrefixExtraction(len(vertices), undecided, nonproductive, merging,
-                            boundary, interior, False)
+                            boundary, interior, False, nonproductive_codes, cycle_codes)
 
 
 # Regime correspondence: misiurewicz-prefix-obstruction
@@ -465,6 +481,43 @@ def misiurewicz_prefix_graph_smoke() -> Bool:
         return False
     # This prefix does not decide the class, and must not read as if it did.
     if found.obstruction_free():
+        return False
+
+    # The pairs the counts are taken from. Every reported code decodes to two
+    # distinct vertices of the graph and is genuinely unseparated now, and the
+    # cyclic ones are a subset closed under doubling: a cycle's successor is on
+    # the same cycle. That is what lets a reader draw the obstruction rather
+    # than re-derive it.
+    if len(found.nonproductive_codes) != found.nonproductive:
+        return False
+    for i in range(len(found.nonproductive_codes)):
+        var code = found.nonproductive_codes[i]
+        var a = code // 14
+        var b = code % 14
+        if a == b or a >= b:
+            return False
+        if separated(a, b, lows, highs, 14):
+            return False
+        var in_closure = 0
+        for v in range(len(closure)):
+            if closure[v] == a or closure[v] == b:
+                in_closure += 1
+        if in_closure != 2:
+            return False
+    if len(found.cycle_codes) == 0 or len(found.cycle_codes) > found.nonproductive:
+        return False
+    for i in range(len(found.cycle_codes)):
+        var image = _successor_code(found.cycle_codes[i], 14)
+        var on_cycle = False
+        for j in range(len(found.cycle_codes)):
+            if found.cycle_codes[j] == image:
+                on_cycle = True
+        if not on_cycle:
+            return False
+    # A refusal reports no pairs at all.
+    if len(rejected_extraction().nonproductive_codes) != 0:
+        return False
+    if len(rejected_extraction().cycle_codes) != 0:
         return False
 
     # The nonproductive set has sinks of two kinds, and `merging` counts the

@@ -8,6 +8,7 @@ version = "0.1.0"
 [tasks]
 test = "python -m pytest tests/"
 mojo-smoke = "mojo src/smoke_tests.mojo"
+atlas-dataset = "mojo src/atlas_dataset.mojo"
 mojo-build = "mojo build src/smoke_tests.mojo -o .pixi/finite-mandelbrot-smoke"
 property = "python tools/exact_arithmetic_property_oracle.py"
 regime-audit = "python tools/audit_regime_correspondences.py"
