@@ -133,6 +133,21 @@ def _period_denominator(period: Int) -> CheckedI64Result:
     return checked_sub_i64(power.value, 1)
 
 
+def _strictly_before(a: CheckedRayAddrResult, b: CheckedRayAddrResult) -> Bool:
+    """`a < b` for two accepted reduced addresses, by cross multiplication.
+
+    Denominators are positive, so the comparison keeps its direction. An
+    overflow in either cross product refuses the comparison rather than
+    guessing, which makes the caller reject the pair."""
+    if a.rejected or b.rejected:
+        return False
+    var left = checked_mul_i64(a.num, b.den)
+    var right = checked_mul_i64(b.num, a.den)
+    if left.overflowed or right.overflowed:
+        return False
+    return left.value < right.value
+
+
 def tuned_angle(
     root_minus_num: Int64,
     root_minus_den: Int64,
@@ -143,11 +158,22 @@ def tuned_angle(
 ) -> CheckedRayAddrResult:
     """`theta` tuned by the component with root rays `theta_- < theta_+`.
 
-    Refuses a root pair whose two periods disagree, a non-periodic argument,
-    a period product beyond `TUNING_PERIOD_LIMIT`, and any overflow. The
-    result is a reduced address."""
+    Refuses a root pair whose two periods disagree, a root pair that is not
+    strictly ordered, a non-periodic argument, a period product beyond
+    `TUNING_PERIOD_LIMIT`, and any overflow. The result is a reduced address.
+
+    The ordering is part of what a component is, and the substitution is not
+    symmetric in the two rays: the lower ray supplies the block for a zero
+    digit and the upper ray the block for a one. So an equal or swapped pair
+    is malformed input, not a component read the other way round, and it is
+    refused rather than silently tuned to a different address."""
     var root_period = angle_period(root_minus_num, root_minus_den)
     if root_period < 1 or angle_period(root_plus_num, root_plus_den) != root_period:
+        return rejected_ray_addr()
+    if not _strictly_before(
+        make_checked_ray_addr(root_minus_num, root_minus_den),
+        make_checked_ray_addr(root_plus_num, root_plus_den),
+    ):
         return rejected_ray_addr()
     var angle_length = angle_period(num, den)
     if angle_length < 1:
@@ -248,6 +274,16 @@ def angle_tuning_smoke() -> Bool:
 
     # Tuning by the doubling component fixes nothing and is not the identity.
     if tunes_to(1, 3, 2, 3, 1, 3, 1, 3):
+        return False
+    # Fail closed: an unordered root pair. The two rays are not
+    # interchangeable, so a swapped pair would otherwise tune to a different
+    # address (3/5 rather than 2/5) and an equal pair is not a component at
+    # all.
+    if tuned_angle(2, 3, 1, 3, 1, 3).accepted():
+        return False
+    if tuned_angle(1, 3, 1, 3, 1, 3).accepted():
+        return False
+    if tuned_angle(2, 7, 1, 7, 1, 3).accepted():
         return False
     # Fail closed: mismatched root periods, a non-periodic argument, and a
     # period product past the bound.
