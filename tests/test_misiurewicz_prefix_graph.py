@@ -338,6 +338,56 @@ def test_counts_past_the_bound_are_refusals_not_passes():
     assert all(mc.catalogue_denominator(l, k) > pg.MAX_PREFIX_GRAPH_DENOMINATOR for l, k in bounded)
 
 
+# --- the negative control (round-two item R5) -------------------------------------
+
+CONTROL_SEED = [9]                 # the period-three orbit 3/7 -> 6/7 -> 5/7 over 21
+RABBIT_WAKE = seps((3, 6))         # 1/7 and 2/7, co-landing at the period-three root
+BASILICA_WAKE = seps((7, 14))      # 1/3 and 2/3, co-landing at the period-two root
+CONTROL_DEN = 21
+
+
+def test_the_control_orbit_is_the_period_three_one_and_holds_no_ray_of_the_prefix():
+    assert pg.forward_closure(CONTROL_SEED, CONTROL_DEN) == [9, 15, 18]
+    assert not pg.endpoints(RABBIT_WAKE + BASILICA_WAKE) & {9, 15, 18}
+
+
+def test_a_prefix_that_separates_no_point_of_the_orbit_is_one_interior_obstruction():
+    """Decided by hand: every point is strictly outside the arc from 3 to 6, so
+    no iterate separates any pair; doubling carries the orbit onto itself, so
+    the three pairs form one cycle; and no point is a ray, so the cycle meets no
+    boundary and the dichotomy must call it interior."""
+    assert [pg.side(p, RABBIT_WAKE[0], CONTROL_DEN) for p in (9, 15, 18)] == [pg.LEFT] * 3
+    found = pg.extract(CONTROL_SEED, RABBIT_WAKE, CONTROL_DEN)
+    assert (found.vertices, found.undecided, found.nonproductive) == (3, 3, 3)
+    assert (found.merging, len(found.boundary), len(found.interior)) == (0, 0, 1)
+    assert not found.obstruction_free
+
+
+def test_one_more_declared_co_landing_makes_the_same_orbit_clean():
+    """The other direction: the arc from 7 to 14 holds 9 and neither 15 nor 18,
+    so the orbit is split and the pair left undecided is separated one doubling
+    later. An extractor that always reported an obstruction fails here."""
+    found = pg.extract(CONTROL_SEED, RABBIT_WAKE + BASILICA_WAKE, CONTROL_DEN)
+    assert found.obstruction_free and found.nonproductive == 0
+    assert found.undecided == 1 and found.vertices == 3
+
+
+def test_the_control_exercises_the_interior_branch_the_pinned_report_does_not():
+    pinned = pg.extract_catalogue(1, 3, PERIOD_THREE)
+    assert len(pinned.interior) == 0
+    assert len(pg.extract(CONTROL_SEED, RABBIT_WAKE, CONTROL_DEN).interior) == 1
+
+
+def test_the_mojo_smoke_pins_the_control_and_the_note_records_it():
+    src = text(SRC)
+    for fragment in ("var control_seed: List[Int] = [9]", "coarse.interior != 1",
+                     "refined.accepted() and refined.obstruction_free()"):
+        assert fragment in src
+    body = text(DOC)
+    assert "## The negative control" in body
+    assert "control on **this extractor**, not on the class" in body
+
+
 def test_the_non_claims_hold_in_the_reference_too():
     assert not pg.obstruction_free_proves_fibre_triviality()
     assert not pg.extractor_decides_persistent_nonseparation()

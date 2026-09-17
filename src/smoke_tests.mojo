@@ -30,6 +30,7 @@ from C1_residual_closure_no_missing_links import FinalExitKind, accepted_final_e
 from C1_theorem_tag_assumption_payloads import AssumptionPayloadKind, PayloadConclusionKind, PayloadStrengthClass, allowed_payload_kind, allowed_payload_conclusion, allowed_payload_strength, theorem_tag_payload_admissible, rational_parameter_ray_landing_payload_scaffold, fiber_definition_payload_scaffold, generic_mlc_payload_rejected, bounded_search_payload_rejected
 from C1_theorem_tag_import_ledger import ImportConclusionKind, ImportStrengthClass, ImportStatus, allowed_conclusion_kind, allowed_strength_class, forbidden_strength_class, rational_parameter_ray_landing_tag_ready, fiber_definition_equivalence_tag_ready, known_trivial_fiber_class_tag_ready, tuning_kneading_substitution_tag_ready, harmonic_measure_fibre_triviality_tag_ready, harmonic_measure_tag_discharges_a_named_pair, theorem_tag_admissible_for_final
 from C1_residual_directive_carrier import residual_directive_carrier_smoke
+from C1_carrier_density_profile import carrier_density_profile_smoke
 from C1_separated_density import separated_density_smoke
 from misiurewicz_catalogue import misiurewicz_catalogue_smoke
 from C1_misiurewicz_prefix_graph import misiurewicz_prefix_graph_smoke
@@ -321,6 +322,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("residual directive carrier", residual_directive_carrier_smoke())
     _ = report.record("exact angle tuning", angle_tuning_smoke())
     _ = report.record("separated density", separated_density_smoke())
+    _ = report.record("carrier density profile", carrier_density_profile_smoke())
     _ = report.record("Misiurewicz exact-type catalogue", misiurewicz_catalogue_smoke())
     _ = report.record("Misiurewicz prefix graph", misiurewicz_prefix_graph_smoke())
     _ = report.record("checked landing target adapter", checked_landing_target_adapter_smoke())

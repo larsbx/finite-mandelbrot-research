@@ -126,18 +126,32 @@ tools/
   atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md
   claim_governance/          # vendored from larsbx/finite-math-kernels audit/, pinned in vendored.toml
+  proof_records/             # vendored proof records and ledger generator, same upstream
+  make_ledger.py             # the one record table; every ledger surface is rendered from it
   check_vendored_sync.py
+tla/
+  ProofArchitecture.tla      # vendored dependency state machine
+  Ledger.tla, MCLedger*      # generated from ledger.json
 tests/
   test_*.py
 claim_governance.toml        # repository policy for the vendored audit
+ledger.json                  # the record table, serialized; generated
 ```
 
 `claim_governance.toml` restates the terminology, no-trigonometry, no-points,
 rank-2 locus, and paper-language rules as configuration for the vendored
-`tools/claim_governance` package, and keeps the C1 proof-block statuses of
-`docs/C1_final_proof_block_ledger.md` and `src/C1_final_proof_block_ledger.mojo`
-in agreement. CI runs it beside the `tools/audit_*.py` scripts, which remain
-the executable record of the same rules until they are retired.
+`tools/claim_governance` package. Its `[[claim]]` block is no longer written by
+hand: the proof-record table of `tools/make_ledger.py` is the single source of
+the C1 proof-block statuses, and the Mojo mirror
+`src/C1_final_proof_block_ledger.mojo`, the block table of
+`docs/C1_final_proof_block_ledger.md`, the claim entries, the index
+`docs/C1_ledger_index.md`, the TLA+ ledger with its TLC models, and the typed
+relationship graph `docs/C1_claim_relationship_graph.json` are all rendered
+from it (`pixi run ledgers`). Whether the final object *requires* a block is
+the dependency edge `C1 -> block`, not a field anyone sets. CI runs
+`tools/make_ledger.py --check` beside the audit, so a hand-edited surface fails
+the build rather than drifting. The `tools/audit_*.py` scripts remain the
+executable record of the same rules until they are retired.
 
 ## Boundary of claims
 
