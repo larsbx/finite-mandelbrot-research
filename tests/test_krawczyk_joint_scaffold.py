@@ -39,7 +39,7 @@ def test_p21_demo_is_computed_not_status_asserted():
     assert "KrawczykWitnessStatus(\"P_2_1\", True, True, True, True" not in demo_src
 
 
-def test_bigq_krawczyk_replay_is_typed_and_fail_closed():
+def test_bigq_krawczyk_replay_is_typed_and_fail_closed(mojo_smoke):
     src = read(KRAW)
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
     assert "struct BigQKrawczykResult(Copyable)" in src
@@ -50,7 +50,7 @@ def test_bigq_krawczyk_replay_is_typed_and_fail_closed():
     assert "q_backend_blocks_proof_acceptance(backend)" in src
     assert "half_width_den_power" in src
     assert "var narrow_box = verify_bigq_p21_krawczyk_c_minus_2(80)" in src
-    assert "if not bigq_krawczyk_replay_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq Krawczyk replay")
 
 
 def test_krawczyk_formula_is_present():

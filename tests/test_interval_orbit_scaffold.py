@@ -30,7 +30,7 @@ def test_native_interval_recurrence_exists():
     assert "return IQBoolResult(re_result.value or im_result.value, False)" in src
 
 
-def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure():
+def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure(mojo_smoke):
     src = text()
     smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
     assert "from krawczyk_witness import c_minus_2_box" in src
@@ -40,7 +40,7 @@ def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure():
     assert "def arithmetic_replay_accepted(self) -> Bool:" in src
     assert "def ambiguous(self) -> Bool:" in src
     assert "var narrow_box = bigq_p21_exact_type_exclusions(80)" in src
-    assert "if not bigq_exact_type_exclusion_replay_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq exact-type exclusion replay")
 
 
 def test_intended_pair_has_clean_semantics():

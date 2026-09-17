@@ -26,7 +26,7 @@ def test_int64_demo_backend_is_not_proof_ready():
     assert "def bigint_backend_blocks_proof_acceptance" in src
 
 
-def test_dynamic_limb_phase_one_is_explicitly_incomplete():
+def test_dynamic_limb_phase_one_is_explicitly_incomplete(mojo_smoke):
     src = read(BIG)
     z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
@@ -41,11 +41,11 @@ def test_dynamic_limb_phase_one_is_explicitly_incomplete():
     assert "not status.has_exact_divisibility" in src
     assert "not status.has_canonical_serialization" in src
     assert "not status.allows_certificate_acceptance" in src
-    assert "if not bigint_z_phase_one_smoke():" in smoke
-    assert "if not bigint_adapter_phase_one_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigint Z phase one")
+    assert mojo_smoke.case_passed("bigint adapter phase one")
 
 
-def test_dynamic_limb_phase_two_adds_division_and_gcd_but_stays_blocked():
+def test_dynamic_limb_phase_two_adds_division_and_gcd_but_stays_blocked(mojo_smoke):
     src = read(BIG)
     z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
@@ -58,11 +58,11 @@ def test_dynamic_limb_phase_two_adds_division_and_gcd_but_stays_blocked():
     assert "status.has_euclidean_gcd and status.has_exact_divisibility" in src
     assert "not status.has_canonical_serialization" in src
     assert "not status.allows_certificate_acceptance" in src
-    assert "if not bigint_z_phase_two_smoke():" in smoke
-    assert "if not bigint_adapter_phase_two_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigint Z phase two")
+    assert mojo_smoke.case_passed("bigint adapter phase two")
 
 
-def test_dynamic_limb_bigz_adds_canonical_serialization_and_is_integer_ready():
+def test_dynamic_limb_bigz_adds_canonical_serialization_and_is_integer_ready(mojo_smoke):
     src = read(BIG)
     z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
@@ -77,8 +77,8 @@ def test_dynamic_limb_bigz_adds_canonical_serialization_and_is_integer_ready():
     assert "not status.allows_certificate_acceptance" in src
     assert "not status.proof_ready()" in src
     assert "bigint_backend_blocks_proof_acceptance(status)" in src
-    assert "if not bigint_z_phase_three_smoke():" in smoke
-    assert "if not bigint_adapter_complete_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigint Z phase three")
+    assert mojo_smoke.case_passed("bigint adapter complete")
 
 
 def test_completed_integer_backend_cannot_enable_certificate_acceptance():
@@ -102,7 +102,7 @@ def test_rational_backend_requires_normalization_and_safe_order():
     assert "canonical_fraction_serialization" in src
 
 
-def test_current_q_uses_bigz_but_blocks_proof_acceptance():
+def test_current_q_uses_bigz_but_blocks_proof_acceptance(mojo_smoke):
     src = read(RAT)
     assert "current_q_backend_status" in src
     assert "dynamic_limb_bigz_backend_status()" in src
@@ -111,10 +111,10 @@ def test_current_q_uses_bigz_but_blocks_proof_acceptance():
     assert "not status.backend.allows_certificate_acceptance" in src
     assert "q_backend_blocks_proof_acceptance(status)" in src
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
-    assert "if not q_backend_migration_smoke():" in smoke
+    assert mojo_smoke.case_passed("Q backend migration")
 
 
-def test_q_storage_is_normalized_bigz_and_fail_closed():
+def test_q_storage_is_normalized_bigz_and_fail_closed(mojo_smoke):
     src = read(ROOT / "src" / "finite_exact" / "rat_q.mojo")
     smoke = read(ROOT / "src" / "smoke_tests.mojo")
     assert "struct Q(Copyable)" in src
@@ -130,7 +130,7 @@ def test_q_storage_is_normalized_bigz_and_fail_closed():
     assert "def q_canonical_bytes" in src
     assert "beyond_i64" in src
     assert "malformed.sign = 2" in src
-    assert "if not bigq_storage_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq storage")
 
 
 def test_bigz_interval_layer_enforces_spec_fail_closed_contracts():

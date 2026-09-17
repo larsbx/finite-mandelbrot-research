@@ -31,12 +31,12 @@ def test_correspondence_metadata_cannot_accept_theorem_or_certificate():
     assert "not association.certificate_accepted()" in src
 
 
-def test_bigq_landing_replay_is_compiler_wired_and_policy_clean():
+def test_bigq_landing_replay_is_compiler_wired_and_policy_clean(mojo_smoke):
     smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
     boundary = (ROOT / "docs" / "mojo-toolchain-boundary.md").read_text(encoding="utf-8")
     assert "from bigq_ray_address import bigq_ray_address_replay_smoke" in smoke
     assert "from bigq_landing_target_adapter import bigq_landing_target_replay_smoke" in smoke
-    assert "if not bigq_landing_target_replay_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq landing target replay")
     assert "src/bigq_ray_address.mojo" in boundary
     assert "src/bigq_landing_target_adapter.mojo" in boundary
 

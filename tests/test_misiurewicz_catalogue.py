@@ -136,11 +136,21 @@ def test_types_and_denominators_beyond_the_bounds_are_refused():
     assert mc.catalogue_count(0, 1) == -1 and mc.catalogue(0, 1) == []
 
 
-def test_mojo_smoke_pins_the_same_instances():
-    src = text(SRC)
-    for fragment in ("var one_three: List[Int] = [1, 3, 5, 9, 11, 13]", "catalogue_denominator(1, 3) != 14",
-                     "catalogue_count(2, 3) != 12", "catalogue_count(3, 3) != 24", "catalogue_matches_count(l, k)",
-                     "var past_index = exact_type(1, 58)", "var past_denominator = exact_type(1, 50)",
-                     "if catalogueable_type(1, 28) or catalogueable_type(1, 20) or not catalogueable_type(1, 3):"):
-        assert fragment in src
-    assert "misiurewicz_catalogue_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
+def test_the_mojo_catalogue_case_passes(mojo_smoke):
+    """The Mojo catalogue is checked by running it, not by reading its source.
+
+    `misiurewicz_catalogue_smoke` pins the same instances this module's
+    reference pins -- the four catalogues, the counting identity, the two
+    bounds, and the non-claims -- so a named pass here is the executable
+    statement that Mojo and the reference agree."""
+    assert mojo_smoke.returncode == 0, mojo_smoke.output
+    assert mojo_smoke.case_passed("Misiurewicz exact-type catalogue")
+    assert not mojo_smoke.failed, mojo_smoke.failed
+
+
+def test_the_smoke_suite_names_every_case_it_runs(mojo_smoke):
+    """A bare FAIL would not say which contract broke, so the suite names each
+    case and keeps going after one fails."""
+    assert mojo_smoke.total >= 50
+    assert len(set(mojo_smoke.passed)) == len(mojo_smoke.passed)
+    assert f"{mojo_smoke.total} cases, all passed." in mojo_smoke.output

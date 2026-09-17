@@ -50,9 +50,9 @@ def test_c1_and_residual_closure_remain_false():
     assert "def proves_residual_closure_no_missing_links(self) -> Bool:\n        return False" in src
 
 
-def test_incidence_replay_is_compiler_wired():
+def test_incidence_replay_is_compiler_wired(mojo_smoke):
     smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
     boundary = (ROOT / "docs" / "mojo-toolchain-boundary.md").read_text(encoding="utf-8")
     assert "from bigq_certificate_incidence import bigq_certificate_incidence_smoke" in smoke
-    assert "if not bigq_certificate_incidence_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq certificate incidence")
     assert "src/bigq_certificate_incidence.mojo" in boundary

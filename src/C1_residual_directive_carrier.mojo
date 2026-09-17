@@ -13,6 +13,7 @@
 # sequences is the theorem tag `TuningKneadingSubstitution` in
 # src/C1_theorem_tag_import_ledger.mojo, scaffolded, not checked.
 
+from angle_tuning import tuned_angle
 from checked_int64_backend import CheckedI64Result, checked_add_i64, checked_mul_i64
 from checked_ray_address import checked_double_ray_addr, make_checked_ray_addr
 from substitution_dynamics.tuning import TuningPattern, kneading_prefix
@@ -256,15 +257,6 @@ def dgp_parity_twist_is_general() -> Bool:
 # --- smoke ------------------------------------------------------------------------
 
 
-def _same(a: List[Int], b: List[Int]) -> Bool:
-    if len(a) != len(b):
-        return False
-    for i in range(len(a)):
-        if a[i] != b[i]:
-            return False
-    return True
-
-
 def _carrier(nums: List[Int64], dens: List[Int64]) -> ResidualDirectiveCarrier:
     var carrier = ResidualDirectiveCarrier.empty()
     for i in range(len(nums)):
@@ -277,13 +269,14 @@ def _carrier(nums: List[Int64], dens: List[Int64]) -> ResidualDirectiveCarrier:
 
 def _tuned_matches(nums: List[Int64], dens: List[Int64], tuned_num: Int64, tuned_den: Int64) -> Bool:
     """The carrier's kneading prefix equals the kneading prefix of the address
-    obtained by exact angle tuning (pinned in tools/kneading_reference.py)."""
+    obtained by exact angle tuning (`angle_tuning.tuned_angle`, cross-checked by
+    the independent oracle tools/kneading_reference.py)."""
     var carrier = _carrier(nums, dens)
     if carrier.depth() != len(nums):
         return False
     var expected = checked_kneading_prefix(tuned_num, tuned_den)
     try:
-        return expected.accepted() and _same(carrier.kneading_word(), expected.prefix)
+        return expected.accepted() and carrier.kneading_word() == expected.prefix
     except:
         return False
 
@@ -295,11 +288,11 @@ def residual_directive_carrier_smoke() -> Bool:
     var expected_doubling: List[Int] = [1]
     var expected_airplane: List[Int] = [1, 0]
     var expected_rabbit: List[Int] = [1, 1]
-    if not (doubling.accepted() and doubling.period == 2 and _same(doubling.prefix, expected_doubling)):
+    if not (doubling.accepted() and doubling.period == 2 and doubling.prefix == expected_doubling):
         return False
-    if not (airplane.accepted() and airplane.period == 3 and _same(airplane.prefix, expected_airplane)):
+    if not (airplane.accepted() and airplane.period == 3 and airplane.prefix == expected_airplane):
         return False
-    if not (rabbit.accepted() and rabbit.period == 3 and _same(rabbit.prefix, expected_rabbit)):
+    if not (rabbit.accepted() and rabbit.period == 3 and rabbit.prefix == expected_rabbit):
         return False
     # Rejections: zero, preperiodic, malformed, out of range.
     if checked_kneading_prefix(0, 1).accepted() or checked_kneading_prefix(1, 2).accepted():
@@ -326,15 +319,30 @@ def residual_directive_carrier_smoke() -> Bool:
     var d4: List[Int64] = [7, 3]
     var n5: List[Int64] = [1, 3]
     var d5: List[Int64] = [7, 7]
-    if not _tuned_matches(n1, d1, 2, 5):
+    # The angle each carrier tunes to is derived here, not quoted: `angle_tuning`
+    # substitutes the root-ray blocks of the component, and the star product of
+    # the levels must reach the same address. A level of the doubling component
+    # is the pair (1/3, 2/3), the rabbit is (1/7, 2/7), and the primitive
+    # period-four component is (7/15, 8/15); a repeated level is a repeated
+    # tuning, so three doubling levels tune 1/3 twice.
+    var doubling_once = tuned_angle(1, 3, 2, 3, 1, 3)
+    var doubling_twice = tuned_angle(1, 3, 2, 3, doubling_once.num, doubling_once.den)
+    var primitive_four = tuned_angle(7, 15, 8, 15, 1, 3)
+    var rabbit_third = tuned_angle(1, 7, 2, 7, 1, 3)
+    var rabbit_airplane = tuned_angle(1, 7, 2, 7, 3, 7)
+    if doubling_once.rejected or doubling_twice.rejected or primitive_four.rejected:
         return False
-    if not _tuned_matches(n2, d2, 7, 17):
+    if rabbit_third.rejected or rabbit_airplane.rejected:
         return False
-    if not _tuned_matches(n3, d3, 8, 17):
+    if not _tuned_matches(n1, d1, doubling_once.num, doubling_once.den):
         return False
-    if not _tuned_matches(n4, d4, 10, 63):
+    if not _tuned_matches(n2, d2, doubling_twice.num, doubling_twice.den):
         return False
-    if not _tuned_matches(n5, d5, 82, 511):
+    if not _tuned_matches(n3, d3, primitive_four.num, primitive_four.den):
+        return False
+    if not _tuned_matches(n4, d4, rabbit_third.num, rabbit_third.den):
+        return False
+    if not _tuned_matches(n5, d5, rabbit_airplane.num, rabbit_airplane.den):
         return False
     # Refinement is strict and agreement is prefix-wise.
     var base = _carrier(n1, d1)

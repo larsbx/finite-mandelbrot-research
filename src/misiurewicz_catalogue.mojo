@@ -194,15 +194,6 @@ def catalogue_proves_fibre_triviality() -> Bool:
 # --- smoke ------------------------------------------------------------------------
 
 
-def _same(a: List[Int], b: List[Int]) -> Bool:
-    if len(a) != len(b):
-        return False
-    for i in range(len(a)):
-        if a[i] != b[i]:
-            return False
-    return True
-
-
 def misiurewicz_catalogue_smoke() -> Bool:
     # 1/2 -> 0 -> 0: preperiod one, period one, and Misiurewicz.
     var half = exact_type(1, 2)
@@ -227,13 +218,13 @@ def misiurewicz_catalogue_smoke() -> Bool:
     var two_one: List[Int] = [1, 3]
     var one_two: List[Int] = [1, 5]
     var one_three: List[Int] = [1, 3, 5, 9, 11, 13]
-    if not _same(catalogue(1, 1), one_one) or catalogue_denominator(1, 1) != 2:
+    if catalogue(1, 1) != one_one or catalogue_denominator(1, 1) != 2:
         return False
-    if not _same(catalogue(2, 1), two_one) or catalogue_denominator(2, 1) != 4:
+    if catalogue(2, 1) != two_one or catalogue_denominator(2, 1) != 4:
         return False
-    if not _same(catalogue(1, 2), one_two) or catalogue_denominator(1, 2) != 6:
+    if catalogue(1, 2) != one_two or catalogue_denominator(1, 2) != 6:
         return False
-    if not _same(catalogue(1, 3), one_three) or catalogue_denominator(1, 3) != 14:
+    if catalogue(1, 3) != one_three or catalogue_denominator(1, 3) != 14:
         return False
     # The counting identity against the enumeration.
     for l in range(1, 5):

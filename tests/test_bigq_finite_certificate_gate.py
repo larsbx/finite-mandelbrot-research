@@ -44,12 +44,12 @@ def test_c1_and_residual_closure_are_explicitly_unproved():
     assert "not status.proves_residual_closure_no_missing_links()" in src
 
 
-def test_new_replays_are_compiler_wired():
+def test_new_replays_are_compiler_wired(mojo_smoke):
     smoke = read("src/smoke_tests.mojo")
     boundary = read("docs/mojo-toolchain-boundary.md")
     assert "from bigq_theorem_tag_payload_instances import bigq_theorem_payload_replay_smoke" in smoke
     assert "from bigq_finite_certificate_gate import bigq_finite_certificate_gate_smoke" in smoke
-    assert "if not bigq_theorem_payload_replay_smoke():" in smoke
-    assert "if not bigq_finite_certificate_gate_smoke():" in smoke
+    assert mojo_smoke.case_passed("bigq theorem payload replay")
+    assert mojo_smoke.case_passed("bigq finite certificate gate")
     assert "src/bigq_theorem_tag_payload_instances.mojo" in boundary
     assert "src/bigq_finite_certificate_gate.mojo" in boundary
