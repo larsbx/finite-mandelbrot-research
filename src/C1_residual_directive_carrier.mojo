@@ -90,17 +90,27 @@ def _rho(nu: List[Int], m: Int) -> Int:
     return 0
 
 
-def _internal_address_contains(nu: List[Int], target: Int) -> Bool:
-    """Whether `target` occurs in the internal address `1 -> rho(1) -> rho(rho(1)) -> ...`
-    of the periodic sequence `nu`."""
+def internal_address(nu: List[Int]) -> List[Int]:
+    """The internal address `1 -> rho(1) -> rho(rho(1)) -> ...` of the periodic
+    sequence `nu`, up to its own length. The list is the address itself, which
+    the membership test below reads rather than recomputing."""
+    var out: List[Int] = [1]
     var m = 1
     while True:
-        if m == target:
-            return True
         var r = _rho(nu, m)
-        if r == 0 or r > target:
-            return False
+        if r == 0 or r > len(nu):
+            return out^
+        out.append(r)
         m = r
+
+
+def _internal_address_contains(nu: List[Int], target: Int) -> Bool:
+    """Whether `target` occurs in the internal address of `nu`."""
+    var address = internal_address(nu)
+    for i in range(len(address)):
+        if address[i] == target:
+            return True
+    return False
 
 
 struct ContinuationResult(ImplicitlyCopyable):
@@ -293,6 +303,32 @@ def residual_directive_carrier_smoke() -> Bool:
     if not (airplane.accepted() and airplane.period == 3 and airplane.prefix == expected_airplane):
         return False
     if not (rabbit.accepted() and rabbit.period == 3 and rabbit.prefix == expected_rabbit):
+        return False
+
+    # The internal address of the continuation is the classical one: the
+    # basilica is 1 -> 2, the rabbit 1 -> 3, the airplane 1 -> 2 -> 3. It is the
+    # list `_internal_address_contains` reads, so the two cannot disagree.
+    var rabbit_letter = continuation_last_letter(rabbit.prefix)
+    var airplane_letter = continuation_last_letter(airplane.prefix)
+    var doubling_letter = continuation_last_letter(doubling.prefix)
+    if rabbit_letter.rejected or airplane_letter.rejected or doubling_letter.rejected:
+        return False
+    var rabbit_nu = rabbit.prefix.copy()
+    rabbit_nu.append(rabbit_letter.last_letter)
+    var airplane_nu = airplane.prefix.copy()
+    airplane_nu.append(airplane_letter.last_letter)
+    var doubling_nu = doubling.prefix.copy()
+    doubling_nu.append(doubling_letter.last_letter)
+    var rabbit_address: List[Int] = [1, 3]
+    var airplane_address: List[Int] = [1, 2, 3]
+    var doubling_address: List[Int] = [1, 2]
+    if internal_address(rabbit_nu) != rabbit_address:
+        return False
+    if internal_address(airplane_nu) != airplane_address:
+        return False
+    if internal_address(doubling_nu) != doubling_address:
+        return False
+    if not _internal_address_contains(rabbit_nu, 3) or _internal_address_contains(rabbit_nu, 2):
         return False
     # Rejections: zero, preperiodic, malformed, out of range.
     if checked_kneading_prefix(0, 1).accepted() or checked_kneading_prefix(1, 2).accepted():

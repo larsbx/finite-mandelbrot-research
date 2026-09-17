@@ -50,6 +50,15 @@ def test_long_division_replaces_shift_and_subtract_and_keeps_the_reference(mojo_
     assert mojo_smoke.case_passed("bigz long division")
 
 
+def test_an_exact_number_can_be_read_in_base_ten(mojo_smoke):
+    """Limbs are base 10^9, so the decimal form is exact and needs no division;
+    it is how an exact rational leaves the repository readable. It sits outside
+    the vendored kernel, which stays byte-identical to its upstream."""
+    assert "def bigz_decimal(" in text("src/exact_decimal.mojo")
+    assert "def bigz_decimal(" not in text("src/finite_exact/bigint_z.mojo")
+    assert mojo_smoke.case_passed("exact decimal")
+
+
 def test_rational_operations_cancel_before_multiplying(mojo_smoke):
     q = text("src/finite_exact/rat_q.mojo")
     assert "struct QCrossTerms(Copyable)" in q

@@ -110,6 +110,7 @@ docs/
   terminology-use-manifest.md
   finite-certificate-calculus.md
   rational-interval-arithmetic-spec.md
+  atlas-dataset.md
   literature-notes.md
   C1_*.md
 examples/
@@ -117,10 +118,12 @@ examples/
   stress-test-m41.md
 src/
   *.mojo
+  atlas_dataset.mojo         # every exact object, printed once as JSON (pixi run atlas-dataset)
   finite_exact/              # vendored from larsbx/finite-math-kernels, pinned in vendored.toml
   substitution_dynamics/     # vendored tuning, directive-prefix, and coincidence kernels, same pin
 tools/
   audit_*.py
+  atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md
   claim_governance/          # vendored from larsbx/finite-math-kernels audit/, pinned in vendored.toml
   check_vendored_sync.py
