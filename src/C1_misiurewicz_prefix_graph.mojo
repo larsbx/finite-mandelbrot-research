@@ -541,6 +541,56 @@ def misiurewicz_prefix_graph_smoke() -> Bool:
     if bare.obstruction_free():
         return False
 
+    # The negative control the correction to N3 asked for. It is a control on
+    # this extractor, not on the class: it pins two verdicts that are decided by
+    # hand, so an extractor that always answered either one fails it.
+    #
+    # Over the denominator 21 the forward closure of 9 is {9, 15, 18}, which is
+    # the period-three orbit 3/7 -> 6/7 -> 5/7. The declared separator is the
+    # pair 1/7 and 2/7, the two rays that co-land at the root of the
+    # period-three component; over 21 they are 3 and 6. That co-landing is an
+    # imported classical fact about a root, and neither ray is a point of the
+    # orbit, so the prefix is not derived from what it is asked to separate.
+    #
+    # Every point of the orbit is strictly outside the arc from 3 to 6, so no
+    # separator ever puts two of them on opposite sides; doubling carries the
+    # orbit onto itself, so all three pairs are nonproductive and lie on one
+    # cycle; and no point of the orbit is 3 or 6, so the cycle meets no
+    # separator boundary and the dichotomy must call it interior. That is the
+    # whole argument, and the extractor has to reproduce it.
+    var control_seed: List[Int] = [9]
+    var wake_low: List[Int] = [3]
+    var wake_high: List[Int] = [6]
+    var wake_tag: List[Int] = [RATIONAL_RAY_LANDING]
+    var coarse = extract(control_seed, wake_low, wake_high, wake_tag, 21)
+    if not coarse.accepted():
+        return False
+    if coarse.vertices != 3 or coarse.undecided != 3 or coarse.nonproductive != 3:
+        return False
+    if coarse.merging != 0 or coarse.boundary != 0 or coarse.interior != 1:
+        return False
+    if coarse.obstruction_free():
+        return False
+
+    # The other direction, decided the same way. Add the declared co-landing
+    # pair 1/3 and 2/3, the rays at the root of the period-two component, which
+    # over 21 are 7 and 14. The arc from 7 to 14 holds 9 and neither 15 nor 18,
+    # so that separator splits the orbit, and the one pair it leaves undecided
+    # is separated one doubling later. An extractor that always reported an
+    # obstruction fails here.
+    var refined_lows: List[Int] = [3, 7]
+    var refined_highs: List[Int] = [6, 14]
+    var refined_tags: List[Int] = [RATIONAL_RAY_LANDING, RATIONAL_RAY_LANDING]
+    var refined = extract(control_seed, refined_lows, refined_highs, refined_tags, 21)
+    if not (refined.accepted() and refined.obstruction_free()):
+        return False
+    if refined.nonproductive != 0 or refined.undecided != 1 or refined.vertices != 3:
+        return False
+    # The control is about the prefix, not the orbit: the same three points are
+    # an obstruction under one declared prefix and clean under the other.
+    if coarse.vertices != refined.vertices:
+        return False
+
     # Fail closed. Each of these is a refusal, never an empty obstruction set.
     var pair_low: List[Int] = [2]
     var pair_high: List[Int] = [3]

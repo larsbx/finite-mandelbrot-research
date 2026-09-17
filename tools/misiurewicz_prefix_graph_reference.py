@@ -371,6 +371,34 @@ def main() -> int:
         print("FAIL: this prefix does not decide the class and must not read as clean")
         return 1
 
+    # The negative control: two verdicts decided by hand, so an extractor that
+    # always answered either one fails. Over 21 the closure of 9 is the orbit
+    # 3/7 -> 6/7 -> 5/7. Under the declared co-landing pair 1/7, 2/7 -- the rays
+    # at the root of the period-three component, 3 and 6 over 21 -- every point
+    # of the orbit is strictly outside the arc, doubling carries the orbit onto
+    # itself, and no point is a ray, so the three pairs form one cycle that
+    # meets no separator boundary: exactly one interior obstruction. Adding the
+    # declared pair 1/3, 2/3, which is 7 and 14 over 21, splits the orbit and
+    # leaves nothing undecided one step later.
+    control_seed = [9]
+    coarse = extract(control_seed, [(3, 6, RATIONAL_RAY_LANDING)], 21)
+    if (coarse.vertices, coarse.undecided, coarse.nonproductive) != (3, 3, 3):
+        print(f"FAIL: the coarse control moved: {coarse}")
+        return 1
+    if (coarse.merging, len(coarse.boundary), len(coarse.interior)) != (0, 0, 1):
+        print(f"FAIL: the coarse control's dichotomy moved: {coarse}")
+        return 1
+    if coarse.obstruction_free:
+        print("FAIL: a prefix that separates nothing on the orbit read as clean")
+        return 1
+    refined = extract(control_seed, [(3, 6, RATIONAL_RAY_LANDING), (7, 14, RATIONAL_RAY_LANDING)], 21)
+    if not refined.obstruction_free or refined.nonproductive or refined.undecided != 1:
+        print(f"FAIL: the refined control moved: {refined}")
+        return 1
+    if endpoints([(3, 6, RATIONAL_RAY_LANDING), (7, 14, RATIONAL_RAY_LANDING)]) & set(forward_closure(control_seed, 21) or []):
+        print("FAIL: the control's rays are points of the orbit they separate")
+        return 1
+
     # Refusals. Each is a refusal, never an empty obstruction set.
     refusals = [
         extract(mc.catalogue(1, 3), [(2, 3, 0)], 14),                   # untagged
@@ -389,6 +417,7 @@ def main() -> int:
 
     print(f"OK: the declared period-three prefix leaves {found.nonproductive} nonproductive pairs "
           f"and {len(found.boundary)} boundary obstructions on exact type (1, 3); "
+          f"the negative control is one interior obstruction coarse and clean refined; "
           f"{len(refusals)} refusals all stayed refusals.")
     return 0
 

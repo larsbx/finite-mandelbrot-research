@@ -83,6 +83,23 @@ On the catalogue of exact type `(1, 3)` over the denominator `14`, under the dec
 
 That prefix does not decide this class, and the module says so rather than reading as clean. This is a report about one declared prefix. It is not a negative control for the class, and nothing here is evidence about the imported tag `KnownTrivialFiberClass`.
 
+## The negative control
+
+Round-two item R5 asked for the negative control the first draft of N3 promised and could not supply: a case whose verdict is fixed by an argument rather than by the code, and whose separators carry a co-landing that is declared rather than derived from the points being separated. It is a control on **this extractor**, not on the class.
+
+Over the denominator `21` the forward closure of `9` is `{9, 15, 18}`, the period-three orbit `3/7 -> 6/7 -> 5/7`. The declared separator is the pair `1/7` and `2/7`, the two rays that co-land at the root of the period-three component; over `21` they are `3` and `6`. That co-landing is an imported classical fact about a root, and neither ray is a point of the orbit.
+
+Every point of the orbit lies strictly outside the arc from `3` to `6`, so no separator ever puts two of them on opposite sides. Doubling carries the orbit onto itself, so all three pairs are nonproductive and lie on one cycle. No point of the orbit is `3` or `6`, so that cycle meets no separator boundary, and the dichotomy must call it interior.
+
+| Declared prefix | vertices | undecided | nonproductive | merging | boundary | interior | verdict |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `1/7, 2/7` | 3 | 3 | 3 | 0 | 0 | 1 | obstruction |
+| `1/7, 2/7` and `1/3, 2/3` | 3 | 1 | 0 | 0 | 0 | 0 | clean |
+
+The second row is the other direction, decided the same way: the rays `1/3` and `2/3` co-land at the root of the period-two component and are `7` and `14` over `21`; the arc from `7` to `14` holds `9` and neither `15` nor `18`, so the orbit is split, and the single pair left undecided at the prefix is separated one doubling later. An extractor that always reported an obstruction fails the second row; one that always reported a clean graph fails the first. This is also the first case in which the interior branch of the dichotomy is exercised at all: the pinned `(1, 3)` report above has no interior obstruction.
+
+The control says nothing about any fibre. The same three points are an obstruction under one declared prefix and clean under the other, which is the point: a verdict here is about a prefix, never about a parameter.
+
 ## Bounds and fail-closed behaviour
 
 One constant governs the graph. Vertices live in `Z/den`, so `MAX_PREFIX_GRAPH_DENOMINATOR` caps the vertex count and the pair count together, and the Python reference carries the same constant so the two agree on every refusal. Of the 64 exact types with both indices at most eight, 29 are within the bound and 35 are past it.
