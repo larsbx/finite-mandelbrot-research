@@ -6,6 +6,12 @@
 # These tests are intentionally narrow. They preserve the computations already
 # used in the research notes while marking the gap between arithmetic smoke
 # tests and a full proof-carrying validator.
+#
+# Each case is named after the contract it checks, and a name that is a
+# governed term is used in the sense that term carries in
+# docs/terminology-registry.md; naming a case asserts nothing beyond the
+# verdict the case returned. Cases are independent and all of them run, so one
+# failure does not hide the next: see src/smoke_report.mojo.
 
 from poly_z import smoke_poly_identities
 from cert_types import MisCertHeader, JointBoxWitness, TheoremTags
@@ -48,6 +54,8 @@ from checked_landing_target_adapter import checked_landing_target_adapter_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
 from rat_backend_plan import q_backend_migration_smoke
+from smoke_report import SmokeReport, smoke_report_smoke
+from angle_tuning import angle_tuning_smoke
 
 
 def test_rational_field_laws() -> Bool:
@@ -262,114 +270,70 @@ def test_theorem_tags() -> Bool:
 
 
 def run_smoke_tests() -> Bool:
-    if not bigq_storage_smoke():
-        return False
-    if not q_backend_migration_smoke():
-        return False
-    if not smoke_poly_identities():
-        return False
-    if not test_headers():
-        return False
-    if not test_joint_box_gate():
-        return False
-    if not test_theorem_tags():
-        return False
-    if not demo_q_normalization() or not demo_q_order():
-        return False
-    if not demo_interval_mul() or not demo_complex_quadrance_point() or not bigq_interval_conformance_smoke():
-        return False
-    if not test_rational_field_laws():
-        return False
-    if not test_interval_enclosure_laws():
-        return False
-    if not test_interval_polynomial_evaluation():
-        return False
-    if not verify_p21_krawczyk_c_minus_2(8):
-        return False
-    if not bigq_krawczyk_replay_smoke():
-        return False
-    if not bigq_exact_type_exclusion_replay_smoke():
-        return False
-    if not bigq_ray_address_replay_smoke():
-        return False
-    if not bigq_landing_target_replay_smoke():
-        return False
-    if not bigq_theorem_payload_replay_smoke():
-        return False
-    if not bigq_finite_certificate_gate_smoke():
-        return False
-    if not bigq_certificate_incidence_smoke():
-        return False
-    if not test_final_proof_ledger_policy():
-        return False
-    if not test_typed_final_exit_kinds():
-        return False
-    if not test_typed_theorem_payload_kinds():
-        return False
-    if not test_typed_theorem_import_kinds():
-        return False
-    if not test_canonical_gcd_helpers():
-        return False
-    if not test_canonical_ray_addresses():
-        return False
-    if not test_canonical_rational_geometry():
-        return False
-    if not test_alignment_policy_data():
-        return False
-    if not test_optimization_policy_data():
-        return False
-    if not test_final_proof_object_policy_data():
-        return False
-    if not checked_i64_boundary_smoke():
-        return False
-    if not checked_q_smoke():
-        return False
-    if not checked_iq_smoke():
-        return False
-    if not checked_complex_horner_smoke():
-        return False
-    if not checked_interval_exclusion_smoke():
-        return False
-    if not checked_krawczyk_smoke():
-        return False
-    if not cert_backend_smoke():
-        return False
-    if not certificate_arithmetic_migration_smoke():
-        return False
-    if not checked_ray_address_smoke():
-        return False
-    if not checked_finite_certificate_gate_smoke():
-        return False
-    if not theorem_tag_payload_instances_smoke():
-        return False
-    if not residual_directive_carrier_smoke():
-        return False
-    if not separated_density_smoke():
-        return False
-    if not misiurewicz_catalogue_smoke():
-        return False
-    if not misiurewicz_prefix_graph_smoke():
-        return False
-    if not checked_landing_target_adapter_smoke():
-        return False
-    if not bigint_z_phase_one_smoke():
-        return False
-    if not bigint_adapter_phase_one_smoke():
-        return False
-    if not bigint_z_phase_two_smoke():
-        return False
-    if not bigint_adapter_phase_two_smoke():
-        return False
-    if not bigint_z_phase_three_smoke():
-        return False
-    if not bigint_adapter_complete_smoke():
-        return False
-    if not bigz_long_division_smoke():
-        return False
-    if not q_cancellation_smoke():
-        return False
-    return True
-
+    """Run every case, naming each one. Cases are independent, so the
+    suite does not stop at the first failure: one run names every broken
+    contract instead of only the earliest."""
+    var report = SmokeReport()
+    _ = report.record("bigq storage", bigq_storage_smoke())
+    _ = report.record("Q backend migration", q_backend_migration_smoke())
+    _ = report.record("polynomial identities", smoke_poly_identities())
+    _ = report.record("certificate headers", test_headers())
+    _ = report.record("joint box gate", test_joint_box_gate())
+    _ = report.record("theorem tags", test_theorem_tags())
+    _ = report.record("Q normalization", demo_q_normalization())
+    _ = report.record("Q order", demo_q_order())
+    _ = report.record("interval multiplication", demo_interval_mul())
+    _ = report.record("complex quadrance point", demo_complex_quadrance_point())
+    _ = report.record("bigq interval conformance", bigq_interval_conformance_smoke())
+    _ = report.record("rational field laws", test_rational_field_laws())
+    _ = report.record("interval enclosure laws", test_interval_enclosure_laws())
+    _ = report.record("interval polynomial evaluation", test_interval_polynomial_evaluation())
+    _ = report.record("Krawczyk witness at c = -2", verify_p21_krawczyk_c_minus_2(8))
+    _ = report.record("bigq Krawczyk replay", bigq_krawczyk_replay_smoke())
+    _ = report.record("bigq exact-type exclusion replay", bigq_exact_type_exclusion_replay_smoke())
+    _ = report.record("bigq ray address replay", bigq_ray_address_replay_smoke())
+    _ = report.record("bigq landing target replay", bigq_landing_target_replay_smoke())
+    _ = report.record("bigq theorem payload replay", bigq_theorem_payload_replay_smoke())
+    _ = report.record("bigq finite certificate gate", bigq_finite_certificate_gate_smoke())
+    _ = report.record("bigq certificate incidence", bigq_certificate_incidence_smoke())
+    _ = report.record("final proof ledger policy", test_final_proof_ledger_policy())
+    _ = report.record("typed final exit kinds", test_typed_final_exit_kinds())
+    _ = report.record("typed theorem payload kinds", test_typed_theorem_payload_kinds())
+    _ = report.record("typed theorem import kinds", test_typed_theorem_import_kinds())
+    _ = report.record("canonical gcd helpers", test_canonical_gcd_helpers())
+    _ = report.record("canonical ray addresses", test_canonical_ray_addresses())
+    _ = report.record("canonical rational geometry", test_canonical_rational_geometry())
+    _ = report.record("alignment policy data", test_alignment_policy_data())
+    _ = report.record("optimization policy data", test_optimization_policy_data())
+    _ = report.record("final proof object policy data", test_final_proof_object_policy_data())
+    _ = report.record("checked i64 boundary", checked_i64_boundary_smoke())
+    _ = report.record("checked Q", checked_q_smoke())
+    _ = report.record("checked interval Q", checked_iq_smoke())
+    _ = report.record("checked complex Horner", checked_complex_horner_smoke())
+    _ = report.record("checked interval exclusion", checked_interval_exclusion_smoke())
+    _ = report.record("checked Krawczyk", checked_krawczyk_smoke())
+    _ = report.record("certificate backend", cert_backend_smoke())
+    _ = report.record("certificate arithmetic migration", certificate_arithmetic_migration_smoke())
+    _ = report.record("checked ray address", checked_ray_address_smoke())
+    _ = report.record("checked finite certificate gate", checked_finite_certificate_gate_smoke())
+    _ = report.record("theorem tag payload instances", theorem_tag_payload_instances_smoke())
+    _ = report.record("residual directive carrier", residual_directive_carrier_smoke())
+    _ = report.record("exact angle tuning", angle_tuning_smoke())
+    _ = report.record("separated density", separated_density_smoke())
+    _ = report.record("Misiurewicz exact-type catalogue", misiurewicz_catalogue_smoke())
+    _ = report.record("Misiurewicz prefix graph", misiurewicz_prefix_graph_smoke())
+    _ = report.record("checked landing target adapter", checked_landing_target_adapter_smoke())
+    _ = report.record("bigint Z phase one", bigint_z_phase_one_smoke())
+    _ = report.record("bigint adapter phase one", bigint_adapter_phase_one_smoke())
+    _ = report.record("bigint Z phase two", bigint_z_phase_two_smoke())
+    _ = report.record("bigint adapter phase two", bigint_adapter_phase_two_smoke())
+    _ = report.record("bigint Z phase three", bigint_z_phase_three_smoke())
+    _ = report.record("bigint adapter complete", bigint_adapter_complete_smoke())
+    _ = report.record("bigz long division", bigz_long_division_smoke())
+    _ = report.record("Q cancellation", q_cancellation_smoke())
+    _ = report.record("smoke reporter", smoke_report_smoke())
+    report.print_summary("finite-regime Mandelbrot smoke suite")
+    return report.all_passed()
 
 def require_smoke_success(ok: Bool) raises:
     if not ok:

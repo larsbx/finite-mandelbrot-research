@@ -40,24 +40,24 @@ def test_boundary_document_declares_names_semantics_and_promise():
     assert "enables no certificate acceptance" in doc
 
 
-def test_long_division_replaces_shift_and_subtract_and_keeps_the_reference():
+def test_long_division_replaces_shift_and_subtract_and_keeps_the_reference(mojo_smoke):
     z = text("src/finite_exact/bigint_z.mojo")
     assert "def bigz_abs_divmod_shift_subtract(" in z
     assert "def bigz_abs_divmod(" in z
     assert "Knuth Algorithm D" in z
     assert "def bigz_abs_mul_small(" in z
     assert "def bigz_long_division_smoke(" in z
-    assert "if not bigz_long_division_smoke():" in text("src/smoke_tests.mojo")
+    assert mojo_smoke.case_passed("bigz long division")
 
 
-def test_rational_operations_cancel_before_multiplying():
+def test_rational_operations_cancel_before_multiplying(mojo_smoke):
     q = text("src/finite_exact/rat_q.mojo")
     assert "struct QCrossTerms(Copyable)" in q
     assert "def q_cross_terms(" in q
     assert "var g1 = bigz_gcd(self.num, other.den)" in q
     assert "var g2 = bigz_gcd(other.num, self.den)" in q
     assert "def q_cancellation_smoke(" in q
-    assert "if not q_cancellation_smoke():" in text("src/smoke_tests.mojo")
+    assert mojo_smoke.case_passed("Q cancellation")
     # naive cross-multiplication must be gone from the comparison methods
     assert "bigz_lt(bigz_mul(self.num, other.den), bigz_mul(other.num, self.den))" not in q
 

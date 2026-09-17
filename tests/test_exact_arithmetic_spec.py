@@ -123,11 +123,17 @@ def test_policy_surfaces_point_at_the_spec():
     assert "no_float_certificate_arithmetic" in text("tools/audit_backend_manifest.py")
 
 
-def test_mojo_law_tests_are_wired_into_the_smoke_target():
+CASE_NAMES = {
+    "test_rational_field_laws": "rational field laws",
+    "test_interval_enclosure_laws": "interval enclosure laws",
+}
+
+
+def test_mojo_law_tests_are_wired_into_the_smoke_target(mojo_smoke):
     smoke = text("src/smoke_tests.mojo")
     for name in ["test_rational_field_laws", "test_interval_enclosure_laws"]:
         assert f"def {name}()" in smoke
-        assert f"if not {name}():" in smoke
+        assert mojo_smoke.case_passed(CASE_NAMES[name])
 
 
 # --- sections 1 to 3: executable laws against the Fraction oracle -----------
