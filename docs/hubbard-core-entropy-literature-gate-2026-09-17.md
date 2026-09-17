@@ -21,12 +21,15 @@ transfer, which families break it, and where the code can actually live.
 
 ## Decision
 
-**Proceed, with the target narrowed to the fiber question and the primitive
-subfamily, and with two claims withheld.**
+**Proceed. The census population stays the whole declared box; what narrows is
+where the exact screen applies, and two claims are withheld.**
 
-The census is not foreclosed. Thurston characterised which numbers arise; he did
-not answer which parameters give which, and that second question is the one B8
-asks. But three things have to be fixed before any code is written: the census
+The census is not foreclosed, and it is worth more than the first draft of this
+note allowed: fixing the degree to two leaves *both* the image question and the
+fiber question open (finding 1). The population must not be narrowed to the
+primitive subfamily — that is where the screen decides, and the satellite and
+renormalizable strata are reported separately rather than dropped, per finding 3.
+Three things have to be fixed before any code is written: the census
 must partition by primitivity rather than assume it, it must not present itself
 as computing the Thurston set or the Master Teapot, and it needs the screen to
 be reachable, which today it is not.
@@ -35,20 +38,35 @@ be reachable, which today it is not.
 
 ### 1. The image set is characterised. The fiber is not, and that is the census
 
-Thurston's theorem settles which numbers occur: a positive real `h` is the
-topological entropy of a postcritically finite self-map of the interval if and
-only if `exp(h)` is a **weak Perron number**, that is a real positive algebraic
-integer at least as large as the modulus of each of its Galois conjugates.[^1]
-[^2] So "which algebraic numbers are core entropies" is answered, and a census
-that framed itself as discovering that would be rediscovering a known theorem.
+Thurston's theorem settles the question **for multimodal maps of unrestricted
+degree**: a positive real `h` is the topological entropy of a postcritically
+finite self-map of the interval if and only if `exp(h)` is a **weak Perron
+number**, a real positive algebraic integer at least as large as the modulus of
+each of its Galois conjugates.[^1] [^2] Every weak Perron number is realised
+there, by some continuous multimodal postcritically finite interval map.[^8]
 
-What is not answered is the assignment. The survey literature states the open
-direction in as many words: describing the shape of the Master Teapot or the
-Thurston set is *a step toward characterising which weak Perron numbers arise as
-the growth rates of which* postcritically finite interval maps.[^3] That is the
-fiber of Thurston's map, and B8's census — fix a box of Misiurewicz types
-`(l, k)`, report the algebraic type of each `exp(h_core)` — is a finite sample of
-exactly it.
+**Fixing the degree does not inherit that answer, and the first draft of this
+note wrongly said it did.** Restricting to degree two is described in the
+literature as the point where the question becomes more subtle: for postcritically
+finite maps of restricted degree the dynamics impose complicated restrictions on
+which Perron numbers are attainable as `exp(h)`, and *describing those numbers* is
+stated as the problem.[^8] Thurston's own degree-two work went to the Galois
+conjugates of the growth rates of real quadratic postcritically finite
+polynomials, and found the fractal structure now called the Thurston set — which
+is what one does when the image is not yet characterised.[^8]
+
+So there are two open questions here, not one, and the census bears on both:
+
+- **the image**, restricted to degree two: which weak Perron numbers in `[1, 2]`
+  actually occur as `exp(h_core)` of a quadratic Hubbard tree map;
+- **the fiber**: which parameters give which value. The survey literature states
+  this direction too — describing the shape of the Master Teapot or the Thurston
+  set is *a step toward characterising which weak Perron numbers arise as the
+  growth rates of which* postcritically finite interval maps.[^3]
+
+B8's census — fix a box of Misiurewicz types `(l, k)`, report the algebraic type
+of each `exp(h_core)` — is a finite sample of the fiber, and its value set is a
+finite sample of the degree-two image. Neither is foreclosed.
 
 Searching for a characterisation of *Pisot* core entropy specifically returned
 none. That is weak evidence and is recorded as such: it means no such result
@@ -76,10 +94,15 @@ that window are unusually well understood:
 - every Pisot number below the golden ratio is known explicitly, by Dufresnoy
   and Pisot 1955.[^5]
 
-So a census reporting "Pisot" is reporting membership in a set that is, in the
-relevant range, enumerable. That is a reason to be *more* careful rather than
-less: a hit is checkable against a known list, so a hit that is not on the list
-is a bug in the census before it is a discovery.
+So a census reporting "Pisot" **below the golden ratio** is reporting membership
+in a set that is explicitly enumerated. That is a reason to be *more* careful
+rather than less: such a hit is checkable against a known list, and one that is
+not on the list is a bug in the census before it is a discovery.
+
+The check does not extend upward. Between the golden ratio and `2` the Pisot
+numbers are not given by any comparable explicit enumeration, so a hit there is
+neither confirmed nor impugned by a list, and treating an unlisted value in that
+range as an error would reject correct output.
 
 At the top of the range `lambda = 2` occurs, at `c = -2`. Two is a rational
 integer and therefore trivially Pisot, and reporting it as an interesting Pisot
@@ -134,7 +157,7 @@ write-up to overclaim.
 | Salem candidates | conjugates on the unit circle | Salem numbers exist below 2, so the screen's circle test is live rather than decorative |
 | A known Pisot value | plastic constant, golden ratio | a reported Pisot hit below the golden ratio must appear on the Dufresnoy–Pisot list |
 
-### 6. The screen is in the wrong repository for this consumer
+### 6. The screen is not reachable from here, and the fix is not extraction
 
 A structural blocker, found by reading `vendored.toml` rather than the
 literature. This repository vendors `finite_exact`, `claim_governance` and
@@ -143,18 +166,29 @@ literature. This repository vendors `finite_exact`, `claim_governance` and
 all — it lives in the Pisot repository, which this one does not vendor from.
 
 So B8's prerequisite is delivered but unreachable from the repository that holds
-the tree combinatorics. Three ways out, and the choice belongs to whoever writes
-the census rather than to this note:
+the tree combinatorics.
 
-1. extract the screen to the kernels monorepo and vendor it here, which matches
-   where the `M`-adic carrier went and keeps one implementation;
-2. put the census in the Pisot repository and move the tree combinatorics to it,
-   which inverts the dependency;
-3. duplicate the screen here, which the vendoring policy exists to forbid.
+**The first draft of this note then prescribed the wrong remedy.** It said
+extraction to the kernels monorepo was the only policy-compliant route and
+declared implementation unlicensed until that happened. This repository's own
+extraction plan says the opposite: the shared library's scope explicitly excludes
+Pisot tests, and PIP-specific predicates and characteristic-polynomial tests stay
+in the Pisot repository, which "computes" while claims and certificate checklists
+remain there.[^9] Extraction is therefore not merely *not the only* route; it is
+the one route the stated plan rules out.
 
-Option 1 is the only one consistent with the standing policy. It is also not free:
-the screen depends on `psc.pisot` for shared polynomial helpers, so extraction is
-a real change and not a file move.
+What is left, and the choice belongs to whoever writes the census:
+
+1. run the census in the Pisot repository, which already holds the screen,
+   consuming tree data exported from here;
+2. compute the transition matrices here and export them, letting the
+   classification happen where the screen lives;
+3. extract only the general linear algebra, already a listed extraction
+   candidate, and keep the Pisot predicate itself in the Pisot repository.[^9]
+
+None of these is blocked. The observation that stands is narrow: the screen is
+not callable from this repository today, so a census written here cannot classify
+`lambda` without one of the arrangements above.
 
 ## What this gate licenses, and what it does not
 
@@ -162,20 +196,26 @@ a real change and not a file move.
    partitioned by whether `A_c` is primitive with irreducible characteristic
    polynomial, reporting root location where the screen decides and refusing
    where it does not.
-2. **Not licensed:** any claim about which weak Perron numbers arise. Thurston
-   answered the image question and this census does not touch it.
+2. **Not licensed:** any claim that Thurston's multimodal realisation settles the
+   degree-two image. It does not, per finding 1; a finite census may report which
+   values it observed, and may not report that set as characterised.
 3. **Not licensed:** presenting the census, or any picture drawn from it, as the
    Thurston set or the Master Teapot. Those are closures of conjugate sets; this
    is a finite sample of a fiber.
 4. **Not licensed:** reading "reducible characteristic polynomial" as "not Pisot"
    in the imprimitive case, where the factorisation `x^k P(x^p)` records the
    matrix's periodicity instead.
-5. **Not licensed:** implementation before the screen is reachable. Finding 6 is a
-   blocker, not a detail, and duplicating the screen to get around it is
-   forbidden by the vendoring policy.
+5. **Not licensed:** duplicating the screen into this repository. The vendoring
+   policy forbids a second copy, and the extraction plan keeps the Pisot
+   predicate in the Pisot repository, so the census must be arranged around
+   finding 6 rather than around a copy.
 6. **Not licensed:** reporting a Pisot hit below the golden ratio without checking
-   it against the known list. In that range the answer is enumerable, so an
-   unlisted hit is a defect until shown otherwise.
+   it against the known list. In that range the answer is enumerated, so an
+   unlisted hit is a defect until shown otherwise. Above the golden ratio no such
+   list applies and the check must not be extended there.
+7. **Not licensed:** narrowing the census population to the primitive subfamily.
+   The screen's reach narrows; the population does not, or the result is a
+   selection effect rather than a census.
 
 ## Sources
 
@@ -188,3 +228,5 @@ Retrieved 2026-09-17. Bibliographic detail is recorded as the sources present it
 [^5]: [Pisot number](https://mathworld.wolfram.com/PisotNumber.html), Wolfram MathWorld, for the plastic constant as the smallest Pisot number (Salem 1944, Siegel 1944), closedness of the set (Salem 1944), the golden ratio as smallest limit point, and the Dufresnoy–Pisot 1955 enumeration below it.
 [^6]: Giulio Tiozzo, "[Continuity of core entropy of quadratic polynomials](https://www.math.utoronto.ca/tiozzo/docs/continuity.pdf)," *Inventiones Mathematicae*, 2016; and Kathryn Lindsey, Giulio Tiozzo and Chenxi Wu, "[Master Teapots and Entropy Algorithms for the Mandelbrot Set](https://arxiv.org/abs/2112.14590)," arXiv:2112.14590, for the principal-vein analogues.
 [^7]: "[Polynomials with core entropy zero](https://arxiv.org/abs/2205.13704)," arXiv:2205.13704.
+[^8]: Giulio Tiozzo, "[Galois conjugates of entropies of real unimodal maps](https://arxiv.org/pdf/1310.7647)," arXiv:1310.7647, for the multimodal realisation of every weak Perron number, for the statement that fixing the degree makes the question subtler, and for the degree-two restrictions on attainable Perron numbers being the problem to describe.
+[^9]: `docs/library-extraction-candidates-2026-09-14.md`, sections 3 and 4: the shared library's scope excludes Pisot tests, PIP-specific predicates and cubic characteristic-polynomial tests stay in the Pisot repository, and spectral claims stay there too.
