@@ -14,6 +14,8 @@ mojo-build = "mojo build src/smoke_tests.mojo -o .pixi/finite-mandelbrot-smoke"
 property = "python tools/exact_arithmetic_property_oracle.py"
 regime-audit = "python tools/audit_regime_correspondences.py"
 vendored = "python tools/check_vendored_sync.py"
+ledgers = "python tools/make_ledger.py"
+ledgers-check = "python tools/make_ledger.py --check"
 
 [dependencies]
 mojo = "==1.0.0"

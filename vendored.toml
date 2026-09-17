@@ -47,3 +47,15 @@ root = "src"
 "substitution_dynamics/sadic.mojo" = "dda1a9b2c355050395679f8dc36c3985dc18405fdc6186d45d262a4ba0262450"
 "substitution_dynamics/substitution.mojo" = "ffa0dafbd11abf612acad3cdd6e75f910ae91e6b24548cf979253372f1ffddde"
 "substitution_dynamics/tuning.mojo" = "3597cdeb191db042f39562b2d6003af4d9bb65162a95ee4fe052882968682a09"
+
+[[package]]
+name = "proof_records"
+repository = "larsbx/finite-math-kernels"
+commit = "d2402d7345304a3fd69d2368ba5552723acebf41"
+root = "tools"
+
+[package.files]
+"proof_records/__init__.py" = "f95c17cdd76e09e5091017859e3c2a011b2b4aa5125890774742083f2a0d828f"
+"proof_records/generate_ledgers.py" = "e44c42353c9d511f8744fbd243c37acb69c5031d0ad512cfe439c339cfa60ca2"
+"proof_records/graph.py" = "b1421a07539edee84a91fdd5208ad4d9b4f87d96dc9cab4686964aa633d080b2"
+"proof_records/records.py" = "53f862a994f8a299e166bd4d5c41a8a948b4ea5530aac42af7840a14c5509db8"
