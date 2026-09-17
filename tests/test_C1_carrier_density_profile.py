@@ -17,6 +17,8 @@ from fractions import Fraction
 from itertools import combinations
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
@@ -88,11 +90,48 @@ def test_the_separator_of_a_level_is_declared_not_derived():
     src = text(SRC)
     start = src.index("def carrier_density_profile(")
     signature = src[start:src.index(") -> CarrierDensityProfile:", start)]
-    for argument in ("level_nums", "level_dens", "lefts_n", "lefts_d", "rights_n", "rights_d"):
+    for argument in ("level_nums", "level_dens", "lefts_n", "lefts_d", "rights_n", "rights_d",
+                     "tags", "co_landings"):
         assert argument in signature
     assert "separator declared for each level is a separate input" in src
     assert "vacuous construction" in src
     assert "docs/C1_admissible_separator_codes.md" in src
+
+
+def test_the_declared_separator_must_also_be_admissible():
+    """Declaring a pair is not enough: two arbitrary rational angles are a cut,
+    and measuring one would report an unproved separation as a decided one."""
+    src = text(SRC)
+    gate = src[src.index("def admissible_separator("):src.index("def _prefix(")]
+    assert "if not co_landing:" in gate
+    for tag in ("LANDING_RATIONAL_RAY", "LANDING_PARABOLIC", "LANDING_HYPERBOLIC_BOUNDARY"):
+        assert tag in gate
+    assert "return ln * rd != rn * ld" in gate
+    body = src[src.index("def carrier_density_profile("):src.index("# --- non-claims")]
+    assert "if not admissible_separator(" in body
+
+
+def test_the_admissibility_gate_is_the_same_on_both_sides():
+    """The oracle applies the gate the Mojo module applies, on the same codes."""
+    assert (cdp.RATIONAL_RAY, cdp.PARABOLIC, cdp.HYPERBOLIC_BOUNDARY) == (1, 2, 3)
+    for name, code in (("LANDING_RATIONAL_RAY", 1), ("LANDING_PARABOLIC", 2),
+                       ("LANDING_HYPERBOLIC_BOUNDARY", 3)):
+        assert f"comptime {name}: Int64 = {code}" in text(SRC)
+    basilica = ((1, 3), (2, 3))
+    assert cdp.admissible(basilica, cdp.RATIONAL_RAY, True)
+    assert not cdp.admissible(basilica, 0, True)          # the generic-boundary tag has no code
+    assert not cdp.admissible(basilica, cdp.RATIONAL_RAY, False)
+    assert not cdp.admissible(((1, 3), (1, 3)), cdp.RATIONAL_RAY, True)
+    with pytest.raises(ValueError, match="inadmissible separator"):
+        cdp.profile((basilica,), cdp.RATIONAL_RAY, False)
+
+
+def test_the_mojo_smoke_exercises_the_gate_in_both_directions():
+    """A gate that refused everything would pass every rejection case above."""
+    src = text(SRC)
+    assert "var generic: List[Int64] = [0]" in src and "var mlc: List[Int64] = [4]" in src
+    assert "var undeclared: List[Bool] = [False]" in src
+    assert "_is(admitted.levels[0].density, 4, 9)" in src
 
 
 def test_non_claims_return_false_in_mojo():

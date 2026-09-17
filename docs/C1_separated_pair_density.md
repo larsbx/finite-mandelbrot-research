@@ -61,6 +61,8 @@ with the null class named, which is what the theorem tag records and what its `e
 
 `src/C1_carrier_density_profile.mojo` runs the measure along a residual directive carrier (`docs/C1_residual_directive_carrier.md`): for each level it reports the density and residue of the prefix up to that level, and the measure that level decided. The separator of a level is a declared input, not a quantity read off the level's address: `docs/C1_admissible_separator_codes.md` requires accepted landing tags on both rays and a declared co-landing pair, which an address cannot supply, and deriving one from the level's own address would put every carrier address in its own arc and measure the construction instead. The classical wake pairs the smoke target uses — `1/3` with `2/3`, `1/7` with `2/7`, `3/7` with `4/7` — are imported co-landings.
 
+Declaring a pair is necessary and not sufficient, and the module enforces the rest rather than trusting the caller. Each level also declares a landing tag and whether the pair is a co-landing, and `admissible_separator` rejects the whole profile unless the tag is one of `RationalRayLanding`, `ParabolicLanding` or `HyperbolicBoundaryLanding`, the co-landing is declared, and the two rays are distinct. The tags the spec forbids — `GenericBoundaryLanding`, `MLCBinding` — are inadmissible by having no code at all, which is where an analytic assumption would enter if it entered anywhere. Two arbitrary rational angles cut the circle without anything licensing the cut, and measuring one at a carrier level would report an unproved separation as a decided one.
+
 | Carrier prefix | Density | Decided at that level | Residue |
 | --- | --- | --- | --- |
 | basilica | `4/9` | `4/9` | `5/9` |

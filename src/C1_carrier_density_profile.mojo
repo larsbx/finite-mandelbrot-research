@@ -18,6 +18,15 @@
 # correction to N3 refused: it would put every carrier address in its own arc
 # and measure the construction rather than anything about the carrier.
 #
+# That requirement is enforced, not only stated. Two rational endpoints are not
+# a separator: an arbitrary pair of distinct angles cuts the circle without
+# anything licensing the cut, and reporting its measure at a carrier level
+# would report an unproved separation as a decided one. Each level therefore
+# declares a landing tag and whether the pair is a declared co-landing, and
+# admissible_separator below refuses the level otherwise -- in particular it
+# refuses the generic-boundary and MLC tags that the spec forbids, which is
+# where an analytic assumption would enter if it entered anywhere.
+#
 # Two identities are checked, not assumed, and a violation is a rejection
 # rather than a reported oddity, because neither can fail on an accepted input:
 #
@@ -87,6 +96,28 @@ def rejected_profile() -> CarrierDensityProfile:
     return CarrierDensityProfile(List[CarrierDensityLevel](), False, True)
 
 
+# Landing tags of docs/C1_admissible_separator_codes.md, as integer codes so a
+# caller cannot spell one wrong and be believed. The forbidden tags -- generic
+# boundary landing, MLC binding -- deliberately have no code: they are every
+# value that is not one of these three.
+comptime LANDING_RATIONAL_RAY: Int64 = 1
+comptime LANDING_PARABOLIC: Int64 = 2
+comptime LANDING_HYPERBOLIC_BOUNDARY: Int64 = 3
+
+
+def admissible_separator(tag: Int64, co_landing: Bool, ln: Int64, ld: Int64, rn: Int64, rd: Int64) -> Bool:
+    """Whether the declared separator of one level may be measured at all: an
+    accepted landing tag, a declared co-landing pair, positive denominators and
+    two distinct rays. Nothing here is derived from the level's address."""
+    if not co_landing:
+        return False
+    if tag != LANDING_RATIONAL_RAY and tag != LANDING_PARABOLIC and tag != LANDING_HYPERBOLIC_BOUNDARY:
+        return False
+    if ld <= 0 or rd <= 0:
+        return False
+    return ln * rd != rn * ld
+
+
 def _prefix(values: List[Int64], count: Int) -> List[Int64]:
     var out = List[Int64]()
     for i in range(count):
@@ -102,16 +133,27 @@ def carrier_density_profile(
     lefts_d: List[Int64],
     rights_n: List[Int64],
     rights_d: List[Int64],
+    tags: List[Int64],
+    co_landings: List[Bool],
 ) -> CarrierDensityProfile:
     """The density of every prefix of the carrier `level_nums/level_dens`,
     under the separator declared for each level. Fails closed on a length
     mismatch, a level address that is not a periodic ray address, a separator
-    the density kernel refuses, and on either identity above failing."""
+    that is not admissible under docs/C1_admissible_separator_codes.md, a
+    separator the density kernel refuses, and on either identity above
+    failing."""
     var count = len(level_nums)
     if len(level_dens) != count or len(lefts_n) != count or len(lefts_d) != count:
         return rejected_profile()
     if len(rights_n) != count or len(rights_d) != count:
         return rejected_profile()
+    if len(tags) != count or len(co_landings) != count:
+        return rejected_profile()
+    for i in range(count):
+        if not admissible_separator(
+            tags[i], co_landings[i], lefts_n[i], lefts_d[i], rights_n[i], rights_d[i]
+        ):
+            return rejected_profile()
     var carrier = ResidualDirectiveCarrier.empty()
     for i in range(count):
         var level = checked_directive_level(level_nums[i], level_dens[i])
@@ -179,12 +221,18 @@ def density_increment_measures_carrier_progress() -> Bool:
 def _levels(nums: List[Int64], dens: List[Int64]) -> CarrierDensityProfile:
     """The wake pairs declared for the basilica, rabbit and airplane levels:
     1/3 with 2/3, 1/7 with 2/7, 3/7 with 4/7. Imported co-landings, not
-    quantities derived from the carrier's addresses."""
+    quantities derived from the carrier's addresses, and each declared as a
+    rational-ray landing because that is what Douady-Hubbard wake theory
+    supplies for them."""
     var lefts_n = List[Int64]()
     var lefts_d = List[Int64]()
     var rights_n = List[Int64]()
     var rights_d = List[Int64]()
+    var tags = List[Int64]()
+    var co_landings = List[Bool]()
     for i in range(len(nums)):
+        tags.append(LANDING_RATIONAL_RAY)
+        co_landings.append(True)
         if nums[i] == 1 and dens[i] == 3:
             lefts_n.append(1)
             lefts_d.append(3)
@@ -200,7 +248,9 @@ def _levels(nums: List[Int64], dens: List[Int64]) -> CarrierDensityProfile:
             lefts_d.append(7)
             rights_n.append(4)
             rights_d.append(7)
-    return carrier_density_profile(nums, dens, lefts_n, lefts_d, rights_n, rights_d)
+    return carrier_density_profile(
+        nums, dens, lefts_n, lefts_d, rights_n, rights_d, tags, co_landings
+    )
 
 
 def _is(value: Q, num: Int64, den: Int64) -> Bool:
@@ -261,7 +311,11 @@ def carrier_density_profile_smoke() -> Bool:
     var short_d: List[Int64] = [3]
     var pair_n: List[Int64] = [1, 2]
     var pair_d: List[Int64] = [3, 3]
-    if carrier_density_profile(short_n, short_d, pair_n, pair_d, pair_n, pair_d).accepted():
+    var two_tags: List[Int64] = [LANDING_RATIONAL_RAY, LANDING_RATIONAL_RAY]
+    var two_yes: List[Bool] = [True, True]
+    if carrier_density_profile(
+        short_n, short_d, pair_n, pair_d, pair_n, pair_d, two_tags, two_yes
+    ).accepted():
         return False
     var preperiodic_n: List[Int64] = [1]
     var preperiodic_d: List[Int64] = [2]
@@ -271,7 +325,48 @@ def carrier_density_profile_smoke() -> Bool:
     var malformed_d: List[Int64] = [0]
     if _levels(malformed_n, malformed_d).accepted():
         return False
-    if carrier_density_profile(one_n, one_d, one_n, one_d, one_n, one_d).accepted():
+    var one_tag: List[Int64] = [LANDING_RATIONAL_RAY]
+    var one_yes: List[Bool] = [True]
+    if carrier_density_profile(
+        one_n, one_d, one_n, one_d, one_n, one_d, one_tag, one_yes
+    ).accepted():
+        return False
+
+    # The admissibility gate itself, which nothing above exercises because
+    # every separator above is a declared rational-ray co-landing. The
+    # basilica pair is the accepted input of the first case in this function,
+    # so only the tag and the co-landing flag differ here.
+    var left_n: List[Int64] = [1]
+    var left_d: List[Int64] = [3]
+    var right_n: List[Int64] = [2]
+    var right_d: List[Int64] = [3]
+    var generic: List[Int64] = [0]   # not one of the three accepted tags
+    var mlc: List[Int64] = [4]       # nor is any other value
+    var undeclared: List[Bool] = [False]
+    if carrier_density_profile(
+        one_n, one_d, left_n, left_d, right_n, right_d, generic, one_yes
+    ).accepted():
+        return False
+    if carrier_density_profile(
+        one_n, one_d, left_n, left_d, right_n, right_d, mlc, one_yes
+    ).accepted():
+        return False
+    if carrier_density_profile(
+        one_n, one_d, left_n, left_d, right_n, right_d, one_tag, undeclared
+    ).accepted():
+        return False
+    # ... and it is not a gate that refuses everything: the same pair with an
+    # accepted tag and a declared co-landing is the 4/9 of the first case.
+    var admitted = carrier_density_profile(
+        one_n, one_d, left_n, left_d, right_n, right_d, one_tag, one_yes
+    )
+    if not (admitted.accepted() and _is(admitted.levels[0].density, 4, 9)):
+        return False
+    if not admissible_separator(LANDING_PARABOLIC, True, 1, 3, 2, 3):
+        return False
+    if not admissible_separator(LANDING_HYPERBOLIC_BOUNDARY, True, 1, 3, 2, 3):
+        return False
+    if admissible_separator(LANDING_RATIONAL_RAY, True, 1, 3, 1, 3):
         return False
 
     return (
