@@ -57,6 +57,20 @@ PersistentNonSeparation(A,B) and A != B  =>  A, B lie in a harmonic-measure-null
 
 with the null class named, which is what the theorem tag records and what its `exceptional_set_is_null_not_empty` payload field forces a user to state. C1 remains an open frontier.
 
+## Along a carrier
+
+`src/C1_carrier_density_profile.mojo` runs the measure along a residual directive carrier (`docs/C1_residual_directive_carrier.md`): for each level it reports the density and residue of the prefix up to that level, and the measure that level decided. The separator of a level is a declared input, not a quantity read off the level's address: `docs/C1_admissible_separator_codes.md` requires accepted landing tags on both rays and a declared co-landing pair, which an address cannot supply, and deriving one from the level's own address would put every carrier address in its own arc and measure the construction instead. The classical wake pairs the smoke target uses — `1/3` with `2/3`, `1/7` with `2/7`, `3/7` with `4/7` — are imported co-landings.
+
+| Carrier prefix | Density | Decided at that level | Residue |
+| --- | --- | --- | --- |
+| basilica | `4/9` | `4/9` | `5/9` |
+| basilica, rabbit | `262/441` | `22/147` | `179/441` |
+| basilica, rabbit, airplane | `286/441` | `8/147` | `155/441` |
+
+Two identities are checked on every profile rather than assumed, and a violation is a rejection: the increments sum to the final density, and the residue never rises. The second is refinement monotonicity read along the carrier order, and the profile records it as a field so that a reader sees it was checked on the prefix in front of them.
+
+A profile decides nothing about the carrier. `profile_decides_carrier_membership()`, `residue_zero_at_some_level_is_reachable()`, and `density_increment_measures_carrier_progress()` all return `False`: finitely many separators cut finitely many atoms, so some class keeps positive measure at every finite level, and the pairs a carrier is about are the ones that stay undecided.
+
 ## Next step
 
-Attach a density to each level of a carrier's catalogue prefix, so that a refinement step reports the measure it decided as well as the addresses it added, and record whether the residue is non-increasing along the C1 carrier-refinement order.
+Decide the measure of the undecided classes a carrier *cannot* refine away: the residue of a prefix is an upper bound for what any extension of it leaves, but no finite computation here bounds the limit, and the infinitely renormalizable parameters sit inside every one of these classes.

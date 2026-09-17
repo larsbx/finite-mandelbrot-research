@@ -73,10 +73,15 @@ def test_regime_correspondence_binds_the_density_symbol():
     entry = next(c for c in spec["correspondence"] if c["id"] == "separated-pair-density")
     assert "harmonic measure on the boundary" in entry["does_not_inherit"]
     assert "separation of a named pair" in entry["does_not_inherit"]
+    # The kernel and the carrier profile of docs/C1_separated_pair_density.md
+    # share this correspondence; each symbol is tagged in its own file.
+    assert "src/C1_separated_density.mojo::separated_pair_density" in entry["symbols"]
     for symbol in entry["symbols"]:
         path, name = symbol.split("::")
-        assert path == "src/C1_separated_density.mojo" and f"def {name}(" in text(SRC)
-    assert text(SRC).count("# Regime correspondence: separated-pair-density") == len(entry["symbols"])
+        source = text(ROOT / path)
+        assert f"def {name}(" in source
+        assert source.count("# Regime correspondence: separated-pair-density") == sum(
+            s.startswith(path + "::") for s in entry["symbols"])
 
 
 # --- the reference model --------------------------------------------------------

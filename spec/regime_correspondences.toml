@@ -125,11 +125,11 @@ analytic_concepts = ["Lebesgue measure on external angles", "harmonic measure", 
 finite_term = "separated-pair density"
 class = "finite_certificate_surrogate"
 status = "implemented_tested"
-preserves = ["exact rational atom lengths of a finite separator set", "side signatures and their classes", "monotonicity under refinement", "orientation independence", "total measure one"]
-does_not_inherit = ["harmonic measure on the boundary", "the limit over all prefixes", "fibre triviality", "local connectivity", "separation of a named pair"]
+preserves = ["exact rational atom lengths of a finite separator set", "side signatures and their classes", "monotonicity under refinement", "orientation independence", "total measure one", "the measure each carrier level decides, along the refinement order"]
+does_not_inherit = ["harmonic measure on the boundary", "the limit over all prefixes", "fibre triviality", "local connectivity", "separation of a named pair", "any verdict on the carrier whose levels order the prefix"]
 domain_conditions = ["normalized rational cut addresses in the half-open interval from zero to one", "accepted exact rational arithmetic"]
-symbols = ["src/C1_separated_density.mojo::separated_pair_density"]
-evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "tools/separated_density_reference.py"]
+symbols = ["src/C1_separated_density.mojo::separated_pair_density", "src/C1_carrier_density_profile.mojo::carrier_density_profile"]
+evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "tools/separated_density_reference.py", "tests/test_C1_carrier_density_profile.py", "tools/carrier_density_profile_reference.py"]
 proof_boundary = "A finite prefix density is a measure of decided pairs; a null undecided set is not an empty one and no named pair is thereby separated."
 
 [[correspondence]]
