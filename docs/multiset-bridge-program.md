@@ -1,10 +1,11 @@
 # Multiset bridge program
 
 **Status:** staged theorem program. The algebraic identities in stages B0 and
-B1 are available to the finite kernel. Later stages require the stated
-certificates or imported theorems. This program keeps multisets in the primary
-research toolbox without identifying an arbitrary finite-field statistic with
-the classical Mandelbrot set.
+B1 and the simple-residue-root subcertificate of B2 are executable in
+`src/critical_relation_bridge.mojo`. The remaining B2 lift and later stages
+require the stated certificates or imported theorems. This program keeps
+multisets in the primary research toolbox without identifying an arbitrary
+finite-field statistic with the classical Mandelbrot set.
 
 ## Objective
 
@@ -79,6 +80,13 @@ embeddings lie in the classical Mandelbrot set.
 
 This stage bridges a certified root multiset to a postcritically finite
 submultiset of `M`; it does not bridge every finite-field parameter to `M`.
+
+Current executable boundary: the checker verifies bounded primality,
+commutation of polynomial reduction with direct iteration, the minimal-horizon
+exact collision pattern, and a nonzero modular derivative. It therefore
+certifies a simple residue root eligible for the next lifting stage. It does
+not yet produce the lift, factor correspondence, or discriminant/resultant
+evidence.
 
 ### B3 — Localization into the existing certificate calculus
 
