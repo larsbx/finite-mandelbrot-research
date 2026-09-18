@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src" / "projective_multiset.mojo"
 SPEC = ROOT / "docs" / "projective-multiset.md"
+DEFINITION = ROOT / "docs" / "mandelbrot-defining-family.md"
 
 
 def read(path: Path) -> str:
@@ -44,3 +45,21 @@ def test_claim_firewall_is_explicit():
     assert "does not identify a finite-field shadow with the classical Mandelbrot set" in spec
     assert "local connectivity, fibre triviality, or landing of external rays" in spec
     assert "Supporting general prime powers" in spec
+
+
+def test_actual_defining_family_is_typed_and_authoritative():
+    definition = read(DEFINITION)
+    assert "f_c(z) = z^2 + c" in definition
+    assert "Phi(c,z) = (c, z^2 + c)" in definition
+    assert "s(c) = (c,0)" in definition
+    assert "Q_n(c) = f_c^n(0)" in definition
+    assert "M = {c in C : the sequence (Q_n(c))_{n >= 0} is bounded}" in definition
+    assert "x_n^2 + y_n^2 > 4" in definition
+    assert "Projectivization alone does not turn boundedness" in definition
+    assert "It is not “the Mandelbrot set with" in definition
+
+
+def test_readme_routes_to_the_authoritative_definition():
+    readme = read(ROOT / "README.md")
+    assert "docs/mandelbrot-defining-family.md" in readme
+    assert "not alternative definitions of the Mandelbrot set" in readme
