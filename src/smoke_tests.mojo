@@ -19,7 +19,7 @@ from finite_exact.rat_q import Q, bigq_storage_smoke, demo_q_normalization, demo
 from finite_exact.closed_interval import IQ, ComplexIQ, demo_interval_mul, demo_complex_quadrance_point, bigq_interval_conformance_smoke
 from poly_interval_eval import eval_p21, demo_poly_interval_eval_status
 from krawczyk_witness import verify_p21_krawczyk_c_minus_2, bigq_krawczyk_replay_smoke
-from interval_orbit import bigq_exact_type_exclusion_replay_smoke
+from interval_orbit import bigq_exact_type_exclusion_replay_smoke, invalid_orbit_config_rejection_smoke
 from bigq_ray_address import bigq_ray_address_replay_smoke
 from bigq_landing_target_adapter import bigq_landing_target_replay_smoke
 from bigq_theorem_tag_payload_instances import bigq_theorem_payload_replay_smoke
@@ -293,6 +293,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("Krawczyk witness at c = -2", verify_p21_krawczyk_c_minus_2(8))
     _ = report.record("bigq Krawczyk replay", bigq_krawczyk_replay_smoke())
     _ = report.record("bigq exact-type exclusion replay", bigq_exact_type_exclusion_replay_smoke())
+    _ = report.record("invalid orbit config rejection", invalid_orbit_config_rejection_smoke())
     _ = report.record("bigq ray address replay", bigq_ray_address_replay_smoke())
     _ = report.record("bigq landing target replay", bigq_landing_target_replay_smoke())
     _ = report.record("bigq theorem payload replay", bigq_theorem_payload_replay_smoke())
