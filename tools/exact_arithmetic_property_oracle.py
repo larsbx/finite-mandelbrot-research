@@ -12,11 +12,18 @@ the same xorshift64* stream, recomputes every result with Python ``int`` and
 ``docs/canonical-serialization.md``, and compares token by token. Nothing
 printed by Mojo is parsed into a number: agreement is on bytes and codes.
 
+Every run first checks the generators against their declared refinement
+(``docs/generator-refinement-spec.md`` in ``larsbx/finite-math-kernels``,
+whose ``oracle_refinement`` package is vendored here), because a differential
+comparison is only as strong as the corpus it draws from.
+
 Usage:
     exact_arithmetic_property_oracle.py              run ``mojo`` and compare
     exact_arithmetic_property_oracle.py TRANSCRIPT   compare a saved transcript
+    exact_arithmetic_property_oracle.py --distribution   report phi_G only
 
-Exit status 0 on agreement, 1 on any mismatch, 2 when ``mojo`` is unavailable.
+Exit status 0 on agreement, 1 on any mismatch or on a corpus that departs from
+its declaration, 2 when ``mojo`` is unavailable.
 """
 
 from __future__ import annotations
@@ -25,10 +32,15 @@ import math
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass, field
 from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+
+from oracle_refinement import Class, Refinement, audit_all  # noqa: E402
+
 PROBE = ROOT / "src" / "exact_arithmetic_property_probe.mojo"
 
 BASE = 10**9
@@ -54,9 +66,26 @@ class Xorshift64Star:
         return (x * 2685821657736338717) & MASK64
 
 
-def random_int(rng: Xorshift64Star, max_limbs: int = MAX_LIMBS) -> int:
+@dataclass
+class Draws:
+    """Every value each declared generator produced, nested calls included.
+
+    A fraction draws two integers and an interval draws two fractions, so
+    auditing only the operands a layer prints would judge `random_int` on a
+    fraction of its own output. Passing a `Draws` changes nothing about the
+    stream: the recorder is a parameter the transcript path never supplies."""
+
+    integers: list[int] = field(default_factory=list)
+    fractions: list[Fraction] = field(default_factory=list)
+    intervals: list[tuple[Fraction, Fraction]] = field(default_factory=list)
+
+
+def random_int(rng: Xorshift64Star, max_limbs: int = MAX_LIMBS, draws: Draws | None = None) -> int:
     if rng.next() % 4 == 0:
-        return rng.next() % 2001 - 1000
+        value = rng.next() % 2001 - 1000
+        if draws is not None:
+            draws.integers.append(value)
+        return value
     count = rng.next() % max_limbs + 1
     limbs = []
     for _ in range(count):
@@ -65,21 +94,120 @@ def random_int(rng: Xorshift64Star, max_limbs: int = MAX_LIMBS) -> int:
     value = sum(limb * BASE**i for i, limb in enumerate(limbs))
     if value != 0 and rng.next() % 2 == 1:
         value = -value
+    if draws is not None:
+        draws.integers.append(value)
     return value
 
 
-def random_nonzero_int(rng: Xorshift64Star) -> int:
-    return random_int(rng) or 1
+def random_nonzero_int(rng: Xorshift64Star, draws: Draws | None = None) -> int:
+    return random_int(rng, draws=draws) or 1
 
 
-def random_fraction(rng: Xorshift64Star) -> Fraction:
-    numerator = random_int(rng)
-    return Fraction(numerator, random_nonzero_int(rng))
+def random_fraction(rng: Xorshift64Star, draws: Draws | None = None) -> Fraction:
+    numerator = random_int(rng, draws=draws)
+    value = Fraction(numerator, random_nonzero_int(rng, draws=draws))
+    if draws is not None:
+        draws.fractions.append(value)
+    return value
 
 
-def random_interval(rng: Xorshift64Star) -> tuple[Fraction, Fraction]:
-    a, b = random_fraction(rng), random_fraction(rng)
-    return (min(a, b), max(a, b))
+def random_interval(rng: Xorshift64Star, draws: Draws | None = None) -> tuple[Fraction, Fraction]:
+    a, b = random_fraction(rng, draws=draws), random_fraction(rng, draws=draws)
+    value = (min(a, b), max(a, b))
+    if draws is not None:
+        draws.intervals.append(value)
+    return value
+
+
+# --- phi_G: what these generators produce, and what they do not ---------------
+#
+# `larsbx/finite-math-kernels: docs/generator-refinement-spec.md`. The stream is
+# deterministic, so these are exact statements about a fixed corpus. A class
+# declared missed names the branch of the transcript grammar it leaves
+# unexercised; declaring the gap is how it becomes a finding rather than a
+# silence.
+
+INTEGER = Refinement(
+    "random_int",
+    f"an integer of at most {MAX_LIMBS} base-{BASE} limbs, either sign",
+    lambda v: isinstance(v, int) and abs(v) < BASE**MAX_LIMBS,
+    (
+        Class("negative", lambda v: v < 0),
+        Class("small", lambda v: abs(v) <= 1000),
+        Class("beyond 64 bits", lambda v: abs(v) >= 1 << 63),
+        Class("a maximal limb", lambda v: (BASE - 1) in limbs_of(v)),
+        Class("zero", lambda v: v == 0,
+              reason="the small branch draws one of 2001 values and the limb branch sums "
+                     "non-zero-biased limbs, so this stream never lands on it; the `Z` "
+                     "division-by-zero branch of the grammar is therefore unexercised"),
+        Class("a unit", lambda v: abs(v) == 1,
+              reason="same window, and this stream misses it; the sign and gcd edges at "
+                     "plus or minus one are covered only by the known-answer suites"),
+    ),
+)
+
+FRACTION = Refinement(
+    "random_fraction",
+    f"a rational whose parts are each an integer of at most {MAX_LIMBS} base-{BASE} limbs",
+    lambda v: (isinstance(v, Fraction) and v.denominator > 0
+               and abs(v.numerator) < BASE**MAX_LIMBS and v.denominator < BASE**MAX_LIMBS),
+    (
+        Class("negative", lambda v: v < 0),
+        Class("proper", lambda v: abs(v) < 1),
+        Class("zero", lambda v: v == 0,
+              reason="its numerator is random_int, which this stream never draws at zero; "
+                     "the `Q` division-by-zero branch is therefore unexercised"),
+        Class("integer-valued", lambda v: v.denominator == 1,
+              reason="both parts are drawn independently from a wide range, so this stream "
+                     "never cancels to one; canonicalisation to denominator one is covered "
+                     "only by the known-answer suites"),
+    ),
+)
+
+INTERVAL = Refinement(
+    "random_interval",
+    "a closed interval whose endpoints are two draws of random_fraction, lo <= hi",
+    lambda v: (isinstance(v, tuple) and len(v) == 2 and v[0] <= v[1]
+               and all(FRACTION.holds(end) for end in v)),
+    (
+        Class("straddling zero", lambda v: v[0] < 0 < v[1]),
+        Class("strictly positive", lambda v: v[0] > 0),
+        Class("strictly negative", lambda v: v[1] < 0),
+        Class("degenerate", lambda v: v[0] == v[1],
+              reason="both endpoints are independent rationals over a wide range, so this "
+                     "stream never draws them equal; the point-interval reciprocal and sign "
+                     "paths are therefore unexercised"),
+    ),
+)
+
+REFINEMENTS = (INTEGER, FRACTION, INTERVAL)
+
+
+def limbs_of(value: int) -> list[int]:
+    """The base-BASE limbs of a magnitude, least significant first."""
+    magnitude, limbs = abs(value), []
+    while magnitude:
+        magnitude, limb = divmod(magnitude, BASE)
+        limbs.append(limb)
+    return limbs or [0]
+
+
+def drawn() -> Draws:
+    """Every value the transcript's stream produces, nested draws included."""
+    rng, draws = Xorshift64Star(SEED), Draws()
+    for _ in range(Z_CASES):
+        random_int(rng, draws=draws), random_int(rng, draws=draws)
+    for _ in range(Q_CASES):
+        random_fraction(rng, draws=draws), random_fraction(rng, draws=draws)
+    for _ in range(I_CASES):
+        random_interval(rng, draws=draws), random_interval(rng, draws=draws)
+    return draws
+
+
+def distribution_problems() -> tuple[str, ...]:
+    """Every way the realized corpus departs from the declarations above."""
+    draws = drawn()
+    return audit_all(zip(REFINEMENTS, (draws.integers, draws.fractions, draws.intervals)))
 
 
 # --- canonical encodings -----------------------------------------------------
@@ -182,7 +310,32 @@ def run_probe() -> list[str] | None:
     return [line for line in result.stdout.splitlines() if line.strip()]
 
 
+def report_distribution() -> int:
+    """The declarations of `REFINEMENTS` against the corpus this stream draws."""
+    problems = distribution_problems()
+    if problems:
+        print("The generators no longer match their declared refinement:\n")
+        print("\n".join(f"  {p}" for p in problems))
+        return 1
+    for refinement in REFINEMENTS:
+        print(f"{refinement.name}: reaches {', '.join(refinement.reached())}")
+        for cls in refinement.classes:
+            if not cls.required:
+                print(f"  misses {cls.name}: {cls.reason}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    if argv[1:] == ["--distribution"]:
+        return report_distribution()
+    # A differential run is only as strong as the corpus it draws, so the
+    # declaration is checked before the comparison it qualifies.
+    problems = distribution_problems()
+    if problems:
+        print("The generators no longer match their declared refinement:\n")
+        print("\n".join(f"  {p}" for p in problems))
+        print("\nSee docs/generator-refinement-spec.md in larsbx/finite-math-kernels.")
+        return 1
     if len(argv) > 1:
         actual = [line for line in Path(argv[1]).read_text(encoding="utf-8").splitlines() if line.strip()]
     else:
@@ -196,6 +349,8 @@ def main(argv: list[str]) -> int:
         print("\n".join(errors))
         return 1
     print(f"OK: property probe agrees with the oracle on {Z_CASES} integer, {Q_CASES} rational, and {I_CASES} interval cases.")
+    missed = [f"{r.name}/{c.name}" for r in REFINEMENTS for c in r.classes if not c.required]
+    print(f"OK: the corpus meets its declared refinement; classes it is declared to miss: {', '.join(missed)}.")
     return 0
 
 

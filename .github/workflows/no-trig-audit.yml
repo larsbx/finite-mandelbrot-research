@@ -48,3 +48,5 @@ jobs:
         run: python3 tools/interval_exclusion_reference.py
       - name: Validate the carrier density profile reference
         run: python3 tools/carrier_density_profile_reference.py
+      - name: Declared input distributions of the differential oracles
+        run: python3 tools/exact_arithmetic_property_oracle.py --distribution
