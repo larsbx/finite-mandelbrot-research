@@ -82,10 +82,23 @@ def test_multiset_bridge_is_a_staged_theorem_program_not_an_exclusion():
 def test_simple_residue_root_bridge_is_executable_and_bounded():
     bridge = read(BRIDGE)
     source = read(BRIDGE_SOURCE)
-    assert "simple-residue-root subcertificate of B2" in bridge
+    assert "simple-residue-root subcertificate" in bridge
     assert "struct SimpleResidueRootCertificate" in source
     assert "def bounded_prime" in source
     assert "def reduction_commutes_through" in source
     assert "def exact_minimal_collision_pattern" in source
     assert "def verify_simple_residue_root" in source
-    assert "does not construct a Hensel lift" in source
+    assert "does not construct an infinite Hensel lift" in source
+
+
+def test_first_hensel_step_is_replayed_without_claiming_full_lift():
+    source = read(BRIDGE_SOURCE)
+    bridge = read(BRIDGE)
+    assert "struct HenselStepCertificate" in source
+    assert "def inverse_mod_prime" in source
+    assert "def verify_hensel_step" in source
+    assert "correction_digit" in source
+    assert "lifted_relation_holds" in source
+    assert "not an infinite p-adic lift" in source
+    assert "one replayable Hensel step" in bridge
+    assert "not an asserted infinite" in bridge
