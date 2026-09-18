@@ -145,9 +145,11 @@ A weighted finite parameter cycle therefore has the form
 D_{p,mu} = sum_{c in F_p} mu(c)[c:1],
 ```
 
-where `mu` must name its semantics. It is not “the Mandelbrot set with
-multiplicity.” It becomes relevant to the classical set only after a separately
-proved bridge connecting the chosen weights across reduction or lifting.
+where `mu` must name its semantics. This does not automatically equal the
+classical Mandelbrot set with multiplicity, but it is retained as a candidate
+bridge object. `docs/multiset-bridge-program.md` gives separate routes for
+algebraic root multiplicity, basin cardinality, Frobenius multiplicity,
+projective intersection multiplicity, and escape-witness counts.
 
 ## 6. Repository type firewall
 
@@ -162,5 +164,7 @@ FiniteFieldShadow(p)  := functional-graph data over F_p
 WeightedShadow(p,mu)  := effective parameter zero-cycle with declared weight
 ```
 
-No conversion from `FiniteFieldShadow` or `WeightedShadow` to
-`ClassicalMandelbrot` exists without an explicit bridge theorem.
+No verified general conversion from `FiniteFieldShadow` or `WeightedShadow` to
+`ClassicalMandelbrot` is currently registered. Such conversions are theorem
+targets, not prohibited constructions; the staged obligations are specified in
+`docs/multiset-bridge-program.md`.
