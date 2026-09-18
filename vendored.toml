@@ -51,14 +51,16 @@ root = "src"
 [[package]]
 name = "proof_records"
 repository = "larsbx/finite-math-kernels"
-commit = "c1a4bb2215a7d454e50862b2931667210031ac78"
+commit = "8af9d7aa27bc902e3d68aa867531b48221b23429"
 root = "tools"
 
 [package.files]
-"proof_records/__init__.py" = "f95c17cdd76e09e5091017859e3c2a011b2b4aa5125890774742083f2a0d828f"
+"proof_records/__init__.py" = "f6c83591674f7c07bfc0eaf70071cf199317047c8e3a4cb0ad64a8623d876ed7"
 "proof_records/generate_ledgers.py" = "e44c42353c9d511f8744fbd243c37acb69c5031d0ad512cfe439c339cfa60ca2"
 "proof_records/graph.py" = "3295e6715e1dcd79ad2b7d846707b2f2464aa7f6ac13054df96a6bf642f7f9dd"
+"proof_records/known_answers.py" = "1da67192a2efb4a073f449d26f6446b140facb95ecfe391ac5e5782f771d1b4e"
 "proof_records/records.py" = "0088eb2e9ecac94063f766ef8c8af58af4c4858312c59b0187450317d1077ca1"
+"proof_records/self_test.py" = "9473538dfbda7c0a1fca157a6f167d0685a41c1c961703d6f7c4dfe88d4d4f13"
 
 [[package]]
 name = "oracle_refinement"
