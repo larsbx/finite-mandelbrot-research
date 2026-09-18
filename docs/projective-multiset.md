@@ -94,7 +94,8 @@ Frobenius-stable cycles, not merely lists of `F_q`-rational classes.
 
 ## Claim firewall
 
-The following do not follow from the implemented multiset:
+The following do not yet follow from the implemented basin multiset without a
+bridge theorem:
 
 - an escape classification of the classical parameter plane;
 - a finite-field replacement for the classical Mandelbrot set;
@@ -103,7 +104,11 @@ The following do not follow from the implemented multiset:
 - a theorem transferring a finite-field multiplicity distribution to
   characteristic zero.
 
-Any such bridge requires its own theorem tag, hypotheses, and source record.
+These are open bridge targets rather than excluded uses. Each requires its own
+theorem tag, hypotheses, and source record. The concrete bridge ladder is in
+`docs/multiset-bridge-program.md`; in particular, algebraic multiplicity of
+critical-relation divisors has a more direct lifting route than basin
+cardinality, while both remain available coefficient semantics.
 
 ## Executable contract
 
