@@ -6,6 +6,7 @@ SOURCE = ROOT / "src" / "projective_multiset.mojo"
 SPEC = ROOT / "docs" / "projective-multiset.md"
 DEFINITION = ROOT / "docs" / "mandelbrot-defining-family.md"
 BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
+BRIDGE_SOURCE = ROOT / "src" / "critical_relation_bridge.mojo"
 
 
 def read(path: Path) -> str:
@@ -76,3 +77,15 @@ def test_multiset_bridge_is_a_staged_theorem_program_not_an_exclusion():
     assert "critical-basin cardinality over `F_p`" in bridge
     assert "remains in the toolbox" in bridge
     assert "It is not yet an imported theorem" in bridge
+
+
+def test_simple_residue_root_bridge_is_executable_and_bounded():
+    bridge = read(BRIDGE)
+    source = read(BRIDGE_SOURCE)
+    assert "simple-residue-root subcertificate of B2" in bridge
+    assert "struct SimpleResidueRootCertificate" in source
+    assert "def bounded_prime" in source
+    assert "def reduction_commutes_through" in source
+    assert "def exact_minimal_collision_pattern" in source
+    assert "def verify_simple_residue_root" in source
+    assert "does not construct a Hensel lift" in source
