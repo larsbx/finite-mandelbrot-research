@@ -59,3 +59,12 @@ root = "tools"
 "proof_records/generate_ledgers.py" = "e44c42353c9d511f8744fbd243c37acb69c5031d0ad512cfe439c339cfa60ca2"
 "proof_records/graph.py" = "3295e6715e1dcd79ad2b7d846707b2f2464aa7f6ac13054df96a6bf642f7f9dd"
 "proof_records/records.py" = "0088eb2e9ecac94063f766ef8c8af58af4c4858312c59b0187450317d1077ca1"
+
+[[package]]
+name = "oracle_refinement"
+repository = "larsbx/finite-math-kernels"
+commit = "f2a8ef1520d5dc63a1543634ec9089e90e66c1fd"
+root = "tools"
+
+[package.files]
+"oracle_refinement/__init__.py" = "ef87305cd6eee2a1c6d0af6b4365edfdae854477f47b8df85daa4f36cd906b99"

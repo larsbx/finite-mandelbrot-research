@@ -34,7 +34,11 @@ from __future__ import annotations
 import sys
 from fractions import Fraction
 from itertools import combinations
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from oracle_refinement import Class, Refinement, audit_all
 from separated_density_reference import Separator, classes, density
 
 Address = tuple[int, int]
@@ -64,6 +68,82 @@ PINNED: dict[str, tuple[tuple[Address, ...], tuple[Separator, ...]]] = {
         ((((1, 3)), ((2, 3))), (((1, 7)), ((2, 7))), (((3, 7)), ((4, 7)))),
     ),
 }
+
+
+# --- phi_G: what the sweep below draws, declared ----------------------------------
+#
+# `larsbx/finite-math-kernels: docs/generator-refinement-spec.md`. The sweep
+# claims the two identities hold "for every prefix of every small catalogue",
+# and it used to draw the first nine pairs of `combinations(range(12), 2)` --
+# every one of which starts at `0/12`. A pencil of rays through one point is not
+# a catalogue, and nothing said so. The corpus below reaches several left
+# endpoints and both extremes of arc width, and the declaration refuses it if it
+# stops doing either.
+
+TWELFTH = 12
+
+
+def _numerators(separator: Separator) -> tuple[int, int]:
+    (a, _), (b, _) = separator
+    return a, b
+
+
+def _gap(separator: Separator) -> int:
+    a, b = _numerators(separator)
+    return abs(b - a)
+
+
+SWEEP = Refinement(
+    "carrier sweep separator",
+    f"an admissible two-ray separator with both endpoints on the {TWELFTH}ths",
+    lambda s: (admissible(s, RATIONAL_RAY, True)
+               and all(d == TWELFTH for _, d in s) and all(0 <= n < TWELFTH for n in _numerators(s))),
+    (
+        Class("a left endpoint other than 0", lambda s: _numerators(s)[0] != 0),
+        Class("adjacent rays", lambda s: _gap(s) == 1),
+        Class("antipodal rays", lambda s: _gap(s) == TWELFTH // 2),
+        Class("endpoints off the twelfths", lambda s: any(d != TWELFTH for _, d in s),
+              reason=f"the sweep is deliberately one denominator wide: every arc is a multiple "
+                     f"of 1/{TWELFTH}, so the identities are checked on a lattice rather than on "
+                     f"the classical wakes, which the PINNED profiles above cover instead"),
+    ),
+)
+
+SWEEP_PAIR = Refinement(
+    "carrier sweep pair",
+    "two separators of the sweep, as a refinement step measures them",
+    lambda pair: all(SWEEP.holds(s) for s in pair) and len(pair) == 2,
+    (
+        Class("crossing", lambda pair: _crosses(*pair)),
+        Class("nested", lambda pair: _nests(*pair)),
+        Class("disjoint", lambda pair: not _crosses(*pair) and not _nests(*pair)),
+    ),
+)
+
+
+def _crosses(first: Separator, second: Separator) -> bool:
+    """The arcs interleave: one endpoint of each lies inside the other."""
+    a, b = sorted(_numerators(first))
+    c, d = sorted(_numerators(second))
+    return a < c < b < d or c < a < d < b
+
+
+def _nests(first: Separator, second: Separator) -> bool:
+    a, b = sorted(_numerators(first))
+    c, d = sorted(_numerators(second))
+    return (a < c and d < b) or (c < a and b < d)
+
+
+def sweep() -> list[Separator]:
+    """The separators the exhaustive prefix check draws, spread over the circle
+    rather than taken in enumeration order from a single left endpoint."""
+    picks = ((0, 1), (1, 3), (2, 7), (3, 4), (4, 10), (5, 9), (6, 11), (7, 8), (2, 5))
+    return [((a, TWELFTH), (b, TWELFTH)) for a, b in picks]
+
+
+def sweep_problems() -> tuple[str, ...]:
+    base = sweep()
+    return audit_all(((SWEEP, base), (SWEEP_PAIR, list(combinations(base, 2)))))
 
 
 def profile(separators: tuple[Separator, ...], tag: int = RATIONAL_RAY, co_landing: bool = True) -> list[dict[str, object]]:
@@ -100,8 +180,14 @@ def main() -> int:
         assert decided_sums_to_the_density(rows), name
         assert all(row["decided"] >= 0 for row in rows), name
         print(f"{name}: " + ", ".join(f"level {r['depth']} density {r['density']} decided {r['decided']}" for r in rows))
-    # The two facts hold for every prefix of every small catalogue, not only the pinned ones.
-    base: list[Separator] = [((k, 12), (j, 12)) for k, j in combinations(range(12), 2)][:9]
+    # The two facts hold for every prefix of every small catalogue, not only the
+    # pinned ones. The corpus is declared: see SWEEP above.
+    problems = sweep_problems()
+    if problems:
+        print("The sweep corpus no longer matches its declared refinement:\n")
+        print("\n".join(f"  {p}" for p in problems))
+        return 1
+    base = sweep()
     for size in (1, 2, 3):
         for chosen in combinations(base, size):
             rows = profile(chosen)
@@ -120,6 +206,9 @@ def main() -> int:
     assert not admissible(((1, 3), (1, 3)), RATIONAL_RAY, True), "a cut needs two distinct rays"
     print(f"OK: {len(PINNED)} pinned carrier profiles; residue non-increasing and increments exact on every prefix.")
     print("OK: inadmissible separators (forbidden tag, undeclared co-landing, coincident rays) are refused.")
+    print(f"OK: the sweep corpus of {len(base)} separators meets its declared refinement "
+          f"(left endpoints {sorted({n for s in base for n in _numerators(s)[:1]})}, "
+          f"arc widths {sorted({_gap(s) for s in base})}).")
     return 0
 
 

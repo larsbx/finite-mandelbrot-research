@@ -96,6 +96,37 @@ docs/rational-interval-arithmetic-spec.md
 
 That file is mirrored verbatim in the PSC research repository and is enforced here by `tools/audit_exact_arithmetic.py`, the `tools/exact_arithmetic_allowlist.md` quarantine list, the `backend.toml` policy keys, and the law tests in `src/smoke_tests.mojo` and `tests/test_exact_arithmetic_spec.py`.
 
+## Fail closed, and which way closed points
+
+"Fail closed" appears throughout this repository as though it had one meaning.
+It has two, and they point opposite ways. `larsbx/native-deployment-control-plane`
+is the repository in this estate that says so, and this section adopts its
+distinction rather than reaching it independently:
+
+> For deploy gates, failing closed means refusing to proceed. For a destructive
+> operation, failing closed means refusing to delete. Uncertainty is never
+> resolved in favour of deletion.
+
+Sorted by effect, not by name:
+
+| Operation | Closed means | Because |
+| --- | --- | --- |
+| A prefix-graph or catalogue cap is reached | refuse to conclude | an exhausted budget is not a verdict; a capped run reports as capped (`UW-2`) |
+| A separator is not admissible | refuse to measure | an unproved cut reported as a decided measure is worse than no measure |
+| A rejected exact value enters an arithmetic chain | refuse and stay rejected | rejection is sticky, so a doubtful number cannot be laundered by later operations |
+| A generated surface disagrees with its table | refuse the run (`make_ledger.py --check`) | the surface is a function of the table, so disagreement is drift, not a new fact |
+| A proof block is to be demoted or a tag withdrawn | **refuse to demote** | the block stays in the ledger with its status visible; an uncertain withdrawal removes the record the doubt was about |
+| A pinned certificate or reference transcript is to be regenerated | **refuse to overwrite** | the pinned bytes are what a reader replays; a doubtful regeneration destroys the evidence rather than the doubt |
+
+The first four refuse to *proceed*. The last two refuse to *destroy*, and a
+rule that only knew the word would have had them delete. When a new gate is
+added, say which column it is in; when it is not obvious, it is the second,
+because that is the direction that cannot be undone.
+
+What fails closed is the *uncertain* case. A demotion or a regeneration whose
+evidence is clear is a deliberate, attributable act, and this rule does not
+stand in its way.
+
 ## Repository layout
 
 ```text
