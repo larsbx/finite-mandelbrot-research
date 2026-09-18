@@ -20,6 +20,6 @@ The original `larsbx/NLAP-JT` repository was marked historical and its legacy CI
 
 ## Repository identity and invariant preservation
 
-Consumer-owned current-tree repository identity is migrated to `larsbx/finite-mandlebrot-research`. Mathematical claims and proof status were not changed by the repository move. In particular, the exact rational/interval arithmetic boundary, no-transcendental-trigonometry policy, no-circle/rank-2 rule, no-ideal-point rule, Mojo-first theorem-kernel policy, theorem-tag imports, and C1 open-frontier status remain binding.
+Consumer-owned current-tree repository identity is migrated to `larsbx/finite-mandelbrot-research`. Mathematical claims and proof status were not changed by the repository move. In particular, the exact rational/interval arithmetic boundary, no-transcendental-trigonometry policy, no-circle/rank-2 rule, no-ideal-point rule, Mojo-first theorem-kernel policy, theorem-tag imports, and C1 open-frontier status remain binding.
 
 Vendored code under `src/finite_exact/` and `tools/claim_governance/` was intentionally kept byte-for-byte unchanged so that the SHA-256 pins in `vendored.toml` remain valid. A vendored upstream comment may therefore retain the former consumer name until the upstream `finite-math-kernels` package is revised and re-pinned.
