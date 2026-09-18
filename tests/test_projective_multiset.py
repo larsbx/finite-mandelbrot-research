@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src" / "projective_multiset.mojo"
 SPEC = ROOT / "docs" / "projective-multiset.md"
 DEFINITION = ROOT / "docs" / "mandelbrot-defining-family.md"
+BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
 
 
 def read(path: Path) -> str:
@@ -56,10 +57,22 @@ def test_actual_defining_family_is_typed_and_authoritative():
     assert "M = {c in C : the sequence (Q_n(c))_{n >= 0} is bounded}" in definition
     assert "x_n^2 + y_n^2 > 4" in definition
     assert "Projectivization alone does not turn boundedness" in definition
-    assert "It is not “the Mandelbrot set with" in definition
+    assert "retained as a candidate" in definition
 
 
 def test_readme_routes_to_the_authoritative_definition():
     readme = read(ROOT / "README.md")
     assert "docs/mandelbrot-defining-family.md" in readme
     assert "not alternative definitions of the Mandelbrot set" in readme
+    assert "docs/multiset-bridge-program.md" in readme
+
+
+def test_multiset_bridge_is_a_staged_theorem_program_not_an_exclusion():
+    definition = " ".join(read(DEFINITION).split())
+    bridge = " ".join(read(BRIDGE).split())
+    assert "Such conversions are theorem targets, not prohibited constructions" in definition
+    assert "A_{ell,k}(C) = Q_{ell+k}(C) - Q_ell(C)" in bridge
+    assert "Good-reduction and lifting certificate" in bridge
+    assert "critical-basin cardinality over `F_p`" in bridge
+    assert "remains in the toolbox" in bridge
+    assert "It is not yet an imported theorem" in bridge
