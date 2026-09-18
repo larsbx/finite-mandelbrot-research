@@ -4,6 +4,12 @@
 document proves no claim about Mandelbrot local connectivity and does not
 identify a finite-field shadow with the classical Mandelbrot set.
 
+The source definition is fixed in `docs/mandelbrot-defining-family.md`. The
+Mandelbrot set is the non-escaping parameter locus of the marked critical
+section for `f_c(z) = z^2 + c`. The construction below starts only after
+reduction to finite-field functional graphs and must not be read as a second
+definition of that set.
+
 ## Projective quadratic morphism
 
 For a field `K` and parameter `c`, the polynomial recurrence `z |-> z^2 + c`
@@ -66,15 +72,18 @@ The first executable coefficient is the **critical-basin multiplicity**
 b_p(c) = #{z in F_p : the eventual cycle of z equals the critical cycle}.
 ```
 
-It is graded by the exact critical-orbit signature `(tail, period)`. Hence the
-finite parameter zero-cycle is
+It is graded by the exact critical-orbit signature `(tail, period)`. Hence one
+weighted arithmetic-shadow zero-cycle is
 
 ```text
 D_p = sum_{c in F_p} b_p(c) [c:1]_(tail(c), period(c)).
 ```
 
-This enriches finite functional-graph statistics without changing the
-existing Mandelbrot-support or certificate definitions.
+This enriches finite functional-graph statistics. It is not a finite
+Mandelbrot support: the classical boundedness predicate accepts every finite
+orbit and therefore distinguishes no residue parameters. Any relation between
+this zero-cycle and the classical parameter locus requires a separate bridge
+theorem.
 
 ## Extension fields
 
