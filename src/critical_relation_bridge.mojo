@@ -10,13 +10,16 @@
 # - every other collision through the minimal horizon is excluded; and
 # - the critical-relation root is simple modulo p.
 #
-# It does not construct a Hensel lift, identify a characteristic-zero factor,
-# choose a complex embedding, or localize a parameter root.
+# It does not construct an infinite Hensel lift, identify a
+# characteristic-zero factor, choose a complex embedding, or localize a
+# parameter root.
 
 from poly_z import PolyZ, critical_orbit_poly, derivative, sub
 
 comptime MAX_BRIDGE_PRIME = 1048576
 comptime MAX_BRIDGE_HORIZON = 8
+comptime MAX_HENSEL_PRIME = 4096
+comptime MAX_HENSEL_HORIZON = 6
 
 
 struct SimpleResidueRootCertificate(ImplicitlyCopyable):
@@ -60,6 +63,53 @@ struct SimpleResidueRootCertificate(ImplicitlyCopyable):
         )
 
 
+struct HenselStepCertificate(ImplicitlyCopyable):
+    """One independently replayable lift from a simple root modulo p to the
+    unique compatible root modulo p^2."""
+
+    var prime: Int
+    var base_residue: Int
+    var correction_digit: Int
+    var lifted_residue: Int
+    var modulus_squared: Int
+    var base_certificate_accepted: Bool
+    var congruent_to_base: Bool
+    var lifted_relation_holds: Bool
+    var derivative_unit: Bool
+    var rejected: Bool
+
+    def __init__(
+        out self,
+        prime: Int,
+        base_residue: Int,
+        correction_digit: Int,
+        lifted_residue: Int,
+        modulus_squared: Int,
+        base_certificate_accepted: Bool,
+        congruent_to_base: Bool,
+        lifted_relation_holds: Bool,
+        derivative_unit: Bool,
+        rejected: Bool,
+    ):
+        self.prime = prime
+        self.base_residue = base_residue
+        self.correction_digit = correction_digit
+        self.lifted_residue = lifted_residue
+        self.modulus_squared = modulus_squared
+        self.base_certificate_accepted = base_certificate_accepted
+        self.congruent_to_base = congruent_to_base
+        self.lifted_relation_holds = lifted_relation_holds
+        self.derivative_unit = derivative_unit
+        self.rejected = rejected
+
+    def accepted(self) -> Bool:
+        return (
+            not self.rejected and self.base_certificate_accepted and
+            self.congruent_to_base and self.lifted_relation_holds and
+            self.derivative_unit
+        )
+
+
 def bridge_residue(value: Int, prime: Int) -> Int:
     var out = value % prime
     if out < 0:
@@ -89,6 +139,25 @@ def eval_poly_mod(poly: PolyZ, value: Int, prime: Int) -> Int:
         var index = poly.degree - offset
         out = bridge_residue(out * x + bridge_residue(poly.coefficient(index), prime), prime)
     return out
+
+
+def inverse_mod_prime(value: Int, prime: Int) -> Int:
+    """Extended Euclidean inverse; returns -1 when no inverse exists."""
+    var old_r = prime
+    var r = bridge_residue(value, prime)
+    var old_t = 0
+    var t = 1
+    while r != 0:
+        var quotient = old_r // r
+        var next_r = old_r - quotient * r
+        old_r = r
+        r = next_r
+        var next_t = old_t - quotient * t
+        old_t = t
+        t = next_t
+    if old_r != 1:
+        return -1
+    return bridge_residue(old_t, prime)
 
 
 def orbit_value_mod(parameter: Int, depth: Int, prime: Int) -> Int:
@@ -154,6 +223,52 @@ def verify_simple_residue_root(
     )
 
 
+def rejected_hensel_step() -> HenselStepCertificate:
+    return HenselStepCertificate(0, 0, 0, 0, 0, False, False, False, False, True)
+
+
+def verify_hensel_step(
+    parameter: Int, ell: Int, k: Int, prime: Int
+) -> HenselStepCertificate:
+    """Compute and replay the unique simple-root correction modulo p^2.
+
+    This is one finite Hensel step. It is not an infinite p-adic lift and does
+    not identify a characteristic-zero factor or complex embedding.
+    """
+    if prime > MAX_HENSEL_PRIME or ell + k > MAX_HENSEL_HORIZON:
+        return rejected_hensel_step()
+    var base = verify_simple_residue_root(parameter, ell, k, prime)
+    if not base.accepted():
+        return rejected_hensel_step()
+    var relation = sub(critical_orbit_poly(ell + k), critical_orbit_poly(ell))
+    var relation_derivative = derivative(relation)
+    var modulus_squared = prime * prime
+    var relation_at_base = eval_poly_mod(relation, base.residue, modulus_squared)
+    if relation_at_base % prime != 0:
+        return rejected_hensel_step()
+    var quotient_mod_prime = (relation_at_base // prime) % prime
+    var derivative_mod_prime = eval_poly_mod(relation_derivative, base.residue, prime)
+    var inverse = inverse_mod_prime(derivative_mod_prime, prime)
+    if inverse < 0:
+        return rejected_hensel_step()
+    var correction = bridge_residue(-quotient_mod_prime * inverse, prime)
+    var lifted = base.residue + prime * correction
+    var congruent = lifted % prime == base.residue
+    var lifted_relation = eval_poly_mod(relation, lifted, modulus_squared) == 0
+    return HenselStepCertificate(
+        prime,
+        base.residue,
+        correction,
+        lifted,
+        modulus_squared,
+        base.accepted(),
+        congruent,
+        lifted_relation,
+        derivative_mod_prime != 0,
+        False,
+    )
+
+
 def critical_relation_bridge_smoke() -> Bool:
     # c = -2 reduces to 3 modulo 5 and has orbit 0,3,2,2: exact type (2,1).
     # A_{2,1}(C) = C^3(C+2); the root 3 is simple modulo 5.
@@ -161,10 +276,16 @@ def critical_relation_bridge_smoke() -> Bool:
     var repeated = verify_simple_residue_root(0, 2, 1, 5)
     var composite = verify_simple_residue_root(3, 2, 1, 9)
     var wrong_type = verify_simple_residue_root(3, 1, 1, 5)
+    var lift = verify_hensel_step(-2, 2, 1, 5)
+    var refused_lift = verify_hensel_step(0, 2, 1, 5)
     return (
         accepted.accepted() and accepted.residue == 3 and
         not repeated.accepted() and repeated.relation_holds and
         not repeated.derivative_nonzero and
         not composite.accepted() and composite.rejected and
-        not wrong_type.accepted()
+        not wrong_type.accepted() and
+        lift.accepted() and lift.base_residue == 3 and
+        lift.correction_digit == 4 and lift.lifted_residue == 23 and
+        lift.modulus_squared == 25 and
+        not refused_lift.accepted() and refused_lift.rejected
     )
