@@ -1,9 +1,10 @@
 # Multiset bridge program
 
 **Status:** staged theorem program. The algebraic identities in stages B0 and
-B1 and the simple-residue-root subcertificate of B2 are executable in
-`src/critical_relation_bridge.mojo`. The remaining B2 lift and later stages
-require the stated certificates or imported theorems. This program keeps
+B1, the simple-residue-root subcertificate, and one replayable Hensel step from
+modulo `p` to modulo `p^2` are executable in
+`src/critical_relation_bridge.mojo`. The unbounded lift, factor correspondence,
+and later stages require the stated certificates or imported theorems. This program keeps
 multisets in the primary research toolbox without identifying an arbitrary
 finite-field statistic with the classical Mandelbrot set.
 
@@ -83,9 +84,11 @@ submultiset of `M`; it does not bridge every finite-field parameter to `M`.
 
 Current executable boundary: the checker verifies bounded primality,
 commutation of polynomial reduction with direct iteration, the minimal-horizon
-exact collision pattern, and a nonzero modular derivative. It therefore
-certifies a simple residue root eligible for the next lifting stage. It does
-not yet produce the lift, factor correspondence, or discriminant/resultant
+exact collision pattern, and a nonzero modular derivative. From an accepted
+simple root it computes the unique correction digit and verifies the compatible
+root modulo `p^2`. This is a finite Hensel step, not an asserted infinite
+`p`-adic lift. The checker does not yet produce a characteristic-zero factor
+correspondence, complex embedding, localization, or discriminant/resultant
 evidence.
 
 ### B3 — Localization into the existing certificate calculus
