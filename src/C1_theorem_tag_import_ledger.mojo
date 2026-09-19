@@ -181,6 +181,21 @@ def known_trivial_fiber_class_tag_ready() -> TheoremTagRecord:
     )
 
 
+def misiurewicz_c_minus_2_trivial_fiber_tag_checked() -> TheoremTagRecord:
+    # Source-specific record for the exact c=-2, orbit-type (2,1) instance.
+    # Consumers must independently validate class membership and source scope.
+    return TheoremTagRecord(
+        "KnownTrivialFiberClass",
+        True,
+        True,
+        ImportConclusionKind.known_trivial_fiber_class(),
+        True,
+        True,
+        ImportStrengthClass.classical_class_specific(),
+        ImportStatus.checked(),
+    )
+
+
 def tuning_kneading_substitution_tag_ready() -> TheoremTagRecord:
     # docs/C1_residual_directive_carrier.md: the substitution form of tuning on
     # kneading sequences. Scaffolded: the payload is per-level and unchecked.

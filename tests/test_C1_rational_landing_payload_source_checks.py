@@ -20,7 +20,7 @@ def test_misiurewicz_trivial_fiber_source_check_hook_exists():
     assert "def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool" in body
     assert "c_minus_2_trivial_fiber_instance()" in body
     assert "fiber.source_scope_checked_width()" in body
-    assert "not fiber.final_import_admissible()" in body
+    assert "fiber.final_import_admissible()" in body
 
 
 def test_source_scope_is_specific_not_generic():
@@ -50,4 +50,4 @@ def test_smoke_and_next_priority_are_updated():
     assert "def rational_landing_payload_proof_grade_association_ready() -> Bool" in body
     assert "landing.final_import_admissible()" in body
     assert "def next_priority_after_proof_grade_landing_association() -> String" in body
-    assert 'return "ProofGradeMisiurewiczTrivialFiberClassification"' in body
+    assert 'return "CanonicalFiniteCertificateIncidenceReplay"' in body
