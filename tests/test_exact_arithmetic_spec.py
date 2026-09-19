@@ -37,7 +37,10 @@ def text(rel: str) -> str:
 def test_spec_exists_with_required_sections():
     body = SPEC.read_text(encoding="utf-8")
     assert all(section in body for section in REQUIRED_SECTIONS)
-    assert "implemented canonically in `larsbx/finite-math-kernels`" in body
+    # The canonical copy lives upstream and names its consumers; this
+    # repository's rows live in its own binding table, not in this file.
+    assert "| `larsbx/finite-mandlebrot-research` | `docs/exact-arithmetic-binding.md` |" in body
+    assert "### 6.2" not in body
     assert "is mirrored byte-for-byte" not in body
 
 

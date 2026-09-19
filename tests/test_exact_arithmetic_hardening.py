@@ -93,9 +93,9 @@ def test_property_probe_is_wired_into_pixi_ci_and_binding_table():
     manifest = tomllib.loads(text("pixi.toml"))
     assert manifest["tasks"]["property"] == "python tools/exact_arithmetic_property_oracle.py"
     assert "pixi run property" in text(".github/workflows/no-trig-audit.yml")
-    spec = text("docs/rational-interval-arithmetic-spec.md")
-    assert "`src/exact_arithmetic_property_probe.mojo`" in spec
-    assert "`tools/exact_arithmetic_property_oracle.py`" in spec
+    binding = text("docs/exact-arithmetic-binding.md")
+    assert "`src/exact_arithmetic_property_probe.mojo`" in binding
+    assert "`tools/exact_arithmetic_property_oracle.py`" in binding
     assert "src/exact_arithmetic_property_probe.mojo" in text("docs/mojo-toolchain-boundary.md")
     probe = text("src/exact_arithmetic_property_probe.mojo")
     assert "docs/rational-interval-arithmetic-spec.md" in probe

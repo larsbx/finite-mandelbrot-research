@@ -94,7 +94,7 @@ Every certificate-relevant number is a normalized rational or a rational-endpoin
 docs/rational-interval-arithmetic-spec.md
 ```
 
-That file is mirrored verbatim in the PSC research repository and is enforced here by `tools/audit_exact_arithmetic.py`, the `tools/exact_arithmetic_allowlist.md` quarantine list, the `backend.toml` policy keys, and the law tests in `src/smoke_tests.mojo` and `tests/test_exact_arithmetic_spec.py`.
+That file is the canonical copy from `larsbx/finite-math-kernels`; this repository's binding rows are `docs/exact-arithmetic-binding.md`, enforced here by `tools/audit_exact_arithmetic.py`, the `tools/exact_arithmetic_allowlist.md` quarantine list, the `backend.toml` policy keys, and the law tests in `src/smoke_tests.mojo` and `tests/test_exact_arithmetic_spec.py`.
 
 ## Fail closed, and which way closed points
 

@@ -41,4 +41,4 @@ Result carriers `BigZDivModResult`, `BigZExactDivisionResult`, `BigZCanonicalByt
 
 ## 5. Stability promise
 
-Names and semantics in sections 1 and 2 change only with a note in this file, a matching change in `docs/rational-interval-arithmetic-spec.md` section 6.2, and a passing property probe. Names outside section 1 carry no promise. Nothing in this file promotes any DEMO row of the specification's binding table, changes `backend.toml`, or affects `ProofGradeCertificateStatus`.
+Names and semantics in sections 1 and 2 change only with a note in this file, a matching change in `docs/exact-arithmetic-binding.md`, and a passing property probe. Names outside section 1 carry no promise. Nothing in this file promotes any DEMO row of the binding table, changes `backend.toml`, or affects `ProofGradeCertificateStatus`.

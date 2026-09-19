@@ -4,9 +4,10 @@
 Three checks, all lexical and CI-cheap:
 
 1. the specification exists and carries every required section heading;
-2. every arithmetic module is named in this repository's binding table (spec
-   section 6), exists, cites the specification by path (criterion C7), and is
-   listed in the allowlist exactly when its class is QUARANTINED;
+2. every arithmetic module is named in this repository's binding table
+   (docs/exact-arithmetic-binding.md), exists, cites the specification by path
+   (criterion C7), and is listed in the allowlist exactly when its class is
+   QUARANTINED;
 3. no floating-point type or literal appears in executable kernel code
    outside the allowlist (criterion C1).
 """
@@ -22,10 +23,11 @@ from source_tokens import mask_comments_and_strings  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_REL = "docs/rational-interval-arithmetic-spec.md"
+BINDING_REL = "docs/exact-arithmetic-binding.md"
 SPEC = ROOT / SPEC_REL
+BINDING = ROOT / BINDING_REL
 ALLOWLIST = ROOT / "tools" / "exact_arithmetic_allowlist.md"
 SCAN_ROOTS = [ROOT / "src"]
-BINDING_HEADING = "### 6.2 `larsbx/finite-mandlebrot-research`"
 
 REQUIRED_SECTIONS = [
     "## 0. The problem being solved",
@@ -38,10 +40,8 @@ REQUIRED_SECTIONS = [
     "### 3.2 Filter-then-exact",
     "## 4. Decision table",
     "## 5. Conformance criteria",
-    "## 6. Repository binding",
-    "### 6.1 `larsbx/pisot-substitution-conjecture-research`",
-    "### 6.2 `larsbx/finite-mandlebrot-research`",
-    "## 7. Hook: how the specification is enforced",
+    "## 6. Consumers and binding tables",
+    "## 7. Hook: how a consumer enforces the specification",
 ]
 
 FLOAT_RE = re.compile(
@@ -63,18 +63,11 @@ VENDORED_FACADES = {
 }
 
 
-def _section(text: str, heading: str) -> str:
-    start = text.index(heading) + len(heading)
-    rest = text[start:]
-    match = re.search(r"^#{2,3} ", rest, flags=re.MULTILINE)
-    return rest if match is None else rest[: match.start()]
-
-
 def binding_rows(text: str | None = None) -> list[tuple[str, list[str]]]:
     """Return ``(class, [module paths])`` for each row of this repo's table."""
-    body = text if text is not None else SPEC.read_text(encoding="utf-8")
+    body = text if text is not None else BINDING.read_text(encoding="utf-8")
     rows: list[tuple[str, list[str]]] = []
-    for line in _section(body, BINDING_HEADING).splitlines():
+    for line in body.splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) < 3 or cells[0] in {"Spec item", "---"} or set(cells[0]) <= {"-"}:
             continue
@@ -112,15 +105,19 @@ def audit() -> list[str]:
     errors: list[str] = []
     if not SPEC.exists():
         return [f"missing specification {SPEC_REL}"]
+    if not BINDING.exists():
+        return [f"missing binding table {BINDING_REL}"]
     spec = SPEC.read_text(encoding="utf-8")
     errors += [f"spec lacks section {s!r}" for s in REQUIRED_SECTIONS if s not in spec]
+    if "larsbx/finite-mandlebrot-research" not in spec:
+        errors.append(f"{SPEC_REL} does not name this repository as a consumer")
     if errors:
         return errors
 
     allow = allowlisted()
     quarantined: set[str] = set()
     bound: set[str] = set()
-    for cls, paths in binding_rows(spec):
+    for cls, paths in binding_rows():
         for rel in paths:
             bound.add(rel)
             path = ROOT / rel
