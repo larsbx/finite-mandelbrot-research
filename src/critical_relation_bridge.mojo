@@ -14,12 +14,15 @@
 # characteristic-zero factor, choose a complex embedding, or localize a
 # parameter root.
 
-from poly_z import PolyZ, critical_orbit_poly, derivative, sub
+from poly_z import PolyZ, critical_orbit_poly, derivative, sub, mul, monic_linear, equal_poly
 
 comptime MAX_BRIDGE_PRIME = 1048576
 comptime MAX_BRIDGE_HORIZON = 8
 comptime MAX_HENSEL_PRIME = 4096
 comptime MAX_HENSEL_HORIZON = 6
+comptime MAX_LINEAR_FACTOR_HORIZON = 3
+comptime MAX_LINEAR_FACTOR_ROOT_ABS = 4
+comptime MAX_LINEAR_FACTOR_COEFFICIENT_ABS = 1000000
 
 
 struct SimpleResidueRootCertificate(ImplicitlyCopyable):
@@ -108,6 +111,59 @@ struct HenselStepCertificate(ImplicitlyCopyable):
             self.congruent_to_base and self.lifted_relation_holds and
             self.derivative_unit
         )
+
+
+struct LinearFactorProvenance(ImplicitlyCopyable):
+    """Bounded characteristic-zero provenance for a monic linear factor."""
+
+    var integer_root: Int
+    var factor_degree: Int
+    var quotient_degree: Int
+    var remainder_zero: Bool
+    var recomposition_exact: Bool
+    var root_simple: Bool
+    var matches_residue_mod_p: Bool
+    var matches_lift_mod_p2: Bool
+    var rejected: Bool
+
+    def __init__(
+        out self,
+        integer_root: Int,
+        factor_degree: Int,
+        quotient_degree: Int,
+        remainder_zero: Bool,
+        recomposition_exact: Bool,
+        root_simple: Bool,
+        matches_residue_mod_p: Bool,
+        matches_lift_mod_p2: Bool,
+        rejected: Bool,
+    ):
+        self.integer_root = integer_root
+        self.factor_degree = factor_degree
+        self.quotient_degree = quotient_degree
+        self.remainder_zero = remainder_zero
+        self.recomposition_exact = recomposition_exact
+        self.root_simple = root_simple
+        self.matches_residue_mod_p = matches_residue_mod_p
+        self.matches_lift_mod_p2 = matches_lift_mod_p2
+        self.rejected = rejected
+
+    def accepted(self) -> Bool:
+        return (
+            not self.rejected and self.factor_degree == 1 and
+            self.remainder_zero and self.recomposition_exact and
+            self.root_simple and self.matches_residue_mod_p and
+            self.matches_lift_mod_p2
+        )
+
+
+struct LinearDivisionResult:
+    var quotient: PolyZ
+    var remainder: Int
+
+    def __init__(out self, quotient: PolyZ, remainder: Int):
+        self.quotient = quotient
+        self.remainder = remainder
 
 
 def bridge_residue(value: Int, prime: Int) -> Int:
@@ -269,6 +325,78 @@ def verify_hensel_step(
     )
 
 
+def bounded_relation_coefficients(poly: PolyZ) -> Bool:
+    for index in range(poly.degree + 1):
+        var coefficient = poly.coefficient(index)
+        if (
+            coefficient < -MAX_LINEAR_FACTOR_COEFFICIENT_ABS or
+            coefficient > MAX_LINEAR_FACTOR_COEFFICIENT_ABS
+        ):
+            return False
+    return True
+
+
+def synthetic_divide_monic_linear(poly: PolyZ, integer_root: Int) -> LinearDivisionResult:
+    """Divide by C - integer_root and return (quotient, remainder)."""
+    var quotient = PolyZ()
+    if poly.degree < 1:
+        return LinearDivisionResult(quotient^, poly.coefficient(0))
+    quotient.coeffs[poly.degree - 1] = poly.coefficient(poly.degree)
+    if poly.degree >= 2:
+        for offset in range(poly.degree - 1):
+            var index = poly.degree - 2 - offset
+            quotient.coeffs[index] = (
+                poly.coefficient(index + 1) +
+                integer_root * quotient.coefficient(index + 1)
+            )
+    quotient.normalize()
+    var remainder = poly.coefficient(0) + integer_root * quotient.coefficient(0)
+    return LinearDivisionResult(quotient^, remainder)
+
+
+def rejected_linear_factor_provenance() -> LinearFactorProvenance:
+    return LinearFactorProvenance(0, 0, 0, False, False, False, False, False, True)
+
+
+def verify_linear_factor_provenance(
+    integer_root: Int, ell: Int, k: Int, prime: Int
+) -> LinearFactorProvenance:
+    """Bind a rational integral root to the modular and p^2 certificates.
+
+    This handles only a bounded monic linear factor. It does not factor a
+    general critical-relation polynomial or select a non-rational embedding.
+    """
+    if (
+        ell < 0 or k < 1 or ell + k > MAX_LINEAR_FACTOR_HORIZON or
+        integer_root < -MAX_LINEAR_FACTOR_ROOT_ABS or
+        integer_root > MAX_LINEAR_FACTOR_ROOT_ABS
+    ):
+        return rejected_linear_factor_provenance()
+    var lift = verify_hensel_step(integer_root, ell, k, prime)
+    if not lift.accepted():
+        return rejected_linear_factor_provenance()
+    var relation = sub(critical_orbit_poly(ell + k), critical_orbit_poly(ell))
+    if not bounded_relation_coefficients(relation):
+        return rejected_linear_factor_provenance()
+    var division = synthetic_divide_monic_linear(relation, integer_root)
+    var quotient = division.quotient
+    var remainder = division.remainder
+    var factor = monic_linear(-integer_root)
+    var recomposed = mul(factor, quotient)
+    var derivative_value = eval_poly_mod(derivative(relation), integer_root, prime)
+    return LinearFactorProvenance(
+        integer_root,
+        factor.degree,
+        quotient.degree,
+        remainder == 0,
+        equal_poly(relation, recomposed),
+        derivative_value != 0,
+        bridge_residue(integer_root, prime) == lift.base_residue,
+        bridge_residue(integer_root, lift.modulus_squared) == lift.lifted_residue,
+        False,
+    )
+
+
 def critical_relation_bridge_smoke() -> Bool:
     # c = -2 reduces to 3 modulo 5 and has orbit 0,3,2,2: exact type (2,1).
     # A_{2,1}(C) = C^3(C+2); the root 3 is simple modulo 5.
@@ -278,6 +406,8 @@ def critical_relation_bridge_smoke() -> Bool:
     var wrong_type = verify_simple_residue_root(3, 1, 1, 5)
     var lift = verify_hensel_step(-2, 2, 1, 5)
     var refused_lift = verify_hensel_step(0, 2, 1, 5)
+    var factor = verify_linear_factor_provenance(-2, 2, 1, 5)
+    var false_factor = verify_linear_factor_provenance(-1, 2, 1, 5)
     return (
         accepted.accepted() and accepted.residue == 3 and
         not repeated.accepted() and repeated.relation_holds and
@@ -287,5 +417,8 @@ def critical_relation_bridge_smoke() -> Bool:
         lift.accepted() and lift.base_residue == 3 and
         lift.correction_digit == 4 and lift.lifted_residue == 23 and
         lift.modulus_squared == 25 and
-        not refused_lift.accepted() and refused_lift.rejected
+        not refused_lift.accepted() and refused_lift.rejected and
+        factor.accepted() and factor.integer_root == -2 and
+        factor.factor_degree == 1 and factor.quotient_degree == 3 and
+        not false_factor.accepted()
     )
