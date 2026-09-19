@@ -1,4 +1,5 @@
 # Proof-grade landing-target association for the c=-2 theorem-tag path.
+# Specification: docs/rational-interval-arithmetic-spec.md (sections 1, 5, 6.2).
 #
 # This module upgrades only the finite association
 #
