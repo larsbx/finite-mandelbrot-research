@@ -11,7 +11,7 @@
 from finite_exact.bigint_z import BigZ, bigz_add, bigz_eq, bigz_from_i64, bigz_mul, bigz_sub
 from finite_exact.rat_q import Q
 from bigq_ray_address import BigQRayOrbitStatus, verify_bigq_one_half_orbit
-from C1_theorem_tag_import_ledger import ImportConclusionKind, ImportStrengthClass, ImportStatus, TheoremTagRecord, theorem_tag_admissible_for_final
+from C1_theorem_tag_import_ledger import ImportConclusionKind, ImportStrengthClass, TheoremTagRecord, rational_parameter_ray_landing_c_minus_2_tag_checked, theorem_tag_admissible_for_final
 from C1_theorem_tag_assumption_payloads import PayloadConclusionKind, PayloadStrengthClass, TheoremTagPayload, rational_parameter_ray_landing_payload_scaffold, theorem_tag_payload_admissible
 
 
@@ -217,16 +217,7 @@ struct RationalLandingTheoremImportWitness(ImplicitlyCopyable):
 
 
 def checked_rational_landing_theorem_import() -> RationalLandingTheoremImportWitness:
-    var record = TheoremTagRecord(
-        "RationalParameterRayLanding",
-        True,
-        True,
-        ImportConclusionKind.rational_ray_landing(),
-        True,
-        True,
-        ImportStrengthClass.classical_local(),
-        ImportStatus.checked(),
-    )
+    var record = rational_parameter_ray_landing_c_minus_2_tag_checked()
     return RationalLandingTheoremImportWitness(
         record,
         rational_parameter_ray_landing_payload_scaffold(),
