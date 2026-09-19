@@ -7,6 +7,7 @@
 from certificate_arithmetic_migration_gate import CheckedLocalizationEnvelope, c_minus_2_checked_localization
 from checked_ray_address import CheckedRayOrbitStatus, verify_checked_one_half_orbit
 from checked_landing_target_adapter import LandingTargetAssociation, verify_c_minus_2_landing_target_association
+from proof_grade_landing_target_association import ProofGradeLandingTargetAssociation, verify_proof_grade_c_minus_2_landing_target_association
 
 
 struct TheoremSourceRef(ImplicitlyCopyable):
@@ -30,15 +31,17 @@ struct RationalRayLandingInstance(ImplicitlyCopyable):
     var address_den: Int64
     var landing_box_name: String
     var landing_target_association: LandingTargetAssociation
+    var proof_grade_landing_target_association: ProofGradeLandingTargetAssociation
     var excludes_generic_boundary_use: Bool
 
-    def __init__(out self, source: TheoremSourceRef, rays: CheckedRayOrbitStatus, address_num: Int64, address_den: Int64, landing_box_name: String, landing_target_association: LandingTargetAssociation, excludes_generic_boundary_use: Bool):
+    def __init__(out self, source: TheoremSourceRef, rays: CheckedRayOrbitStatus, address_num: Int64, address_den: Int64, landing_box_name: String, landing_target_association: LandingTargetAssociation, proof_grade_landing_target_association: ProofGradeLandingTargetAssociation, excludes_generic_boundary_use: Bool):
         self.source = source
         self.rays = rays
         self.address_num = address_num
         self.address_den = address_den
         self.landing_box_name = landing_box_name
         self.landing_target_association = landing_target_association
+        self.proof_grade_landing_target_association = proof_grade_landing_target_association
         self.excludes_generic_boundary_use = excludes_generic_boundary_use
 
     def source_scope_checked(self) -> Bool:
@@ -52,7 +55,7 @@ struct RationalRayLandingInstance(ImplicitlyCopyable):
         )
 
     def final_import_admissible(self) -> Bool:
-        return self.source_scope_checked() and self.landing_target_association.proof_grade_associated()
+        return self.source_scope_checked() and self.proof_grade_landing_target_association.proof_grade_associated()
 
 
 struct MisiurewiczTrivialFiberInstance(ImplicitlyCopyable):
@@ -106,6 +109,7 @@ def c_minus_2_landing_instance() -> RationalRayLandingInstance:
         2,
         "beta_c_minus_2",
         verify_c_minus_2_landing_target_association(),
+        verify_proof_grade_c_minus_2_landing_target_association(),
         True,
     )
 
@@ -122,7 +126,12 @@ def c_minus_2_trivial_fiber_instance() -> MisiurewiczTrivialFiberInstance:
 
 def rational_landing_payload_source_checks_ready() -> Bool:
     var landing = c_minus_2_landing_instance()
-    return landing.source_scope_checked() and not landing.final_import_admissible()
+    return landing.source_scope_checked()
+
+
+def rational_landing_payload_proof_grade_association_ready() -> Bool:
+    var landing = c_minus_2_landing_instance()
+    return landing.source_scope_checked() and landing.final_import_admissible()
 
 
 def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool:
@@ -131,8 +140,16 @@ def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool:
 
 
 def theorem_tag_payload_instances_smoke() -> Bool:
-    return rational_landing_payload_source_checks_ready() and misiurewicz_trivial_fiber_payload_source_checks_ready()
+    return (
+        rational_landing_payload_source_checks_ready() and
+        rational_landing_payload_proof_grade_association_ready() and
+        misiurewicz_trivial_fiber_payload_source_checks_ready()
+    )
+
+
+def next_priority_after_proof_grade_landing_association() -> String:
+    return "ProofGradeMisiurewiczTrivialFiberClassification"
 
 
 def next_priority_after_payload_source_checks() -> String:
-    return "ProofGradeLandingTargetAssociation"
+    return next_priority_after_proof_grade_landing_association()
