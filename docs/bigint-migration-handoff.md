@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The current repository has useful finite-regime scaffolding, but its rational arithmetic still sits on bounded `Int64` demos. That is acceptable for smoke tests only. No proof-grade certificate may be accepted until the integer backend is unbounded and canonical.
+The repository retains bounded `Int64` transition/demo paths for negative controls, but the canonical exact rational path now uses the dynamic-limb BigZ backend and normalized BigZ-backed `Q`. Full proof-grade certificate acceptance remains fail-closed until every acceptance-bearing downstream predicate and imported theorem obligation is discharged.
 
 ## Non-negotiable invariant
 
@@ -66,19 +66,29 @@ Every constructor and operation must normalize. Equality and order may use cross
    `src/checked_ray_address.mojo` computes the c=-2 rational ray orbit with
    fixed-width overflow rejection, and `src/checked_finite_certificate_gate.mojo`
    now proves that checked finite inputs are insufficient for proof-grade use.
-   `src/checked_landing_target_adapter.mojo` derives the bounded-width `1/2` to
-   c=-2 association from exact-type uniqueness; theorem-tag instances now fail
-   only at proof-grade classification. Do not replace `Q` until every downstream
-   arithmetic predicate propagates failure.
+   `src/checked_landing_target_adapter.mojo` retains the bounded-width `1/2`
+   to c=-2 association as a migration cross-check. The acceptance-bearing
+   successor `src/proof_grade_landing_target_association.mojo` now identifies
+   the target with exact BigZ/Q ray replay, exact BigZ replay of
+   `R_{2,1}=C^3(C+2)`, lower-type exclusion of `C=0`, exact type-`(2,1)`
+   verification at `C=-2`, and the canonical checked rational-ray theorem
+   import record. The rational landing import is therefore admissible without
+   using the checked-width localization gate. The Misiurewicz trivial-fiber
+   classification remains fail-closed.
 1. **Selected:** Mojo-native dynamic base-`10^9` limbs in `src/finite_exact/bigint_z.mojo`.
 2. **Complete:** the integer layer implements unbounded signed storage, exact
    add/sub/mul/order, quotient/remainder, rejected non-divisions, Euclidean gcd,
    and canonical `Z(sign, byte_len, big_endian_magnitude)` serialization.
 3. **Complete:** `Q` stores normalized `BigZ` numerator and denominator values while preserving its public arithmetic names; invalid denominators and division by zero propagate rejection.
 4. **Complete (arithmetic hardening):** the public boundary of `BigZ`, `Q`, `IQ`, and `ComplexIQ` is declared in `docs/exact-arithmetic-public-boundary.md`; long division replaces shift-and-subtract; `Q` cancels before multiplying and comparing; the randomized property probe runs against the Python oracle in CI.
-5. **Next:** replay interval arithmetic and certificate predicates against bigint-backed `Q`.
-6. Promote coordinate-record polynomial evaluation from pending to certificate-ready.
-7. Only then allow `ProofGradeCertificateStatus.accepted()` to return true.
+5. **Complete for the c=-2 replay path:** interval arithmetic, exact-type
+   exclusions, rational ray-address replay, and the proof-grade landing-target
+   association now execute on the BigZ/Q path.
+6. **Next theorem boundary:** validate the class-specific Misiurewicz
+   trivial-fiber import for the exact type-`(2,1)` `c=-2` instance.
+7. Keep complete certificate acceptance fail-closed until that theorem import,
+   incidence serialization/replay requirements, and every remaining
+   acceptance-bearing gate are satisfied.
 
 ## Forbidden shortcuts
 

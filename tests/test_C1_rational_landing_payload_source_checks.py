@@ -13,7 +13,6 @@ def test_rational_landing_source_check_hook_exists():
     assert "def rational_landing_payload_source_checks_ready() -> Bool" in body
     assert "c_minus_2_landing_instance()" in body
     assert "landing.source_scope_checked()" in body
-    assert "not landing.final_import_admissible()" in body
 
 
 def test_misiurewicz_trivial_fiber_source_check_hook_exists():
@@ -48,5 +47,7 @@ def test_smoke_and_next_priority_are_updated():
     assert "theorem_tag_payload_instances_smoke()" in body
     assert "rational_landing_payload_source_checks_ready()" in body
     assert "misiurewicz_trivial_fiber_payload_source_checks_ready()" in body
-    assert "def next_priority_after_payload_source_checks() -> String" in body
-    assert 'return "ProofGradeLandingTargetAssociation"' in body
+    assert "def rational_landing_payload_proof_grade_association_ready() -> Bool" in body
+    assert "landing.final_import_admissible()" in body
+    assert "def next_priority_after_proof_grade_landing_association() -> String" in body
+    assert 'return "ProofGradeMisiurewiczTrivialFiberClassification"' in body
