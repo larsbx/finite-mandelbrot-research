@@ -70,3 +70,34 @@ root = "tools"
 
 [package.files]
 "oracle_refinement/__init__.py" = "ef87305cd6eee2a1c6d0af6b4365edfdae854477f47b8df85daa4f36cd906b99"
+
+[[package]]
+name = "quadratic_orbit"
+repository = "larsbx/finite-math-kernels"
+commit = "56ac8bc6e2fe47aae32f74fc392819d334ffecba"
+root = "src"
+
+[package.files]
+"quadratic_orbit/__init__.mojo" = "4d8f371cf6378c9154f0f22e874b405c0c05a524904c6747ef385d48b9b4b49f"
+"quadratic_orbit/collision.mojo" = "9c2a89dc89a715fef35619d95bc8b1abe5ef788c37de8180e39cc7de72621142"
+"quadratic_orbit/orbit.mojo" = "ce37cada4a11ba57c0f6d3d6008a69846ca3136c07d021a25b082410c1f8392b"
+
+[[package]]
+name = "mojo_smoke"
+repository = "larsbx/finite-math-kernels"
+commit = "56ac8bc6e2fe47aae32f74fc392819d334ffecba"
+root = "src"
+
+[package.files]
+"mojo_smoke/__init__.mojo" = "55145a26cff03dbc92a81f445903ea447bee9c9360d9e5ccd1ba8094f0908d14"
+"mojo_smoke/report.mojo" = "aea279f9c9fefc2edea5c32175a328e57f3e098582eadfea23eac4ca566b2e33"
+
+[[package]]
+name = "vendoring"
+repository = "larsbx/finite-math-kernels"
+commit = "56ac8bc6e2fe47aae32f74fc392819d334ffecba"
+root = "tools"
+
+[package.files]
+"vendoring/__init__.py" = "959cdf7a89536784da18659db7cfe4099c885f5370249eccc71ce73775f8a584"
+"vendoring/check_vendored_sync.py" = "cdcb673d92bcd0cab84574b8fbe1744253e9a935d9d779bc76066f7828e3cba1"

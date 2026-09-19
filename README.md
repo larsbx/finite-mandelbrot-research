@@ -152,6 +152,8 @@ src/
   atlas_dataset.mojo         # every exact object, printed once as JSON (pixi run atlas-dataset)
   finite_exact/              # vendored from larsbx/finite-math-kernels, pinned in vendored.toml
   substitution_dynamics/     # vendored tuning, directive-prefix, and coincidence kernels, same pin
+  quadratic_orbit/           # vendored seeded orbit of z^2+c and its collision partition, same upstream
+  mojo_smoke/                # vendored smoke reporter, same upstream
 tools/
   audit_*.py
   atlas/                     # the atlas page: exact sections from Mojo, positions traced here
@@ -159,7 +161,7 @@ tools/
   claim_governance/          # vendored from larsbx/finite-math-kernels audit/, pinned in vendored.toml
   proof_records/             # vendored proof records and ledger generator, same upstream
   make_ledger.py             # the one record table; every ledger surface is rendered from it
-  check_vendored_sync.py
+  vendoring/                 # vendored vendoring checker, same upstream
 tla/
   ProofArchitecture.tla      # vendored dependency state machine
   Ledger.tla, MCLedger*      # generated from ledger.json

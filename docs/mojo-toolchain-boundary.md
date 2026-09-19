@@ -38,7 +38,7 @@ The compiler-checked dependency closure currently consists of:
 - `src/checked_landing_target_adapter.mojo`.
 - `src/finite_exact/bigint_z.mojo`.
 - `src/bigint_adapter.mojo`.
-- `src/smoke_report.mojo`.
+- `src/mojo_smoke/report.mojo`.
 - `src/angle_tuning.mojo`.
 - `src/bigq_ray_address.mojo`.
 - `src/bigq_landing_target_adapter.mojo`.

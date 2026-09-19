@@ -29,7 +29,7 @@ jobs:
       - name: Audit governed terminology
         run: python3 tools/audit_terminology.py
       - name: Recheck vendored package digests after tests
-        run: python3 tools/check_vendored_sync.py
+        run: python3 tools/vendoring/check_vendored_sync.py
       - name: Generated ledger surfaces are current (Mojo mirror, block table, claims, index, TLA+, graph)
         run: python3 tools/make_ledger.py --check
       - name: Audit governed theorem/claim usage

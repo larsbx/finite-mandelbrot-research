@@ -8,6 +8,8 @@
 
 from finite_exact.closed_interval import ComplexIQ, IQ, IQBoolResult
 from finite_exact.rat_q import Q
+from quadratic_orbit.collision import forbidden_count, intended_count, intended_pair
+from quadratic_orbit.orbit import collision_interval, complex_excludes_zero, quadratic_step as next_orbit_value, zero_box
 from krawczyk_witness import c_minus_2_box
 
 
@@ -132,40 +134,6 @@ struct BigQExactTypeExclusionResult(Copyable):
         return not self.arithmetic_rejected and self.excluded_count < self.required_count
 
 
-def intended_pair(ell: Int, period: Int, i: Int, j: Int) -> Bool:
-    # Public verifiers reject invalid OrbitEvalConfig values before partitioning.
-    # Keep this primitive total as defense in depth for internal callers.
-    if ell < 1 or period < 1:
-        return False
-    return i >= ell and ((j - i) % period == 0)
-
-
-def forbidden_count(ell: Int, period: Int, horizon: Int) -> Int:
-    var total = 0
-    for i in range(horizon + 1):
-        for j in range(i + 1, horizon + 1):
-            if not intended_pair(ell, period, i, j):
-                total += 1
-    return total
-
-
-def intended_count(ell: Int, period: Int, horizon: Int) -> Int:
-    var total = 0
-    for i in range(horizon + 1):
-        for j in range(i + 1, horizon + 1):
-            if intended_pair(ell, period, i, j):
-                total += 1
-    return total
-
-
-def zero_box() -> ComplexIQ:
-    return ComplexIQ.singleton(Q.zero(), Q.zero())
-
-
-def next_orbit_value(z: ComplexIQ, c_box: ComplexIQ) -> ComplexIQ:
-    return z.square().add(c_box)
-
-
 def build_interval_orbit_h3(c_box: ComplexIQ) -> Orbit4:
     var q0 = zero_box()
     var q1 = next_orbit_value(q0, c_box)
@@ -183,20 +151,6 @@ def build_interval_orbit_h6(c_box: ComplexIQ) -> Orbit7:
     var q5 = next_orbit_value(q4, c_box)
     var q6 = next_orbit_value(q5, c_box)
     return Orbit7(q0, q1, q2, q3, q4, q5, q6)
-
-
-def collision_interval(a: ComplexIQ, b: ComplexIQ) -> ComplexIQ:
-    return b.sub(a)
-
-
-def complex_excludes_zero(z: ComplexIQ) -> IQBoolResult:
-    if not z.accepted():
-        return IQBoolResult(False, True)
-    var re_result = z.re.excludes_zero()
-    var im_result = z.im.excludes_zero()
-    if re_result.rejected or im_result.rejected:
-        return IQBoolResult(False, True)
-    return IQBoolResult(re_result.value or im_result.value, False)
 
 
 def excludes_zero(z: ComplexIQ) -> Bool:

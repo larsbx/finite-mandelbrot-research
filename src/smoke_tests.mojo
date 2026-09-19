@@ -56,7 +56,7 @@ from exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
 from rat_backend_plan import q_backend_migration_smoke
-from smoke_report import SmokeReport, smoke_report_smoke
+from mojo_smoke.report import SmokeReport, smoke_report_smoke
 from angle_tuning import angle_tuning_smoke
 
 

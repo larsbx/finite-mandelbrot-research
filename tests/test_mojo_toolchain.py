@@ -72,7 +72,7 @@ def test_compiler_checked_boundary_is_explicit():
         "src/checked_landing_target_adapter.mojo",
         "src/finite_exact/bigint_z.mojo",
         "src/bigint_adapter.mojo",
-        "src/smoke_report.mojo",
+        "src/mojo_smoke/report.mojo",
         "src/angle_tuning.mojo",
     ]:
         assert path in boundary

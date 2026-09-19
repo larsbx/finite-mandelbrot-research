@@ -1,4 +1,6 @@
-# Named reporting for the canonical Mojo smoke suite.
+# report.mojo
+#
+# Named reporting for a Mojo smoke suite.
 #
 # The suite used to be one chain of `if not case(): return False`, so a
 # failure reported a single bare FAIL: which of the fifty checks broke, and

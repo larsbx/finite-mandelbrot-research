@@ -3,31 +3,44 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src" / "interval_orbit.mojo"
 
+#: The recurrence and the collision partition moved upstream to
+#: `larsbx/finite-math-kernels` once a second consumer needed them, and are
+#: vendored back here. The guard below follows them: what this module must
+#: still do is import them and keep its own scaffold, and what the semantics
+#: must still be is asserted against the vendored package that now holds them.
+ORBIT = ROOT / "src" / "quadratic_orbit" / "orbit.mojo"
+COLLISION = ROOT / "src" / "quadratic_orbit" / "collision.mojo"
+
 
 def text() -> str:
     return SRC.read_text(encoding="utf-8")
+
+
+def vendored(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
 
 
 def test_interval_orbit_scaffold_exists():
     src = text()
     assert "struct OrbitEvalConfig" in src
     assert "struct IntervalOrbitStatus" in src
-    assert "def forbidden_count" in src
-    assert "def intended_pair" in src
+    assert "from quadratic_orbit.collision import forbidden_count, intended_count, intended_pair" in src
 
 
 def test_native_interval_recurrence_exists():
     src = text()
+    orbit = vendored(ORBIT)
     assert "from finite_exact.closed_interval import ComplexIQ, IQ, IQBoolResult" in src
-    assert "def next_orbit_value" in src
-    assert "return z.square().add(c_box)" in src
+    assert "from quadratic_orbit.orbit import collision_interval, complex_excludes_zero, quadratic_step as next_orbit_value, zero_box" in src
     assert "def build_interval_orbit_h3" in src
     assert "def build_interval_orbit_h6" in src
-    assert "def collision_interval" in src
-    assert "return b.sub(a)" in src
     assert "def excludes_zero" in src
-    assert "if re_result.rejected or im_result.rejected:" in src
-    assert "return IQBoolResult(re_result.value or im_result.value, False)" in src
+    assert "def quadratic_step" in orbit
+    assert "return z.square().add(c)" in orbit
+    assert "def collision_interval" in orbit
+    assert "return b.sub(a)" in orbit
+    assert "if re_result.rejected or im_result.rejected:" in orbit
+    assert "return IQBoolResult(re_result.value or im_result.value, False)" in orbit
 
 
 def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure(mojo_smoke):
@@ -44,10 +57,10 @@ def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure(mojo_smoke):
 
 
 def test_intended_pair_has_clean_semantics():
-    src = text()
-    assert "if ell < 1 or period < 1:" in src
-    assert "return i >= ell and ((j - i) % period == 0)" in src
-    assert "j >= ell" not in src
+    collision = vendored(COLLISION)
+    assert "if ell < 1 or period < 1 or i < 0 or j < 0:" in collision
+    assert "return i >= ell and ((j - i) % period == 0)" in collision
+    assert "j >= ell" not in collision
 
 
 def test_public_verifiers_reject_invalid_orbit_configs_before_partitioning(mojo_smoke):
