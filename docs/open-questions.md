@@ -52,7 +52,12 @@ Can external-ray theory be represented by finite rational/binary angle certifica
 
 Do finite-field or finite-ring reductions of the critical-orbit polynomials reveal useful Mandelbrot structure, or only unrelated finite functional-graph statistics?
 
-Finite fields do not have escape, so they are auxiliary shadows, not the primary substrate.
+Affine finite-field orbits do not land on infinity and always become periodic.
+Projective infinity still has algebraic ramification and divisor multiplicity,
+and valued extensions admit pole-order growth. Can Frobenius-stable effective
+zero-cycles and these algebraic infinity invariants reveal structure that
+survives a rigorously stated characteristic-zero bridge? They remain auxiliary
+shadows, not the primary substrate; see `docs/projective-multiset.md`.
 
 ## OQ8 — Complexity of certificates
 

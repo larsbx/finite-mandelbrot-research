@@ -118,6 +118,13 @@ point := vertex of vertices.
 
 ## C10. Finite-Field Shadow
 
-Finite-field dynamics of `z -> z^2 + c` cannot model escape, because every finite orbit eventually cycles. It may still provide arithmetic shadows of the critical-orbit polynomials and Misiurewicz/parabolic loci.
+Finite affine-field dynamics of `z -> z^2 + c` does not reproduce classical
+analytic escape: every affine orbit eventually cycles and none lands on the
+infinity divisor. The projective morphism does retain exact algebraic infinity
+data, including total ramification and divisor pullback multiplicity; over
+valued function or global fields, pole-order growth gives a further algebraic
+escape invariant. These constructions may provide arithmetic shadows of the
+critical-orbit polynomials and Misiurewicz/parabolic loci, but no transfer to
+the classical parameter plane is claimed. See `docs/projective-multiset.md`.
 
 This is lower priority and must not be confused with the main dyadic/rational certificate calculus.

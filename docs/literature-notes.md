@@ -106,7 +106,15 @@ This project is not just integer rendering. It is proof-carrying finite certific
 
 Relevant but secondary.
 
-Finite fields do not support escape, because every orbit is eventually periodic. Therefore finite-field Mandelbrot analogues are shadows, not replacements for the classical escape-defined set.
+Every affine finite-field orbit is eventually periodic and, for a polynomial
+morphism, never lands on the infinity divisor. Projective infinity nevertheless
+has exact algebraic dynamics: for `z |-> z^2 + c` it is fixed and totally
+ramified, with pullback multiplicity `2^n` after `n` iterates. Intersection
+multiplicity at infinity and valuative pole-order growth are also algebraic
+notions, but they are distinct from classical analytic escape of an affine
+complex orbit. Finite-field Mandelbrot analogues therefore remain arithmetic
+shadows, not replacements for the classical escape-defined set. See
+`docs/projective-multiset.md`.
 
 Possible use:
 

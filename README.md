@@ -4,6 +4,19 @@
 
 This repository develops a finite, certificate-carrying formulation of Mandelbrot-set computation.
 
+The authoritative definition of the quadratic family, its marked critical
+orbit, the critical-orbit polynomials, and the classical Mandelbrot parameter
+locus is `docs/mandelbrot-defining-family.md`. In particular, the defining
+object is the family `f_c(z) = z^2 + c` with marked critical point zero;
+the finite-field and projective-multiset layers are typed shadows of that
+family, not alternative definitions of the Mandelbrot set.
+
+Multisets remain a first-class research tool. The current bridge program in
+`docs/multiset-bridge-program.md` begins with integral critical-orbit divisors,
+good-reduction and lifting certificates, and characteristic-zero localization;
+it also isolates the additional theorem needed to connect basin-cardinality
+weights to that algebraic route.
+
 The project goal is not to replace the classical analytic Mandelbrot set with a false finite exact object. Instead, it formalizes a hierarchy of finite algebraic certificates that reproduce the observable content available at finite resolution while isolating the single generic-boundary obstruction as MLC / fiber triviality.
 
 ## Priority-zero conjecture
