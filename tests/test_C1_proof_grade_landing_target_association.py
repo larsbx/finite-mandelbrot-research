@@ -48,7 +48,7 @@ def test_external_landing_theorem_is_an_explicit_checked_import():
     assert "struct RationalLandingTheoremImportWitness" in body
     assert '"SchleicherRationalParameterRays"' in body
     assert '"preperiodic rational parameter rays"' in body
-    assert "ImportStatus.checked()" in body
+    assert "rational_parameter_ray_landing_c_minus_2_tag_checked" in body
     assert "theorem_tag_admissible_for_final(self.record)" in body
     assert "theorem_tag_payload_admissible(self.payload)" in body
     assert "self.critical_orbit_preperiod_offset == 1" in body
