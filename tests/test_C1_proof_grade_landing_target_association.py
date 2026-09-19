@@ -58,9 +58,12 @@ def test_external_landing_theorem_is_an_explicit_checked_import():
 
 def test_proof_grade_association_has_wrong_source_and_wrong_target_negative_controls():
     body = read(ASSOC)
-    assert 'Q(-1, 1)' in body
+    assert "self.target_num == -2 and self.target_den == 1" in body
+    assert "        -1,\n        1," in body
     assert '"WrongSource"' in body
     assert "not wrong_target.proof_grade_associated()" in body
+    assert "var rays: BigQRayOrbitStatus" not in body
+    assert "var target: P21ExactTargetWitness" not in body
     assert "not wrong_source.proof_grade_associated()" in body
 
 
