@@ -1,9 +1,10 @@
 # Multiset bridge program
 
 **Status:** staged theorem program. The algebraic identities in stages B0 and
-B1, the simple-residue-root subcertificate, and one replayable Hensel step from
+B1, the simple-residue-root subcertificate, one replayable Hensel step from
 modulo `p` to modulo `p^2` are executable in
-`src/critical_relation_bridge.mojo`. The unbounded lift, factor correspondence,
+`src/critical_relation_bridge.mojo`, together with bounded factor provenance
+for monic linear factors. The unbounded lift, general factor correspondence,
 and later stages require the stated certificates or imported theorems. This program keeps
 multisets in the primary research toolbox without identifying an arbitrary
 finite-field statistic with the classical Mandelbrot set.
@@ -90,6 +91,13 @@ root modulo `p^2`. This is a finite Hensel step, not an asserted infinite
 `p`-adic lift. The checker does not yet produce a characteristic-zero factor
 correspondence, complex embedding, localization, or discriminant/resultant
 evidence.
+
+The first characteristic-zero factor subcase is also executable: for a bounded
+integer root, the checker replays synthetic division by `C - r`, exact
+recomposition, simple-root differentiation, and agreement of `r` with the
+certified residues modulo `p` and `p^2`. This proves factor provenance for
+rational PCF parameters such as `c = -2`. It is not a general factorization
+algorithm and says nothing yet about non-rational complex embeddings.
 
 ### B3 — Localization into the existing certificate calculus
 
