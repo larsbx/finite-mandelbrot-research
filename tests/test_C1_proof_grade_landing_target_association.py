@@ -51,6 +51,7 @@ def test_external_landing_theorem_is_an_explicit_checked_import():
     assert "rational_parameter_ray_landing_c_minus_2_tag_checked" in body
     assert "var record = TheoremTagRecord(" not in body
     assert "theorem_tag_admissible_for_final(self.record)" in body
+    assert "self.payload.payload_kind.code == AssumptionPayloadKind.rational_ray_landing().code" in body
     assert "theorem_tag_payload_admissible(self.payload)" in body
     assert "self.critical_orbit_preperiod_offset == 1" in body
     assert "self.period_preserved" in body
@@ -65,6 +66,8 @@ def test_proof_grade_association_has_wrong_source_and_wrong_target_negative_cont
     assert "var rays: BigQRayOrbitStatus" not in body
     assert "var target: P21ExactTargetWitness" not in body
     assert "not wrong_source.proof_grade_associated()" in body
+    assert "AssumptionPayloadKind.fiber_definition()" in body
+    assert "not wrong_payload_kind.proof_grade_associated()" in body
 
 
 def test_association_does_not_promote_fiber_c1_or_residual_closure():
