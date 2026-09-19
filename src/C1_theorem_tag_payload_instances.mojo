@@ -120,10 +120,19 @@ def c_minus_2_trivial_fiber_instance() -> MisiurewiczTrivialFiberInstance:
     )
 
 
-def theorem_tag_payload_instances_smoke() -> Bool:
+def rational_landing_payload_source_checks_ready() -> Bool:
     var landing = c_minus_2_landing_instance()
+    return landing.source_scope_checked() and not landing.final_import_admissible()
+
+
+def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool:
     var fiber = c_minus_2_trivial_fiber_instance()
-    return (
-        landing.source_scope_checked() and not landing.final_import_admissible() and
-        fiber.source_scope_checked_width() and not fiber.final_import_admissible()
-    )
+    return fiber.source_scope_checked_width() and not fiber.final_import_admissible()
+
+
+def theorem_tag_payload_instances_smoke() -> Bool:
+    return rational_landing_payload_source_checks_ready() and misiurewicz_trivial_fiber_payload_source_checks_ready()
+
+
+def next_priority_after_payload_source_checks() -> String:
+    return "ProofGradeLandingTargetAssociation"
