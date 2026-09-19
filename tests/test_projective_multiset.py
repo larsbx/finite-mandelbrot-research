@@ -102,3 +102,16 @@ def test_first_hensel_step_is_replayed_without_claiming_full_lift():
     assert "not an infinite p-adic lift" in source
     assert "one replayable Hensel step" in bridge
     assert "not an asserted infinite" in bridge
+
+
+def test_bounded_linear_factor_provenance_closes_the_rational_subcase():
+    source = read(BRIDGE_SOURCE)
+    bridge = read(BRIDGE)
+    assert "struct LinearFactorProvenance" in source
+    assert "def synthetic_divide_monic_linear" in source
+    assert "def verify_linear_factor_provenance" in source
+    assert "recomposition_exact" in source
+    assert "matches_lift_mod_p2" in source
+    assert "does not factor a" in source
+    assert "bounded factor provenance" in bridge
+    assert "not a general factorization" in bridge
