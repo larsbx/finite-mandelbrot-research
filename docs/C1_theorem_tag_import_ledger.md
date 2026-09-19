@@ -181,6 +181,13 @@ Strength class: `CLASSICAL_IMPORTED_CLASS_SPECIFIC`.
 
 Final use: allowed only for class-specific closure. It cannot be used as a generic boundary theorem unless the source theorem actually has that scope.
 
+For the exact `c=-2`, orbit-type `(2,1)` instance, the canonical checked
+record is `misiurewicz_c_minus_2_trivial_fiber_tag_checked()`. It is consumed
+only together with the proof-grade exact-target association and the
+`known_trivial_fiber` payload. This authorizes the class-specific conclusion
+for that instance only; it does not authorize generic MLC, all-fiber
+triviality, `ResidualClosureNoMissingLinks`, or C1.
+
 ### Yoccoz-type local connectivity under hypotheses
 
 Tag family:

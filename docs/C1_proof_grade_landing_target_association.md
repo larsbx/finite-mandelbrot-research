@@ -113,3 +113,11 @@ ProofGradeMisiurewiczTrivialFiberClassification
 That slice should attach and validate the class-specific trivial-fiber theorem
 for the now exact type-`(2,1)` parameter without weakening any global
 frontier.
+
+## Successor status
+
+The successor classification is now implemented in
+`src/proof_grade_misiurewicz_trivial_fiber_classification.mojo`. It binds the
+checked Schleicher class-specific import to the proof-grade `c=-2`, exact
+type-`(2,1)` witness and rejects wrong target, type, source, and payload-kind
+controls. Its global-boundary predicates remain hard-false.

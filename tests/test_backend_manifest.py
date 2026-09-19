@@ -117,13 +117,14 @@ def test_checked_ray_and_finite_certificate_boundary_are_compiler_wired(mojo_smo
     assert "verify_checked_one_half_orbit" in ray
     assert "self.localization.checked_width_accepted() and self.rays.accepted()" in gate
     assert "self.landing_tag.final_import_admissible()" in gate
-    assert "not status.theorem_tags_accepted()" in gate
+    assert "status.theorem_tags_accepted()" in gate
+    assert "not status.canonical_incidence_replay_accepted()" in gate
     assert '"SchleicherRationalParameterRays"' in tags
     assert '"SchleicherFibersLC"' in tags
     assert "proof_grade_landing_target_association.proof_grade_associated()" in tags
-    assert "self.localization.proof_grade_accepted()" in tags
+    assert "class_specific_trivial_fiber_accepted()" in tags
     assert "landing.final_import_admissible()" in tags
-    assert "not fiber.final_import_admissible()" in tags
+    assert "fiber.final_import_admissible()" in tags
     assert "equal_poly(relation, expected_R_2_1())" in association
     assert "squarefree.coefficient(1) == 2" in association
     assert "eval_poly_at_int(q0, 0) == eval_poly_at_int(q1, 0)" in association

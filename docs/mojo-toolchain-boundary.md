@@ -51,6 +51,8 @@ The compiler-checked dependency closure currently consists of:
 - `src/C1_separated_density.mojo`.
 - `src/misiurewicz_catalogue.mojo`.
 - `src/C1_misiurewicz_prefix_graph.mojo`.
+- `src/proof_grade_landing_target_association.mojo`.
+- `src/proof_grade_misiurewicz_trivial_fiber_classification.mojo`.
 
 A second compile target, `src/exact_arithmetic_property_probe.mojo`, imports
 `bigint_z`, `rat_q`, and `interval_q` and is executed by `pixi run property`,

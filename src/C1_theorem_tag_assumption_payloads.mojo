@@ -172,6 +172,22 @@ def fiber_definition_payload_scaffold() -> TheoremTagPayload:
     )
 
 
+def misiurewicz_trivial_fiber_payload_scaffold() -> TheoremTagPayload:
+    return TheoremTagPayload(
+        "KnownTrivialFiberClass",
+        AssumptionPayloadKind.known_trivial_fiber(),
+        PayloadConclusionKind.class_specific_trivial_fiber(),
+        PayloadStrengthClass.class_specific_fiber_triviality(),
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+    )
+
+
 def generic_mlc_payload_rejected() -> Bool:
     var payload = TheoremTagPayload(
         "GenericMLC",
