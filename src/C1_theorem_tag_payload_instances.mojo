@@ -44,18 +44,26 @@ struct RationalRayLandingInstance(ImplicitlyCopyable):
         self.proof_grade_landing_target_association = proof_grade_landing_target_association
         self.excludes_generic_boundary_use = excludes_generic_boundary_use
 
-    def source_scope_checked(self) -> Bool:
+    def source_metadata_checked(self) -> Bool:
         return (
             self.source.complete() and self.source.citation_key == "SchleicherRationalParameterRays" and
             self.source.covered_class == "preperiodic rational parameter rays" and
-            self.rays.accepted() and self.rays.preperiod == 1 and self.rays.period == 1 and
             self.address_num == 1 and self.address_den == 2 and
-            self.landing_box_name == "beta_c_minus_2" and self.excludes_generic_boundary_use and
+            self.landing_box_name == "beta_c_minus_2" and self.excludes_generic_boundary_use
+        )
+
+    def source_scope_checked(self) -> Bool:
+        return (
+            self.source_metadata_checked() and
+            self.rays.accepted() and self.rays.preperiod == 1 and self.rays.period == 1 and
             self.landing_target_association.checked_width_associated()
         )
 
     def final_import_admissible(self) -> Bool:
-        return self.source_scope_checked() and self.proof_grade_landing_target_association.proof_grade_associated()
+        return (
+            self.source_metadata_checked() and
+            self.proof_grade_landing_target_association.proof_grade_associated()
+        )
 
 
 struct MisiurewiczTrivialFiberInstance(ImplicitlyCopyable):
