@@ -162,7 +162,7 @@ struct LinearDivisionResult:
     var remainder: Int
 
     def __init__(out self, quotient: PolyZ, remainder: Int):
-        self.quotient = quotient
+        self.quotient = quotient.copy()
         self.remainder = remainder
 
 
@@ -379,7 +379,7 @@ def verify_linear_factor_provenance(
     if not bounded_relation_coefficients(relation):
         return rejected_linear_factor_provenance()
     var division = synthetic_divide_monic_linear(relation, integer_root)
-    var quotient = division.quotient
+    var quotient = division.quotient.copy()
     var remainder = division.remainder
     var factor = monic_linear(-integer_root)
     var recomposed = mul(factor, quotient)
