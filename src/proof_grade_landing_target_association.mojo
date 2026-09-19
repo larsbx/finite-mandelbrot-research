@@ -232,33 +232,53 @@ def checked_rational_landing_theorem_import() -> RationalLandingTheoremImportWit
 
 struct ProofGradeLandingTargetAssociation(ImplicitlyCopyable):
     var theorem_import: RationalLandingTheoremImportWitness
-    var rays: BigQRayOrbitStatus
-    var target: P21ExactTargetWitness
+    var ray_replay_accepted: Bool
+    var ray_preperiod: Int
+    var ray_period: Int
+    var target_num: Int64
+    var target_den: Int64
+    var factorization_verified: Bool
+    var zero_lower_type_verified: Bool
+    var target_exact_type_verified: Bool
     var ell: Int
     var period: Int
 
     def __init__(
         out self,
         theorem_import: RationalLandingTheoremImportWitness,
-        rays: BigQRayOrbitStatus,
-        target: P21ExactTargetWitness,
+        ray_replay_accepted: Bool,
+        ray_preperiod: Int,
+        ray_period: Int,
+        target_num: Int64,
+        target_den: Int64,
+        factorization_verified: Bool,
+        zero_lower_type_verified: Bool,
+        target_exact_type_verified: Bool,
         ell: Int,
         period: Int,
     ):
         self.theorem_import = theorem_import
-        self.rays = rays
-        self.target = target
+        self.ray_replay_accepted = ray_replay_accepted
+        self.ray_preperiod = ray_preperiod
+        self.ray_period = ray_period
+        self.target_num = target_num
+        self.target_den = target_den
+        self.factorization_verified = factorization_verified
+        self.zero_lower_type_verified = zero_lower_type_verified
+        self.target_exact_type_verified = target_exact_type_verified
         self.ell = ell
         self.period = period
 
     def proof_grade_associated(self) -> Bool:
         return (
             self.theorem_import.accepted() and
-            self.rays.arithmetic_replay_accepted() and
-            self.rays.preperiod + self.theorem_import.critical_orbit_preperiod_offset == self.ell and
-            self.rays.period == self.period and
+            self.ray_replay_accepted and
+            self.ray_preperiod + self.theorem_import.critical_orbit_preperiod_offset == self.ell and
+            self.ray_period == self.period and
             self.ell == 2 and self.period == 1 and
-            self.target.complete_factorization_identifies_target()
+            self.target_num == -2 and self.target_den == 1 and
+            self.factorization_verified and self.zero_lower_type_verified and
+            self.target_exact_type_verified
         )
 
     def proves_fiber_triviality(self) -> Bool:
@@ -275,10 +295,21 @@ def verify_proof_grade_c_minus_2_landing_target_association() -> ProofGradeLandi
     # Use a representation of 1/2 whose unreduced numerator is already beyond
     # Int64 to exercise the unbounded BigZ/Q path before normalization.
     var beyond_i64 = bigz_add(bigz_from_i64(9223372036854775807), bigz_from_i64(1))
+    var rays = verify_bigq_one_half_orbit(
+        beyond_i64,
+        bigz_mul(beyond_i64, bigz_from_i64(2)),
+    )
+    var target = verify_c_minus_2_exact_target()
     return ProofGradeLandingTargetAssociation(
         checked_rational_landing_theorem_import(),
-        verify_bigq_one_half_orbit(beyond_i64, bigz_mul(beyond_i64, bigz_from_i64(2))),
-        verify_c_minus_2_exact_target(),
+        rays.arithmetic_replay_accepted(),
+        rays.preperiod,
+        rays.period,
+        -2,
+        1,
+        target.factorization_verified,
+        target.zero_lower_type_verified,
+        target.complete_factorization_identifies_target(),
         2,
         1,
     )
@@ -288,12 +319,14 @@ def proof_grade_landing_target_association_smoke() -> Bool:
     var association = verify_proof_grade_c_minus_2_landing_target_association()
     var wrong_target = ProofGradeLandingTargetAssociation(
         association.theorem_import,
-        association.rays,
-        P21ExactTargetWitness(
-            Q(-1, 1),
-            proof_grade_r21_factorization_verified(),
-            zero_is_lower_type_for_r21(),
-        ),
+        association.ray_replay_accepted,
+        association.ray_preperiod,
+        association.ray_period,
+        -1,
+        1,
+        association.factorization_verified,
+        association.zero_lower_type_verified,
+        association.target_exact_type_verified,
         2,
         1,
     )
@@ -309,8 +342,14 @@ def proof_grade_landing_target_association_smoke() -> Bool:
     )
     var wrong_source = ProofGradeLandingTargetAssociation(
         wrong_import,
-        association.rays,
-        association.target,
+        association.ray_replay_accepted,
+        association.ray_preperiod,
+        association.ray_period,
+        association.target_num,
+        association.target_den,
+        association.factorization_verified,
+        association.zero_lower_type_verified,
+        association.target_exact_type_verified,
         2,
         1,
     )
@@ -322,3 +361,4 @@ def proof_grade_landing_target_association_smoke() -> Bool:
         not association.proves_c1() and
         not association.proves_residual_closure_no_missing_links()
     )
+
