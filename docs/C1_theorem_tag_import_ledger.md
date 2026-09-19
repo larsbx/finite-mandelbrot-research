@@ -92,6 +92,12 @@ Strength class: `CLASSICAL_IMPORTED_LOCAL`.
 
 Final use: allowed for separator certificates only after the finite address data and source-family scope are checked.
 
+For the source-specific `c=-2`, address-`1/2` payload, the canonical checked
+record is `rational_parameter_ray_landing_c_minus_2_tag_checked()`. That record
+is admissible only when the consumer also validates the concrete source payload
+and the proof-grade landing-target association; the checked record by itself is
+not a landing proof.
+
 ### Rational-ray separator interpretation
 
 Tag family:
