@@ -13,7 +13,7 @@ from finite_exact.bigint_z import BigZ, bigz_add, bigz_eq, bigz_from_i64, bigz_m
 from finite_exact.rat_q import Q
 from bigq_ray_address import BigQRayOrbitStatus, verify_bigq_one_half_orbit
 from C1_theorem_tag_import_ledger import ImportConclusionKind, ImportStrengthClass, TheoremTagRecord, rational_parameter_ray_landing_c_minus_2_tag_checked, theorem_tag_admissible_for_final
-from C1_theorem_tag_assumption_payloads import PayloadConclusionKind, PayloadStrengthClass, TheoremTagPayload, rational_parameter_ray_landing_payload_scaffold, theorem_tag_payload_admissible
+from C1_theorem_tag_assumption_payloads import AssumptionPayloadKind, PayloadConclusionKind, PayloadStrengthClass, TheoremTagPayload, rational_parameter_ray_landing_payload_scaffold, theorem_tag_payload_admissible
 
 
 struct BigZPoly2(Copyable):
@@ -208,6 +208,7 @@ struct RationalLandingTheoremImportWitness(ImplicitlyCopyable):
             self.record.conclusion_kind.code == ImportConclusionKind.rational_ray_landing().code and
             self.record.strength_class.code == ImportStrengthClass.classical_local().code and
             self.payload.tag_name == self.record.name and
+            self.payload.payload_kind.code == AssumptionPayloadKind.rational_ray_landing().code and
             self.payload.conclusion_kind.code == PayloadConclusionKind.ray_landing().code and
             self.payload.strength_class.code == PayloadStrengthClass.local_landing().code and
             self.critical_orbit_preperiod_offset == 1 and self.period_preserved and
@@ -354,10 +355,47 @@ def proof_grade_landing_target_association_smoke() -> Bool:
         2,
         1,
     )
+    var wrong_payload = TheoremTagPayload(
+        "RationalParameterRayLanding",
+        AssumptionPayloadKind.fiber_definition(),
+        PayloadConclusionKind.ray_landing(),
+        PayloadStrengthClass.local_landing(),
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+    )
+    var wrong_payload_import = RationalLandingTheoremImportWitness(
+        association.theorem_import.record,
+        wrong_payload,
+        association.theorem_import.citation_key,
+        association.theorem_import.source_title,
+        association.theorem_import.covered_class,
+        1,
+        True,
+        True,
+    )
+    var wrong_payload_kind = ProofGradeLandingTargetAssociation(
+        wrong_payload_import,
+        association.ray_replay_accepted,
+        association.ray_preperiod,
+        association.ray_period,
+        association.target_num,
+        association.target_den,
+        association.factorization_verified,
+        association.zero_lower_type_verified,
+        association.target_exact_type_verified,
+        2,
+        1,
+    )
     return (
         association.proof_grade_associated() and
         not wrong_target.proof_grade_associated() and
         not wrong_source.proof_grade_associated() and
+        not wrong_payload_kind.proof_grade_associated() and
         not association.proves_fiber_triviality() and
         not association.proves_c1() and
         not association.proves_residual_closure_no_missing_links()
