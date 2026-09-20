@@ -30,9 +30,10 @@ proof-grade certificate and cannot discharge an imported theorem or C1.
 
 ## Next obligations
 
-1. Audit and attach the source-specific classical theorem payloads; executable
-   source-scope matching alone must not accept an import.
-2. Define canonical serialization for the explicit finite incidence carrier
-   before any certificate artifact can be hashed or replayed across processes.
+1. Implement `CanonicalFiniteCertificateIncidenceReplay`: define canonical
+   serialization for the explicit finite incidence carrier and verify
+   deterministic replay across processes.
+2. Keep complete certificate acceptance fail-closed until canonical incidence
+   replay is acceptance-bearing.
 3. Keep the C1 residual-closure proof track separate; no finite example or
    successful certificate implies the missing global closure statement.
