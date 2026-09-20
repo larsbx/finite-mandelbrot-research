@@ -138,6 +138,23 @@ def rational_parameter_ray_landing_tag_ready() -> TheoremTagRecord:
     )
 
 
+def rational_parameter_ray_landing_c_minus_2_tag_checked() -> TheoremTagRecord:
+    # Canonical source-specific import record for the c=-2 / address-1/2
+    # payload. The consumer must still validate the concrete source payload and
+    # proof-grade target association; this record alone does no mathematical
+    # work.
+    return TheoremTagRecord(
+        "RationalParameterRayLanding",
+        True,
+        True,
+        ImportConclusionKind.rational_ray_landing(),
+        True,
+        True,
+        ImportStrengthClass.classical_local(),
+        ImportStatus.checked(),
+    )
+
+
 def fiber_definition_equivalence_tag_ready() -> TheoremTagRecord:
     return TheoremTagRecord(
         "FiberDefinitionEquivalence",

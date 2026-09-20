@@ -108,6 +108,17 @@ def test_initial_tags_are_scaffolded_not_final_checked():
     assert "theorem_tags_block_final_proof_until_checked() -> Bool" in text
 
 
+def test_c_minus_2_rational_landing_has_a_canonical_checked_specialization():
+    text = body(SRC)
+    start = text.index("def rational_parameter_ray_landing_c_minus_2_tag_checked")
+    end = text.index("def fiber_definition_equivalence_tag_ready", start)
+    block = text[start:end]
+    assert '"RationalParameterRayLanding"' in block
+    assert "ImportConclusionKind.rational_ray_landing()" in block
+    assert "ImportStrengthClass.classical_local()" in block
+    assert "ImportStatus.checked()" in block
+
+
 def test_next_priority_is_assumption_payloads():
     text = body(DOC) + "\n" + body(SRC)
     assert "TheoremTagAssumptionPayloads" in text

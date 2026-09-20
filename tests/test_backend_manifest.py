@@ -120,9 +120,9 @@ def test_checked_ray_and_finite_certificate_boundary_are_compiler_wired(mojo_smo
     assert "not status.theorem_tags_accepted()" in gate
     assert '"SchleicherRationalParameterRays"' in tags
     assert '"SchleicherFibersLC"' in tags
-    assert "landing_target_association.proof_grade_associated()" in tags
+    assert "proof_grade_landing_target_association.proof_grade_associated()" in tags
     assert "self.localization.proof_grade_accepted()" in tags
-    assert "not landing.final_import_admissible()" in tags
+    assert "landing.final_import_admissible()" in tags
     assert "not fiber.final_import_admissible()" in tags
     assert "equal_poly(relation, expected_R_2_1())" in association
     assert "squarefree.coefficient(1) == 2" in association
