@@ -31,11 +31,11 @@ proof-grade certificate and cannot discharge an imported theorem or C1.
 
 ## Next obligations
 
-1. Attach and validate the class-specific Misiurewicz trivial-fiber theorem
-   payload for the exact type-`(2,1)` `c=-2` instance. The rational landing
-   import is no longer the blocker.
-2. Define canonical serialization for the explicit finite incidence carrier
-   before any certificate artifact can be hashed or replayed across processes.
+1. Implement `CanonicalFiniteCertificateIncidenceReplay`: define canonical
+   serialization for the explicit finite incidence carrier and verify
+   deterministic replay across processes.
+2. Keep complete certificate acceptance fail-closed until canonical incidence
+   replay is acceptance-bearing.
 3. Keep the C1 residual-closure proof track separate; no finite example,
    accepted landing import, or successful certificate instance implies the
    missing global closure statement.
