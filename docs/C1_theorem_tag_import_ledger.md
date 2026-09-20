@@ -92,6 +92,12 @@ Strength class: `CLASSICAL_IMPORTED_LOCAL`.
 
 Final use: allowed for separator certificates only after the finite address data and source-family scope are checked.
 
+For the source-specific `c=-2`, address-`1/2` payload, the canonical checked
+record is `rational_parameter_ray_landing_c_minus_2_tag_checked()`. That record
+is admissible only when the consumer also validates the concrete source payload
+and the proof-grade landing-target association; the checked record by itself is
+not a landing proof.
+
 ### Rational-ray separator interpretation
 
 Tag family:
@@ -174,6 +180,13 @@ adapter_domain_matches
 Strength class: `CLASSICAL_IMPORTED_CLASS_SPECIFIC`.
 
 Final use: allowed only for class-specific closure. It cannot be used as a generic boundary theorem unless the source theorem actually has that scope.
+
+For the exact `c=-2`, orbit-type `(2,1)` instance, the canonical checked
+record is `misiurewicz_c_minus_2_trivial_fiber_tag_checked()`. It is consumed
+only together with the proof-grade exact-target association and the
+`known_trivial_fiber` payload. This authorizes the class-specific conclusion
+for that instance only; it does not authorize generic MLC, all-fiber
+triviality, `ResidualClosureNoMissingLinks`, or C1.
 
 ### Yoccoz-type local connectivity under hypotheses
 

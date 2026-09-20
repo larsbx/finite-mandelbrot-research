@@ -31,7 +31,12 @@ struct CheckedFiniteCertificateStatus(ImplicitlyCopyable):
         )
 
     def certificate_accepted(self) -> Bool:
-        return self.checked_finite_inputs_accepted() and self.theorem_tags_accepted()
+        # The two class-specific theorem imports are now checked, but complete
+        # certificate acceptance still requires canonical incidence replay.
+        return self.checked_finite_inputs_accepted() and self.theorem_tags_accepted() and self.canonical_incidence_replay_accepted()
+
+    def canonical_incidence_replay_accepted(self) -> Bool:
+        return False
 
     def proof_grade_accepted(self) -> Bool:
         return self.certificate_accepted() and self.localization.proof_grade_accepted()
@@ -50,7 +55,8 @@ def checked_finite_certificate_gate_smoke() -> Bool:
     var status = c_minus_2_checked_finite_certificate()
     return (
         status.checked_finite_inputs_accepted() and
-        not status.theorem_tags_accepted() and
+        status.theorem_tags_accepted() and
+        not status.canonical_incidence_replay_accepted() and
         not status.certificate_accepted() and
         not status.proof_grade_accepted()
     )

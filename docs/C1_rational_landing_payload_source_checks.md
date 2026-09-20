@@ -1,6 +1,6 @@
 # Rational landing payload source checks
 
-Status: canonical next-step slice for the priority conjecture proof stack.
+Status: PR #19 baseline; source-scope slice completed before the proof-grade successor.
 
 This document records the narrow purpose of branch `c1/rational-landing-payload-source-checks` in the canonical repository `larsbx/finite-mandelbrot-research`.
 
@@ -61,3 +61,33 @@ ProofGradeLandingTargetAssociation
 ```
 
 That target must upgrade the checked-width landing-target association to a proof-grade association, or preserve a precise reason why the import remains non-final.
+
+
+## Successor status
+
+The stacked successor `c1/proof-grade-landing-target-association` now
+discharges the rational landing-target association without changing the
+historical claim made by this document:
+
+```text
+PR #19 source-scope baseline
+  rational landing source scope     checked
+  rational landing final import     fail-closed
+
+successor proof-grade association
+  exact BigZ/Q target association   accepted
+  rational landing final import     admissible
+  Misiurewicz trivial-fiber import  fail-closed
+```
+
+The proof-grade landing path no longer depends on the checked-width localization
+gate for final admissibility. It uses exact BigZ/Q ray-address replay, exact
+BigZ coefficient replay of `R_{2,1}=C^3(C+2)`, lower-type exclusion of
+`C=0`, an exact type-`(2,1)` check at `C=-2`, and the canonical checked
+rational-ray theorem import record.
+
+The next concrete bottleneck after the successor is:
+
+```text
+ProofGradeMisiurewiczTrivialFiberClassification
+```

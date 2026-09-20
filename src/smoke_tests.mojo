@@ -22,6 +22,8 @@ from krawczyk_witness import verify_p21_krawczyk_c_minus_2, bigq_krawczyk_replay
 from interval_orbit import bigq_exact_type_exclusion_replay_smoke, invalid_orbit_config_rejection_smoke
 from bigq_ray_address import bigq_ray_address_replay_smoke
 from bigq_landing_target_adapter import bigq_landing_target_replay_smoke
+from proof_grade_landing_target_association import proof_grade_landing_target_association_smoke
+from proof_grade_misiurewicz_trivial_fiber_classification import proof_grade_misiurewicz_trivial_fiber_classification_smoke
 from bigq_theorem_tag_payload_instances import bigq_theorem_payload_replay_smoke
 from bigq_finite_certificate_gate import bigq_finite_certificate_gate_smoke
 from bigq_certificate_incidence import bigq_certificate_incidence_smoke
@@ -298,6 +300,8 @@ def run_smoke_tests() -> Bool:
     _ = report.record("invalid orbit config rejection", invalid_orbit_config_rejection_smoke())
     _ = report.record("bigq ray address replay", bigq_ray_address_replay_smoke())
     _ = report.record("bigq landing target replay", bigq_landing_target_replay_smoke())
+    _ = report.record("proof-grade landing target association", proof_grade_landing_target_association_smoke())
+    _ = report.record("proof-grade Misiurewicz trivial-fiber classification", proof_grade_misiurewicz_trivial_fiber_classification_smoke())
     _ = report.record("bigq theorem payload replay", bigq_theorem_payload_replay_smoke())
     _ = report.record("bigq finite certificate gate", bigq_finite_certificate_gate_smoke())
     _ = report.record("bigq certificate incidence", bigq_certificate_incidence_smoke())
