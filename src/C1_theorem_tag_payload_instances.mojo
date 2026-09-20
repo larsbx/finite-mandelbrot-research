@@ -8,6 +8,7 @@ from certificate_arithmetic_migration_gate import CheckedLocalizationEnvelope, c
 from checked_ray_address import CheckedRayOrbitStatus, verify_checked_one_half_orbit
 from checked_landing_target_adapter import LandingTargetAssociation, verify_c_minus_2_landing_target_association
 from proof_grade_landing_target_association import ProofGradeLandingTargetAssociation, verify_proof_grade_c_minus_2_landing_target_association
+from proof_grade_misiurewicz_trivial_fiber_classification import ProofGradeMisiurewiczTrivialFiberClassification, verify_c_minus_2_misiurewicz_trivial_fiber_classification
 
 
 struct TheoremSourceRef(ImplicitlyCopyable):
@@ -71,13 +72,15 @@ struct MisiurewiczTrivialFiberInstance(ImplicitlyCopyable):
     var localization: CheckedLocalizationEnvelope
     var ell: Int
     var period: Int
+    var proof_grade_classification: ProofGradeMisiurewiczTrivialFiberClassification
     var excludes_generic_boundary_use: Bool
 
-    def __init__(out self, source: TheoremSourceRef, localization: CheckedLocalizationEnvelope, ell: Int, period: Int, excludes_generic_boundary_use: Bool):
+    def __init__(out self, source: TheoremSourceRef, localization: CheckedLocalizationEnvelope, ell: Int, period: Int, proof_grade_classification: ProofGradeMisiurewiczTrivialFiberClassification, excludes_generic_boundary_use: Bool):
         self.source = source
         self.localization = localization
         self.ell = ell
         self.period = period
+        self.proof_grade_classification = proof_grade_classification
         self.excludes_generic_boundary_use = excludes_generic_boundary_use
 
     def source_scope_checked_width(self) -> Bool:
@@ -90,7 +93,14 @@ struct MisiurewiczTrivialFiberInstance(ImplicitlyCopyable):
         )
 
     def final_import_admissible(self) -> Bool:
-        return self.source_scope_checked_width() and self.localization.proof_grade_accepted()
+        return (
+            self.source.complete() and
+            self.source.citation_key == "SchleicherFibersLC" and
+            self.source.covered_class == "Misiurewicz parameters" and
+            self.ell == 2 and self.period == 1 and
+            self.excludes_generic_boundary_use and
+            self.proof_grade_classification.class_specific_trivial_fiber_accepted()
+        )
 
 
 def schleicher_rational_parameter_ray_source() -> TheoremSourceRef:
@@ -128,6 +138,7 @@ def c_minus_2_trivial_fiber_instance() -> MisiurewiczTrivialFiberInstance:
         c_minus_2_checked_localization(),
         2,
         1,
+        verify_c_minus_2_misiurewicz_trivial_fiber_classification(),
         True,
     )
 
@@ -144,7 +155,7 @@ def rational_landing_payload_proof_grade_association_ready() -> Bool:
 
 def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool:
     var fiber = c_minus_2_trivial_fiber_instance()
-    return fiber.source_scope_checked_width() and not fiber.final_import_admissible()
+    return fiber.source_scope_checked_width() and fiber.final_import_admissible()
 
 
 def theorem_tag_payload_instances_smoke() -> Bool:
@@ -156,7 +167,7 @@ def theorem_tag_payload_instances_smoke() -> Bool:
 
 
 def next_priority_after_proof_grade_landing_association() -> String:
-    return "ProofGradeMisiurewiczTrivialFiberClassification"
+    return "CanonicalFiniteCertificateIncidenceReplay"
 
 
 def next_priority_after_payload_source_checks() -> String:

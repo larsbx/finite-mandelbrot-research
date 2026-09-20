@@ -77,7 +77,7 @@ def test_association_does_not_promote_fiber_c1_or_residual_closure():
     assert "def proves_residual_closure_no_missing_links(self) -> Bool:\n        return False" in body
 
 
-def test_c1_landing_payload_now_uses_proof_grade_association_but_fiber_stays_closed():
+def test_c1_landing_payload_uses_proof_grade_association_and_names_successor():
     tags = read(TAGS)
     assert "var proof_grade_landing_target_association: ProofGradeLandingTargetAssociation" in tags
     assert "verify_proof_grade_c_minus_2_landing_target_association()" in tags
@@ -88,8 +88,8 @@ def test_c1_landing_payload_now_uses_proof_grade_association_but_fiber_stays_clo
     assert "self.source_scope_checked()" not in final_block
     assert "rational_landing_payload_proof_grade_association_ready()" in tags
     assert "landing.final_import_admissible()" in tags
-    assert "not fiber.final_import_admissible()" in tags
-    assert 'return "ProofGradeMisiurewiczTrivialFiberClassification"' in tags
+    assert "fiber.final_import_admissible()" in tags
+    assert 'return "CanonicalFiniteCertificateIncidenceReplay"' in tags
 
 
 def test_proof_grade_association_is_compiler_wired(mojo_smoke):
