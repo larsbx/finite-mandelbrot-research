@@ -19,6 +19,8 @@ def test_b3_root_handle_composes_factor_provenance_and_localization():
     assert "factor_provenance_accepted" in body
     assert "localization_unique" in body
     assert "exact_type_verified_over_z" in body
+    assert "current_q_backend_status()" in body
+    assert "q_backend_blocks_proof_acceptance(backend)" in body
 
 
 def test_b3_scope_is_rational_c_minus_2_and_fail_closed():
@@ -30,6 +32,10 @@ def test_b3_scope_is_rational_c_minus_2_and_fail_closed():
     assert "def accepts_nonrational_complex_embedding" in body
     assert "def imports_distributional_bridge" in body
     assert body.count("return False") >= 3
+    assert "def arithmetic_replay_accepted" in body
+    assert "self.arithmetic_replay_accepted() and self.backend_proof_gate_open" in body
+    assert "not replay.accepted()" in body
+    assert "not replay.proof_grade_accepted()" in body
 
 
 def test_exact_integer_orbit_replay_identifies_type_2_1():
