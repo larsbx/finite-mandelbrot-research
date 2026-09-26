@@ -26,6 +26,6 @@ def test_interval_oracle_uses_fraction_not_float():
 
 
 def test_same_box_language_present():
-    text = (ROOT / "tools" / "interval_exclusion_reference.py").read_text()
+    text = (ROOT / "reference" / "python" / "interval" / "interval_exclusion_reference.py").read_text()
     assert "same-box" in text
     assert "forbidden collision" in text
