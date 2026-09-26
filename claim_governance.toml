@@ -38,7 +38,7 @@ classes = ["proved-or-imported-checked", "scaffolded", "open-frontier", "researc
 "RESEARCH_ONLY" = "research-only"
 "False, False, False, True" = "research-only"
 # A block whose own statement is checked but whose premises are not, and a
-# withdrawn one: reachable only through the record table, never by hand.
+# withdrawn one: reachable only through the declarative proof records, never by hand.
 "CONDITIONAL" = "conditional"
 "RETIRED" = "retired"
 
@@ -158,9 +158,10 @@ message = "project-internal term in the field-facing manuscript (tools/audit_pap
 # ---------------------------------------------------------------------------
 # Claim ledger: the required blocks of the final C1 proof object, on the
 # Markdown ledger and its Mojo mirror, plus C1 itself.  Generated from the
-# proof-record table of tools/make_ledger.py (serialized to ledger.json,
-# itself generated) through the vendored tools/proof_records package; do not
-# edit the block below or ledger.json, edit the table and regenerate.
+# declarative proof state in proof/c1/records.toml (serialized to ledger.json,
+# itself generated) through tools/make_ledger.py and the vendored
+# tools/proof_records package; do not edit the block below or ledger.json,
+# edit records.toml and regenerate.
 # ---------------------------------------------------------------------------
 
 # BEGIN generated claims (proof_records/generate_ledgers.py); do not edit between the markers
