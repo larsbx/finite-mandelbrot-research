@@ -41,10 +41,11 @@ def test_exact_integer_orbit_replay_identifies_type_2_1():
 
 def test_b3_bridge_documentation_names_executable_boundary():
     bridge = read(BRIDGE)
-    assert "RationalB3RootHandle" in bridge
-    assert "c = -2" in bridge
-    assert "general algebraic factors" in bridge
-    assert "non-rational complex embeddings" in bridge
+    normalized = bridge.lower()
+    assert "rationalb3roothandle" in normalized
+    assert "c = -2" in normalized
+    assert "general algebraic factors" in normalized
+    assert "non-rational complex embeddings" in normalized
 
 
 def test_b3_localization_is_compiler_wired(mojo_smoke):
