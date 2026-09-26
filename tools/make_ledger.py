@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Build ledger.json from the record table below and regenerate every ledger surface.
+"""Build ledger.json from proof/c1/records.toml and regenerate every ledger surface.
 
 Round-two item R2 of `docs/cross-pollination-round-two-2026-09-16.md`, the half
 that was still owed here: this repository's ledgers were hand-maintained on
 three surfaces at once -- the Mojo mirror `src/C1_final_proof_block_ledger.mojo`,
 the Markdown table of `docs/C1_final_proof_block_ledger.md`, and the `[[claim]]`
 entries of `claim_governance.toml` -- and the claim-governance `consistency`
-check could only report drift after it had happened. The table below is now the
-single source. Every surface is a function of it, so drift is impossible rather
-than detected.
+check could only report drift after it had happened. `proof/c1/records.toml` is
+now the single source. Every surface is a function of it, so drift is impossible
+rather than detected.
 
 `tools/proof_records` is vendored byte-for-byte from `larsbx/finite-math-kernels`
 (`docs/ledger-generation-spec.md` and `docs/typed-relationship-graph-spec.md`
@@ -30,6 +30,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,102 +43,48 @@ LEDGER = ROOT / "ledger.json"
 POLICY = ROOT / "claim_governance.toml"
 MOJO = ROOT / "src" / "C1_final_proof_block_ledger.mojo"
 BLOCK_DOC = ROOT / "docs" / "C1_final_proof_block_ledger.md"
-SCOPE = "the final C1 proof object"
+SPEC_PATH = ROOT / "proof" / "c1" / "records.toml"
 
-T, P = Kind.REPOSITORY, Kind.PENDING
-SCAFFOLDED = "status:scaffolded"
 
-# name -> (kind, statement, source or reason, dependencies, tags, final role, next action)
-# A pending record is an open frontier unless it carries the scaffolded tag: a
-# scaffolded block has the statement and the checker shape, an open-frontier
-# block has an active mathematical frontier in front of it.
-TABLE: dict[str, tuple] = {
-    "SeparatorCatalogueSoundness": (
-        P, "a finite separator certificate implies classical rational-ray separation",
-        "scaffolded: the side and landing checks exist as checker shapes, the proof objects do not",
-        (), (SCAFFOLDED,),
-        "finite separator certificate implies classical rational-ray separation",
-        "convert side/landing checks into proof objects"),
-    "SeparatorCatalogueCompleteness": (
-        P, "every admitted classical separator is eventually enumerated",
-        "scaffolded: fair enumeration runs, finite normalization coverage is unproved",
-        (), (SCAFFOLDED,),
-        "every admitted classical separator is eventually enumerated",
-        "prove finite normalization and fair enumeration coverage"),
-    "FiberDefinitionAdapter": (
-        P, "persistent finite non-separation presents the classical same-fiber relation on the covered domain",
-        "scaffolded: the adapter exists, the classical fiber convention and on-separator routing are not stated exactly",
-        (), (SCAFFOLDED,),
-        "persistent finite non-separation presents the classical same-fiber relation on the covered domain",
-        "state exact classical fiber convention and on-separator routing"),
-    "ResidualClosureNoMissingLinks": (
-        P, "persistent non-separation exits only through finite separation, boundary equality, or an established trivial-fiber tag",
-        "open frontier: missing-link exits are not eliminated; this is the priority-zero bottleneck",
-        (), (),
-        "persistent non-separation exits only through finite separation, boundary equality, or established trivial-fiber tag",
-        "eliminate missing-link exits"),
-    "ExitClosureForC1": (
-        P, "every residual exit has a finite closing payload",
-        "scaffolded: exit certificates exist and are not connected to the final proof object",
-        (), (SCAFFOLDED,),
-        "every residual exit has a finite closing payload",
-        "connect exit certificates to final proof object"),
-    "BoundaryEqualitySoundness": (
-        P, "accepted boundary equality implies equality in the adapter",
-        "scaffolded: label-only equality is refused, the finite or analytic payload is not required yet",
-        (), (SCAFFOLDED,),
-        "accepted boundary equality implies equality in the adapter",
-        "reject label-only equality and require finite/analytic payload"),
-    "TheoremTagImportSoundness": (
-        P, "accepted imported theorem tags carry valid assumptions",
-        "scaffolded: the tag shape is checked, the accepted families and their assumptions are not enumerated",
-        (), (SCAFFOLDED,),
-        "accepted imported theorem tags carry valid assumptions",
-        "enumerate accepted theorem families and assumptions"),
-    "TheoremTagPayloadInstances": (
-        P, "every imported theorem tag the final object uses has an instantiated assumption payload",
-        "scaffolded: the payload schema exists, the instances do not discharge final-proof obligations yet",
-        (), (SCAFFOLDED,),
-        "imported tags used by the final object carry instantiated payloads",
-        "instantiate the payloads the import ledger and the schemas describe"),
-    "TheoremTagImportLedger": (
-        T, "the theorem-tag import ledger names every imported theorem family with its strength class",
-        "src/C1_theorem_tag_import_ledger.mojo; docs/C1_theorem_tag_import_ledger.md",
-        (), (),
-        "the import ledger itself exists and is checked", "none: the ledger is in place"),
-    "TheoremTagAssumptionPayloads": (
-        T, "every theorem tag in the import ledger has a declared assumption-payload schema",
-        "src/C1_theorem_tag_assumption_payloads.mojo",
-        (), (),
-        "the assumption-payload schemas exist and are checked", "none: the schemas are in place"),
-    "C1": (
-        P, "the C1 proof object is accepted",
-        "open frontier: the required blocks are not all checked; priority zero",
-        ("SeparatorCatalogueSoundness", "SeparatorCatalogueCompleteness", "FiberDefinitionAdapter",
-         "ResidualClosureNoMissingLinks", "ExitClosureForC1", "BoundaryEqualitySoundness",
-         "TheoremTagImportSoundness", "TheoremTagPayloadInstances"),
-        (), "", ""),
-}
+def load_spec() -> dict:
+    data = tomllib.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    if data.get("version") != 1 or data.get("format") != "finite-mandelbrot-c1-records-v1":
+        raise ValueError("unsupported C1 proof-record specification")
+    rows = data.get("record", [])
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("C1 proof-record specification has no records")
+    names = [row.get("name") for row in rows]
+    if any(not isinstance(name, str) or not name for name in names):
+        raise ValueError("every C1 proof record needs a non-empty name")
+    if len(names) != len(set(names)):
+        raise ValueError("duplicate C1 proof-record name")
+    known = set(names)
+    for row in rows:
+        try:
+            Kind(row["kind"])
+        except (KeyError, ValueError) as exc:
+            raise ValueError(f"{row.get('name', '<unnamed>')}: unknown record kind") from exc
+        for field in ("statement", "source_or_reason", "dependencies", "tags", "final_role", "next_action"):
+            if field not in row:
+                raise ValueError(f"{row['name']}: missing {field}")
+        unknown = set(row["dependencies"]) - known
+        if unknown:
+            raise ValueError(f"{row['name']}: unknown dependencies: {sorted(unknown)}")
+    for key in ("root_record", "priority_block", "next_block"):
+        if data.get(key) not in known:
+            raise ValueError(f"{key} must name a declared record")
+    return data
 
-ROOT_RECORD = "C1"
-PRIORITY_BLOCK = "ResidualClosureNoMissingLinks"
-NEXT_BLOCK = "TheoremTagPayloadInstances"
 
-# The exits allowed as research diagnostics and forbidden in the final object:
-# field name -> the accessor the Mojo mirror exposes for it.
-FORBIDDEN_FINAL_EXITS = {
-    "missing_link_exit": "missing_link_exit_allowed_in_final",
-    "bounded_search": "bounded_search_allowed_as_final_evidence",
-    "label_only_equality": "label_only_equality_allowed_as_final_evidence",
-    "unchecked_theorem_tag": "unchecked_theorem_tag_allowed_in_final",
-    "rank2_locus_primitive": "rank2_locus_primitive_allowed_in_final",
-}
-
-STATUS_CLASSES = {Kind.PENDING.value: "open-frontier", Kind.REPOSITORY.value: "proved-or-imported-checked"}
-STATUS_LABELS = {"open-frontier": "OPEN_FRONTIER", "scaffolded": "SCAFFOLDED",
-                 "proved-or-imported-checked": "PROVED_OR_IMPORTED_CHECKED",
-                 "research-only": "RESEARCH_ONLY", "conditional": "CONDITIONAL", "retired": "RETIRED"}
-
+SPEC = load_spec()
+SCOPE = str(SPEC["scope"])
+TABLE = {row["name"]: row for row in SPEC["record"]}
+ROOT_RECORD = str(SPEC["root_record"])
+PRIORITY_BLOCK = str(SPEC["priority_block"])
+NEXT_BLOCK = str(SPEC["next_block"])
+FORBIDDEN_FINAL_EXITS = dict(SPEC["forbidden_final_exits"])
+STATUS_CLASSES = dict(SPEC["status_classes"])
+STATUS_LABELS = dict(SPEC["status_labels"])
 
 def surface(path: str, anchor: str, window_lines: int = 0, expect: str = "labelled") -> dict:
     return {"path": path, "anchor": anchor, "window_lines": window_lines, "expect": expect}
@@ -153,10 +100,13 @@ SURFACES = {
     for name in TABLE if name != ROOT_RECORD
 }
 SURFACES[ROOT_RECORD] = [
-    surface("README.md", "C1 proof work is"),
-    surface("docs/C1_proof_definition_and_priority.md", "Status: PRIORITY_ZERO", expect="present"),
-    surface("src/C1_theorem_status.mojo", "return C1Status(local, True, True, False, False)", expect="present"),
-    surface("src/C1_theorem_status.mojo", "fn bounded_search_proves_c1() -> Bool:\n    return False", expect="present"),
+    surface(
+        str(item["path"]),
+        str(item["anchor"]),
+        int(item.get("window_lines", 0)),
+        str(item.get("expect", "labelled")),
+    )
+    for item in SPEC.get("root_surface", [])
 ]
 
 
@@ -166,7 +116,12 @@ def records() -> dict[str, Record]:
     def build(name: str) -> Record:
         if name in built:
             return built[name]
-        kind, statement, source, deps, tags = TABLE[name][:5]
+        row = TABLE[name]
+        kind = Kind(row["kind"])
+        statement = str(row["statement"])
+        source = str(row["source_or_reason"])
+        deps = tuple(str(d) for d in row["dependencies"])
+        tags = tuple(str(t) for t in row["tags"])
         edges = tuple(Edge(build(d).id, build(d).statement, f"{name}/{d}") for d in deps)
         evidence = (("reason", source),) if kind is Kind.PENDING else (("proof_reviewed", "true"), ("source", source))
         built[name] = identified(Record("", kind, statement, SCOPE, edges, evidence, frozenset(tags)))
@@ -184,12 +139,12 @@ def record_json(record: Record) -> dict:
 def ledger() -> dict:
     return {
         "format": gl.FORMAT,
-        "repository": "larsbx/finite-mandlebrot-research",
-        "module": "Ledger",
-        "tla_dir": "tla",
-        "index_path": "docs/C1_ledger_index.md",
-        "graph_path": "docs/C1_claim_relationship_graph.json",
-        "assumption_sets": {"RequiredBlocksAssumed": list(TABLE[ROOT_RECORD][3])},
+        "repository": str(SPEC["repository"]),
+        "module": str(SPEC["module"]),
+        "tla_dir": str(SPEC["tla_dir"]),
+        "index_path": str(SPEC["index_path"]),
+        "graph_path": str(SPEC["graph_path"]),
+        "assumption_sets": {"RequiredBlocksAssumed": list(TABLE[ROOT_RECORD]["dependencies"])},
         "status_classes": STATUS_CLASSES,
         "status_labels": STATUS_LABELS,
         "aliases": {},
@@ -214,7 +169,7 @@ def blocks(analysis: gl.Analysis) -> list:
 
 def required() -> tuple[str, ...]:
     """The blocks the root record depends on: what `required_for_final` means."""
-    return TABLE[ROOT_RECORD][3]
+    return tuple(str(name) for name in TABLE[ROOT_RECORD]["dependencies"])
 
 
 def render_mojo(analysis: gl.Analysis) -> str:
@@ -222,7 +177,7 @@ def render_mojo(analysis: gl.Analysis) -> str:
     off the record's class and `required_for_final` read off the root's edges."""
     needed = set(required())
     lines = [f"# {gl.GENERATED.format(source='ledger.json')}",
-             "# Final proof block ledger for C1, from the record table in tools/make_ledger.py.",
+             "# Final proof block ledger for C1, from proof/c1/records.toml.",
              "#",
              "# This module records the status of required blocks for the final proof object.",
              "# It is intentionally conservative: a scaffolded or open-frontier block rejects",
@@ -302,7 +257,7 @@ def render_block_table(analysis: gl.Analysis) -> str:
         out = ["| Block | Current status | Final role | Current next action |", "|---|---:|---|---|"]
         for name in names:
             entry = by_name[name]
-            out.append(f"| `{name}` | `{labels.get(entry.status, entry.status)}` | {TABLE[name][5]} | {TABLE[name][6]} |")
+            out.append(f"| `{name}` | `{labels.get(entry.status, entry.status)}` | {TABLE[name][\"final_role\"]} | {TABLE[name][\"next_action\"]} |")
         return out
 
     by_name = {e.name: e for e in analysis.entries}
