@@ -271,7 +271,7 @@ def carrier_density_profile_smoke() -> Bool:
 
     # Basilica then rabbit: the second level decides 22/147 more, and the
     # residue falls from 5/9 to 179/441. Both are asserted identically by
-    # tools/carrier_density_profile_reference.py.
+    # reference/python/c1/carrier_density_profile_reference.py.
     var two_n: List[Int64] = [1, 1]
     var two_d: List[Int64] = [3, 7]
     var refined = _levels(two_n, two_d)

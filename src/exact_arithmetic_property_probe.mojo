@@ -6,7 +6,7 @@
 # Executable property probe for the BigZ / Q / IQ public boundary. It draws
 # deterministic pseudo-random operands, applies the public operations, and
 # prints one transcript line per case using only the canonical byte encodings
-# of docs/canonical-serialization.md. tools/exact_arithmetic_property_oracle.py
+# of docs/canonical-serialization.md. reference/python/arithmetic/exact_arithmetic_property_oracle.py
 # regenerates the same operands from the same generator, recomputes every
 # result with Python int and fractions.Fraction, and compares the transcripts
 # token by token. No parser of Mojo output is trusted: the comparison is on

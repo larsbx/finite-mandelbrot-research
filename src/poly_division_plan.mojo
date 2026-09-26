@@ -2,7 +2,7 @@
 #
 # Mojo-shaped implementation plan for exact polynomial division and gcd.
 # This file is not proof-grade executable yet. It defines the target API and
-# invariants for replacing tools/poly_reference.py.
+# invariants for replacing reference/python/polynomial/poly_reference.py.
 
 
 struct DivResult:

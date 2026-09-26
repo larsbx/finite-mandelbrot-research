@@ -15,7 +15,7 @@ Positions cannot come from there: they are floating point, and no module under
 and the page says so where it shows them.
 
 The exclusion boxes are the exception that proves the split. The boxes and
-their verdicts are exact, from `tools/interval_exclusion_reference.py`, the
+their verdicts are exact, from `reference/python/interval/interval_exclusion_reference.py`, the
 oracle for `src/interval_orbit.mojo`; only their placement on a canvas is
 floating point. Exclusion is not existence: a root in the box is a separate
 witness and the page claims none.
