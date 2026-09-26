@@ -7,13 +7,14 @@
 #
 #   A_{2,1}(C) = C^3(C+2), p = 5, c = -2.
 #
-# The modular simple-root and p^2 lift are provenance.  Acceptance is supplied
-# only after the characteristic-zero factor C+2 and the dyadic Krawczyk root
-# box are replayed.  This module does not accept a general algebraic factor,
+# The modular simple-root and p^2 lift are provenance.  Factor and dyadic
+# Krawczyk replay produce a finite candidate only.  Acceptance additionally
+# requires the repository proof-backend gate to be open.  This module does not accept a general algebraic factor,
 # choose a non-rational complex embedding, or import an equidistribution claim.
 
 from critical_relation_bridge import verify_linear_factor_provenance
 from krawczyk_witness import verify_bigq_p21_krawczyk_c_minus_2
+from rat_backend_plan import current_q_backend_status, q_backend_blocks_proof_acceptance
 
 
 struct RationalB3RootHandle(ImplicitlyCopyable):
@@ -28,6 +29,7 @@ struct RationalB3RootHandle(ImplicitlyCopyable):
     var localization_unique: Bool
     var exact_type_verified_over_z: Bool
     var rational_embedding_selected: Bool
+    var backend_proof_gate_open: Bool
     var rejected: Bool
 
     def __init__(
@@ -43,6 +45,7 @@ struct RationalB3RootHandle(ImplicitlyCopyable):
         localization_unique: Bool,
         exact_type_verified_over_z: Bool,
         rational_embedding_selected: Bool,
+        backend_proof_gate_open: Bool,
         rejected: Bool,
     ):
         self.integer_root = integer_root
@@ -56,9 +59,10 @@ struct RationalB3RootHandle(ImplicitlyCopyable):
         self.localization_unique = localization_unique
         self.exact_type_verified_over_z = exact_type_verified_over_z
         self.rational_embedding_selected = rational_embedding_selected
+        self.backend_proof_gate_open = backend_proof_gate_open
         self.rejected = rejected
 
-    def accepted(self) -> Bool:
+    def arithmetic_replay_accepted(self) -> Bool:
         return (
             not self.rejected and
             self.integer_root == -2 and
@@ -73,6 +77,12 @@ struct RationalB3RootHandle(ImplicitlyCopyable):
             self.rational_embedding_selected
         )
 
+    def accepted(self) -> Bool:
+        return self.arithmetic_replay_accepted() and self.backend_proof_gate_open
+
+    def proof_grade_accepted(self) -> Bool:
+        return self.accepted()
+
     def accepts_general_algebraic_factor(self) -> Bool:
         return False
 
@@ -86,7 +96,7 @@ struct RationalB3RootHandle(ImplicitlyCopyable):
 def rejected_rational_b3_root_handle() -> RationalB3RootHandle:
     return RationalB3RootHandle(
         0, 0, 0, 0, 0,
-        False, False, False, False, False, False, True,
+        False, False, False, False, False, False, False, True,
     )
 
 
@@ -115,6 +125,8 @@ def verify_c_minus_2_b3_root_handle(
     if not provenance.accepted() or not localization.arithmetic_replay_accepted():
         return rejected_rational_b3_root_handle()
 
+    var backend = current_q_backend_status()
+    var backend_gate_open = not q_backend_blocks_proof_acceptance(backend)
     return RationalB3RootHandle(
         -2,
         2,
@@ -127,22 +139,25 @@ def verify_c_minus_2_b3_root_handle(
         localization.contraction_verified,
         c_minus_2_exact_type_2_1_over_z(),
         True,
+        backend_gate_open,
         False,
     )
 
 
 def multiset_b3_localization_smoke() -> Bool:
-    var accepted = verify_c_minus_2_b3_root_handle(5, 8)
+    var replay = verify_c_minus_2_b3_root_handle(5, 8)
     var wrong_prime = verify_c_minus_2_b3_root_handle(7, 8)
     var invalid_box = verify_c_minus_2_b3_root_handle(5, -1)
     return (
-        accepted.accepted() and accepted.integer_root == -2 and
-        accepted.factor_provenance_accepted and
-        accepted.localization_unique and
-        accepted.exact_type_verified_over_z and
-        not accepted.accepts_general_algebraic_factor() and
-        not accepted.accepts_nonrational_complex_embedding() and
-        not accepted.imports_distributional_bridge() and
+        replay.arithmetic_replay_accepted() and not replay.accepted() and
+        not replay.proof_grade_accepted() and
+        not replay.backend_proof_gate_open and replay.integer_root == -2 and
+        replay.factor_provenance_accepted and
+        replay.localization_unique and
+        replay.exact_type_verified_over_z and
+        not replay.accepts_general_algebraic_factor() and
+        not replay.accepts_nonrational_complex_embedding() and
+        not replay.imports_distributional_bridge() and
         not wrong_prime.accepted() and wrong_prime.rejected and
         not invalid_box.accepted() and invalid_box.rejected
     )
