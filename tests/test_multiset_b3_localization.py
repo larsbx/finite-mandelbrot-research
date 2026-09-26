@@ -41,7 +41,7 @@ def test_exact_integer_orbit_replay_identifies_type_2_1():
 
 def test_b3_bridge_documentation_names_executable_boundary():
     bridge = read(BRIDGE)
-    normalized = bridge.lower()
+    normalized = " ".join(bridge.lower().split())
     assert "rationalb3roothandle" in normalized
     assert "c = -2" in normalized
     assert "general algebraic factors" in normalized
