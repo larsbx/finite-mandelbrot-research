@@ -36,8 +36,12 @@ from fractions import Fraction
 from itertools import combinations
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT = SCRIPT_DIR.parents[2]
+# Keep the canonical sibling modules ahead of temporary compatibility shims.
+# Direct execution cannot use the package-relative import below.
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(SCRIPT_DIR))
 
 from oracle_refinement import Class, Refinement, audit_all
 try:
