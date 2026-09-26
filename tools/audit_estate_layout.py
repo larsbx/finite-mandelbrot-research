@@ -136,6 +136,16 @@ def validate(data: dict) -> None:
         if not (ROOT / required).is_file():
             fail(f"missing architecture entrypoint: {required}")
 
+    workspace = ROOT / "pixi.toml"
+    if workspace.is_file():
+        wdata = tomllib.loads(workspace.read_text(encoding="utf-8"))
+        expected_name = repository_id.split("/", 1)[1]
+        if wdata.get("workspace", {}).get("name") != expected_name:
+            fail(
+                "pixi workspace identity disagrees with estate.toml: "
+                f"expected {expected_name!r}"
+            )
+
     polyglot = ROOT / "polyglot.manifest.toml"
     if polyglot.is_file():
         pdata = tomllib.loads(polyglot.read_text(encoding="utf-8"))
