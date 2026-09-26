@@ -1,0 +1,165 @@
+version = 1
+template = "estate-repository-v1"
+
+[repository]
+id = "larsbx/finite-mandelbrot-research"
+kind = "research"
+lifecycle = "active"
+default_branch = "main"
+layout_status = "transitional"
+
+[principles]
+ordering = ["authority", "domain", "language"]
+empty_silos = "forbidden"
+cross_language_disagreement = "fail_closed"
+generated_surfaces = "derived_only"
+vendor_code = "non_local"
+experimental_code = "non_authoritative"
+
+[[plane]]
+id = "policy"
+target = "policy"
+authority = "governance"
+required = true
+current = ["backend.toml", "claim_governance.toml", "polyglot.manifest.toml", "vendored.toml"]
+
+[[plane]]
+id = "kernel"
+target = "kernel"
+authority = "canonical_executable"
+required = true
+current = ["src"]
+
+[[plane]]
+id = "proof"
+target = "proof"
+authority = "claim_state"
+required = true
+current = ["ledger.json", "tla"]
+
+[[plane]]
+id = "reference"
+target = "reference"
+authority = "non_authoritative_reference"
+required = true
+current_globs = [
+  "tools/*_reference.py",
+  "tools/*_oracle.py",
+  "tools/poly_reference.py",
+]
+
+[[plane]]
+id = "oracles"
+target = "oracles"
+authority = "non_authoritative_oracle"
+required = true
+current = ["oracles"]
+
+[[plane]]
+id = "experiments"
+target = "experiments"
+authority = "non_authoritative_experiment"
+required = true
+current = ["spikes"]
+
+[[plane]]
+id = "schemas"
+target = "schemas"
+authority = "contract"
+required = true
+current = ["spec"]
+current_globs = [".polyglot/*.schema.json"]
+
+[[plane]]
+id = "conformance"
+target = "conformance"
+authority = "evidence"
+required = true
+current = ["tests", ".polyglot/conformance-v1.json"]
+
+[[plane]]
+id = "vendor"
+target = "vendor"
+authority = "pinned_external"
+required = true
+current = [
+  "src/finite_exact",
+  "src/substitution_dynamics",
+  "tools/claim_governance",
+  "tools/proof_records",
+  "tools/oracle_refinement",
+]
+
+[[plane]]
+id = "tooling"
+target = "tools"
+authority = "repository_tooling"
+required = true
+current_globs = [
+  "tools/audit_*.py",
+  "tools/check_vendored_sync.py",
+  "tools/make_ledger.py",
+  "tools/atlas",
+]
+
+[[plane]]
+id = "docs"
+target = "docs"
+authority = "exposition"
+required = true
+current = ["docs"]
+
+[[plane]]
+id = "paper"
+target = "paper"
+authority = "publication"
+required = true
+current = ["paper"]
+
+[[plane]]
+id = "examples"
+target = "examples"
+authority = "example"
+required = true
+current = ["examples"]
+
+[[language]]
+name = "Mojo"
+authority = "canonical"
+roles = ["kernel", "finite_proof_checking"]
+acceptance_authority = true
+
+[[language]]
+name = "Python"
+authority = "supporting"
+roles = ["audit", "reference", "migration"]
+acceptance_authority = false
+
+[[language]]
+name = "Julia"
+authority = "supporting"
+roles = ["oracle", "experiment"]
+acceptance_authority = false
+
+[[language]]
+name = "Lean"
+authority = "supporting"
+roles = ["formal_proof_target"]
+acceptance_authority = false
+
+[[language]]
+name = "Haskell"
+authority = "supporting"
+roles = ["semantic_reference"]
+acceptance_authority = false
+
+[migration]
+mode = "boundary_first"
+mass_move = false
+next = [
+  "make C1 proof records declarative",
+  "separate mathematical references from repository tools",
+  "move local Mojo into domain namespaces",
+  "make vendored packages physically explicit",
+  "split CI by authority plane",
+]
