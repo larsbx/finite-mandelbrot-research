@@ -25,6 +25,7 @@ DOC = (ROOT / "docs" / "C1_final_proof_block_ledger.md").read_text(encoding="utf
 POLICY = tomllib.loads((ROOT / "claim_governance.toml").read_text(encoding="utf-8"))
 LEDGER = json.loads((ROOT / "ledger.json").read_text(encoding="utf-8"))
 GRAPH = json.loads((ROOT / "docs" / "C1_claim_relationship_graph.json").read_text(encoding="utf-8"))
+RECORD_SPEC = tomllib.loads((ROOT / "proof" / "c1" / "records.toml").read_text(encoding="utf-8"))
 CLASS_FLAGS = ("proved-or-imported-checked", "scaffolded", "open-frontier", "research-only")
 
 
