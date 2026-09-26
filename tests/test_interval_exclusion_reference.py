@@ -19,7 +19,7 @@ def test_interval_exclusion_reference_passes():
 
 
 def test_interval_oracle_uses_fraction_not_float():
-    text = (ROOT / "tools" / "interval_exclusion_reference.py").read_text()
+    text = (ROOT / "reference" / "python" / "interval" / "interval_exclusion_reference.py").read_text()
     assert "from fractions import Fraction" in text
     assert "float(" not in text
     assert "math." not in text
