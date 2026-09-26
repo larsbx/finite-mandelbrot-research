@@ -257,7 +257,7 @@ def render_block_table(analysis: gl.Analysis) -> str:
         out = ["| Block | Current status | Final role | Current next action |", "|---|---:|---|---|"]
         for name in names:
             entry = by_name[name]
-            out.append(f"| `{name}` | `{labels.get(entry.status, entry.status)}` | {TABLE[name][\"final_role\"]} | {TABLE[name][\"next_action\"]} |")
+            out.append(f"| `{name}` | `{labels.get(entry.status, entry.status)}` | {TABLE[name]['final_role']} | {TABLE[name]['next_action']} |")
         return out
 
     by_name = {e.name: e for e in analysis.entries}
