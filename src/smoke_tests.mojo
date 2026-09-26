@@ -62,6 +62,7 @@ from smoke_report import SmokeReport, smoke_report_smoke
 from angle_tuning import angle_tuning_smoke
 from projective_multiset import projective_multiset_smoke
 from critical_relation_bridge import critical_relation_bridge_smoke
+from multiset_b3_localization import multiset_b3_localization_smoke
 
 
 def test_rational_field_laws() -> Bool:
@@ -345,6 +346,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("smoke reporter", smoke_report_smoke())
     _ = report.record("projective multiset", projective_multiset_smoke())
     _ = report.record("critical-relation bridge", critical_relation_bridge_smoke())
+    _ = report.record("multiset B3 localization", multiset_b3_localization_smoke())
     report.print_summary("finite-regime Mandelbrot smoke suite")
     return report.all_passed()
 
