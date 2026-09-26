@@ -4,7 +4,7 @@ Status: priority-zero proof ledger.
 
 This ledger is the canonical internal checklist for the final C1 proof object. It does not prove C1. It records exactly which theorem blocks must be accepted by the Mojo theorem kernel before `C1FinalProofObject` may be accepted.
 
-The block tables below are generated from the proof-record table of `tools/make_ledger.py`, together with `src/C1_final_proof_block_ledger.mojo`, the `[[claim]]` entries of `claim_governance.toml`, `C1_ledger_index.md`, the TLA+ ledger, and `C1_claim_relationship_graph.json`. Change the table and regenerate (`pixi run ledgers`); CI fails on a hand-edited surface. Which blocks are *required* is the dependency edge `C1 -> block` in that table, so a block cannot be quietly dropped from the requirement by editing a status line.
+The block tables below are generated from `proof/c1/records.toml`, together with `src/C1_final_proof_block_ledger.mojo`, the `[[claim]]` entries of `claim_governance.toml`, `C1_ledger_index.md`, the TLA+ ledger, and `C1_claim_relationship_graph.json`. Change the declarative record specification and regenerate (`pixi run ledgers`); CI fails on a hand-edited surface. Which blocks are *required* is the dependency edge `C1 -> block` in that specification, so a block cannot be quietly dropped from the requirement by editing a status line.
 
 ## Final acceptance rule
 

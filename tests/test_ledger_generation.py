@@ -1,11 +1,9 @@
-"""Every ledger surface is the record table, and nothing else.
+"""Every ledger surface is the declarative C1 record specification, and nothing else.
 
-Round-two item R2. `tools/make_ledger.py` holds one table of proof records and
-renders the Mojo mirror, the Markdown block table, the claim entries, the
-index, the TLA+ ledger with its TLC models, and the typed relationship graph.
-These tests assert that the surfaces on disk are what the table renders, and
-that the two facts nobody may spell by hand -- a block's status and whether the
-final object requires it -- agree across the surfaces that state them.
+`proof/c1/records.toml` owns the claim/proof state. `tools/make_ledger.py`
+validates and renders it into the Mojo mirror, Markdown block table, claim
+entries, index, TLA+ ledger and typed relationship graph. These tests assert
+that generated surfaces agree with that single declarative source.
 """
 
 from __future__ import annotations
@@ -27,6 +25,7 @@ DOC = (ROOT / "docs" / "C1_final_proof_block_ledger.md").read_text(encoding="utf
 POLICY = tomllib.loads((ROOT / "claim_governance.toml").read_text(encoding="utf-8"))
 LEDGER = json.loads((ROOT / "ledger.json").read_text(encoding="utf-8"))
 GRAPH = json.loads((ROOT / "docs" / "C1_claim_relationship_graph.json").read_text(encoding="utf-8"))
+RECORD_SPEC = tomllib.loads((ROOT / "proof" / "c1" / "records.toml").read_text(encoding="utf-8"))
 CLASS_FLAGS = ("proved-or-imported-checked", "scaffolded", "open-frontier", "research-only")
 
 
@@ -47,7 +46,7 @@ def test_every_generated_surface_is_current():
                           capture_output=True, text=True).returncode == 0
 
 
-def test_generation_is_a_pure_function_of_the_table():
+def test_generation_is_a_pure_function_of_the_declarative_records():
     """Running the generator twice changes nothing."""
     before = {p: p.read_text(encoding="utf-8") for p in (ROOT / "src" / "C1_final_proof_block_ledger.mojo",
                                                          ROOT / "docs" / "C1_final_proof_block_ledger.md",
@@ -56,8 +55,17 @@ def test_generation_is_a_pure_function_of_the_table():
     assert {p: p.read_text(encoding="utf-8") for p in before} == before
 
 
-def test_the_claim_ledger_is_exactly_the_record_table():
-    assert {c["name"] for c in POLICY["claim"]} == set(ml.TABLE) == set(LEDGER["records"])
+def test_the_claim_ledger_is_exactly_the_declarative_record_set():
+    declared = {record["name"] for record in RECORD_SPEC["record"]}
+    assert declared == set(ml.TABLE)
+    assert {c["name"] for c in POLICY["claim"]} == declared == set(LEDGER["records"])
+
+
+def test_generator_contains_mechanism_not_theorem_status_table():
+    source = (ROOT / "tools" / "make_ledger.py").read_text(encoding="utf-8")
+    assert 'SPEC_PATH = ROOT / "proof" / "c1" / "records.toml"' in source
+    assert "TABLE: dict[str, tuple] = {" not in source
+    assert "open frontier: missing-link exits are not eliminated" not in source
 
 
 def test_the_mojo_mirror_carries_every_block_and_only_blocks():
@@ -89,7 +97,7 @@ def test_the_final_readiness_predicate_conjoins_exactly_the_required_blocks():
 
 
 def test_no_block_is_ready_while_any_required_one_is_unchecked():
-    """The conservative rule the ledger exists to enforce, read off the table."""
+    """The conservative rule the ledger exists to enforce, read off the records."""
     assert any(status_of(name) != "proved-or-imported-checked" for name in ml.required())
     assert 'ProofBlockStatus("ResidualClosureNoMissingLinks", False, False, True, False, True)' in MOJO
 
