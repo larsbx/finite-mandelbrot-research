@@ -13,7 +13,7 @@ jobs:
         with:
           cache: true
       - name: Audit estate repository architecture
-        run: pixi run estate-audit
+        uses: larsbx/finite-math-kernels/audit/estate_repository/v1@7543130ccfa05a88b5ddbacb46d4371ac99c21f9
       - name: Build the canonical Mojo smoke binary
         run: pixi run mojo-build
       - name: Verify vendored package digests
