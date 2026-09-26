@@ -4,8 +4,10 @@
 B1, the simple-residue-root subcertificate, one replayable Hensel step from
 modulo `p` to modulo `p^2` are executable in
 `src/critical_relation_bridge.mojo`, together with bounded factor provenance
-for monic linear factors. The unbounded lift, general factor correspondence,
-and later stages require the stated certificates or imported theorems. This program keeps
+for monic linear factors. The rational `c = -2` subcase now also has an
+executable B3 root-handle handoff into the dyadic localization calculus. The
+unbounded lift, general factor correspondence, and later stages require the
+stated certificates or imported theorems. This program keeps
 multisets in the primary research toolbox without identifying an arbitrary
 finite-field statistic with the classical Mandelbrot set.
 
@@ -112,6 +114,20 @@ The output can then use the ordinary landing, ray-address, and theorem-tag
 interfaces. The finite-field record is provenance for the candidate and its
 multiplicity; the characteristic-zero localization is what admits it to the
 classical certificate layer.
+
+The first executable B3 subcase is `RationalB3RootHandle` in
+`src/multiset_b3_localization.mojo`. For `c = -2`, it composes:
+
+1. the modular simple-root and one-step Hensel provenance at `p = 5`;
+2. exact characteristic-zero factor provenance for `C + 2`;
+3. the dyadic box for `P_{2,1}=C(C+2)`;
+4. the exact Krawczyk contraction proving a unique root in that box; and
+5. direct integer replay of the critical orbit `0,-2,2,2`.
+
+The rational root has a canonical characteristic-zero embedding, so this
+closes the localization handoff for this one parameter. General algebraic
+factors, conjugate selection, and non-rational complex embeddings remain
+fail-closed.
 
 ### B4 — Distributional bridge
 
