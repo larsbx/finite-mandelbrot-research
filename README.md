@@ -162,6 +162,12 @@ docs/
 examples/
   misiurewicz-c-minus-2.md
   stress-test-m41.md
+reference/
+  python/                     # non-authoritative independent semantics
+    arithmetic/
+    polynomial/
+    interval/
+    c1/
 src/
   *.mojo
   atlas_dataset.mojo         # every exact object, printed once as JSON (pixi run atlas-dataset)
@@ -172,6 +178,8 @@ proof/
     records.toml              # canonical C1 claim/proof state
     README.md
 tools/
+  *_reference.py              # compatibility shims only; semantics live in reference/python
+  *_oracle.py                 # compatibility shims only where retained
   audit_*.py
   atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md

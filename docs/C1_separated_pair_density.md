@@ -35,7 +35,7 @@ density = 1 - sum_c |C_c|^2,     residue = sum_c |C_c|^2.
 - **Orientation independence.** Exchanging a separator's two endpoints leaves the density and the class measures unchanged.
 - **Exactness.** Every length, midpoint, square, and sum is an unbounded rational; no floating point appears, as `docs/rational-interval-arithmetic-spec.md` requires of certificate-relevant numbers.
 
-Pinned instances, asserted identically by the Mojo smoke target and by `tools/separated_density_reference.py`:
+Pinned instances, asserted identically by the Mojo smoke target and by `reference/python/c1/separated_density_reference.py`:
 
 | Separators | Classes | Density |
 | --- | --- | --- |

@@ -116,7 +116,7 @@ preserves = ["0/1 itinerary of a periodic address under doubling", "internal-add
 does_not_inherit = ["parameter-plane shrinking", "a priori bounds", "fibre triviality", "companion address identification", "measured angle"]
 domain_conditions = ["periodic address in the open interval from zero to one with odd reduced denominator", "period at most 62", "checked Int64 arithmetic accepted"]
 symbols = ["src/C1_residual_directive_carrier.mojo::checked_kneading_prefix", "src/C1_residual_directive_carrier.mojo::continuation_last_letter", "src/C1_residual_directive_carrier.mojo::checked_directive_level"]
-evidence = ["tests/test_C1_residual_directive_carrier.py", "docs/C1_residual_directive_carrier.md", "tools/kneading_reference.py"]
+evidence = ["tests/test_C1_residual_directive_carrier.py", "docs/C1_residual_directive_carrier.md", "reference/python/c1/kneading_reference.py"]
 proof_boundary = "A directive prefix encodes finitely many renormalization levels; it does not decide residual membership or same-fibre relations."
 
 [[correspondence]]
@@ -129,7 +129,7 @@ preserves = ["exact rational atom lengths of a finite separator set", "side sign
 does_not_inherit = ["harmonic measure on the boundary", "the limit over all prefixes", "fibre triviality", "local connectivity", "separation of a named pair", "any verdict on the carrier whose levels order the prefix"]
 domain_conditions = ["normalized rational cut addresses in the half-open interval from zero to one", "accepted exact rational arithmetic"]
 symbols = ["src/C1_separated_density.mojo::separated_pair_density", "src/C1_carrier_density_profile.mojo::carrier_density_profile"]
-evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "tools/separated_density_reference.py", "tests/test_C1_carrier_density_profile.py", "tools/carrier_density_profile_reference.py"]
+evidence = ["tests/test_C1_separated_density.py", "docs/C1_separated_pair_density.md", "reference/python/c1/separated_density_reference.py", "tests/test_C1_carrier_density_profile.py", "reference/python/c1/carrier_density_profile_reference.py"]
 proof_boundary = "A finite prefix density is a measure of decided pairs; a null undecided set is not an empty one and no named pair is thereby separated."
 
 [[correspondence]]
@@ -142,7 +142,7 @@ preserves = ["exact preperiod and period of a rational address under doubling", 
 does_not_inherit = ["parameter location", "landing theorem", "theorem-tag acceptance", "fibre triviality", "MLC", "measured angle"]
 domain_conditions = ["rational address in lowest terms with numerator below denominator", "denominator at most 2^20 for the exact type", "preperiod and period at most twenty and catalogue denominator at most 2^20 for the catalogue, which is strictly stronger"]
 symbols = ["src/misiurewicz_catalogue.mojo::exact_type", "src/misiurewicz_catalogue.mojo::catalogue", "src/misiurewicz_catalogue.mojo::catalogue_count"]
-evidence = ["tests/test_misiurewicz_catalogue.py", "docs/C1_misiurewicz_catalogue.md", "tools/misiurewicz_catalogue_reference.py"]
+evidence = ["tests/test_misiurewicz_catalogue.py", "docs/C1_misiurewicz_catalogue.md", "reference/python/c1/misiurewicz_catalogue_reference.py"]
 proof_boundary = "The catalogue enumerates ray addresses; associating a parameter with an address needs a landing tag, and the triviality of the corresponding fibres is the imported tag KnownTrivialFiberClass."
 
 [[correspondence]]
@@ -155,5 +155,5 @@ preserves = ["the pairs a declared separator prefix leaves undecided under every
 does_not_inherit = ["parameter location", "landing theorem", "co-landing of any ray pair", "fibre triviality", "persistent non-separation", "MLC", "local connectivity", "any statement about a finer prefix"]
 domain_conditions = ["denominator at most 256", "separator rays in range and distinct within each separator", "an accepted landing tag declared for every separator", "one named separator prefix"]
 symbols = ["src/C1_misiurewicz_prefix_graph.mojo::forward_closure", "src/C1_misiurewicz_prefix_graph.mojo::extract", "src/C1_misiurewicz_prefix_graph.mojo::extract_catalogue"]
-evidence = ["tests/test_misiurewicz_prefix_graph.py", "docs/C1_misiurewicz_prefix_graph.md", "tools/misiurewicz_prefix_graph_reference.py"]
+evidence = ["tests/test_misiurewicz_prefix_graph.py", "docs/C1_misiurewicz_prefix_graph.md", "reference/python/c1/misiurewicz_prefix_graph_reference.py"]
 proof_boundary = "An empty obstruction set is a verdict about one declared prefix graph; every landing tag is the caller's hypothesis, a refusal at the bound is not an empty set, and neither decides persistent non-separation or fibre triviality."

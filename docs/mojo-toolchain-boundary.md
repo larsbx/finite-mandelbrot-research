@@ -56,7 +56,7 @@ The compiler-checked dependency closure currently consists of:
 
 A second compile target, `src/exact_arithmetic_property_probe.mojo`, imports
 `bigint_z`, `rat_q`, and `interval_q` and is executed by `pixi run property`,
-which pipes its transcript into `tools/exact_arithmetic_property_oracle.py`.
+which pipes its transcript into `reference/python/arithmetic/exact_arithmetic_property_oracle.py`.
 
 This slice checks the preserved polynomial identities, certificate-header
 constraints, the same-box joint-witness gate, imported-theorem-tag acceptance,

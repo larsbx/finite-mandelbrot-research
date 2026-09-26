@@ -17,9 +17,9 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import exact_arithmetic_property_oracle as oracle  # noqa: E402
+from reference.python.arithmetic import exact_arithmetic_property_oracle as oracle  # noqa: E402
 
 
 def text(rel: str) -> str:
@@ -91,11 +91,11 @@ def test_no_points_audit_has_no_exemptions_and_bans_def_point():
 
 def test_property_probe_is_wired_into_pixi_ci_and_binding_table():
     manifest = tomllib.loads(text("pixi.toml"))
-    assert manifest["tasks"]["property"] == "python tools/exact_arithmetic_property_oracle.py"
+    assert manifest["tasks"]["property"] == "python reference/python/arithmetic/exact_arithmetic_property_oracle.py"
     assert "pixi run property" in text(".github/workflows/no-trig-audit.yml")
     spec = text("docs/rational-interval-arithmetic-spec.md")
     assert "`src/exact_arithmetic_property_probe.mojo`" in spec
-    assert "`tools/exact_arithmetic_property_oracle.py`" in spec
+    assert "`reference/python/arithmetic/exact_arithmetic_property_oracle.py`" in spec
     assert "src/exact_arithmetic_property_probe.mojo" in text("docs/mojo-toolchain-boundary.md")
     probe = text("src/exact_arithmetic_property_probe.mojo")
     assert "docs/rational-interval-arithmetic-spec.md" in probe

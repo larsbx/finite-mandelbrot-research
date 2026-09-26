@@ -280,7 +280,7 @@ def _carrier(nums: List[Int64], dens: List[Int64]) -> ResidualDirectiveCarrier:
 def _tuned_matches(nums: List[Int64], dens: List[Int64], tuned_num: Int64, tuned_den: Int64) -> Bool:
     """The carrier's kneading prefix equals the kneading prefix of the address
     obtained by exact angle tuning (`angle_tuning.tuned_angle`, cross-checked by
-    the independent oracle tools/kneading_reference.py)."""
+    the independent oracle reference/python/c1/kneading_reference.py)."""
     var carrier = _carrier(nums, dens)
     if carrier.depth() != len(nums):
         return False

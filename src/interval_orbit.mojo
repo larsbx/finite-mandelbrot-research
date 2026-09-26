@@ -2,7 +2,7 @@
 #
 # Native Mojo target for interval critical-orbit evaluation.
 # Specification: docs/rational-interval-arithmetic-spec.md (binding 6.2).
-# This mirrors tools/interval_exclusion_reference.py using only rational interval
+# This mirrors reference/python/interval/interval_exclusion_reference.py using only rational interval
 # operations from interval_q.mojo. Arithmetic is BigZ-backed; this consumer
 # remains barred from certificate acceptance until its replay is complete.
 

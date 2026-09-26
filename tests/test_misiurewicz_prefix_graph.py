@@ -8,10 +8,10 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import misiurewicz_catalogue_reference as mc  # noqa: E402
-import misiurewicz_prefix_graph_reference as pg  # noqa: E402
+from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
+from reference.python.c1 import misiurewicz_prefix_graph_reference as pg  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_misiurewicz_prefix_graph.md"
 SRC = ROOT / "src" / "C1_misiurewicz_prefix_graph.mojo"

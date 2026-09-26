@@ -1,6 +1,6 @@
 # interval_exclusion_plan.mojo
 #
-# Mojo-native replacement target for tools/interval_exclusion_reference.py.
+# Mojo-native replacement target for reference/python/interval/interval_exclusion_reference.py.
 #
 # This file is deliberately contract-shaped until the bigint rational backend is
 # certificate-ready. The goal is to specify the exact computation surface that
