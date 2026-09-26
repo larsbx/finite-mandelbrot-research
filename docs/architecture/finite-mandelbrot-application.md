@@ -9,6 +9,17 @@ packages, schemas, conformance tests, research documentation, and a paper.
 
 No mathematical claim changes in this adoption.
 
+## Shared v1 mechanism
+
+The generic Estate Repository Template v1 contract and audit no longer live in
+this consumer repository. They are pinned from
+`larsbx/finite-math-kernels/audit/estate_repository/v1` by the
+`[estate_tooling]` table in `estate.toml`.
+
+This repository still owns its concrete authority map, migration plan, and every
+domain-specific gate. In particular, finite-Mandelbrot-specific checks such as the
+Julia/polyglot authority boundary are not promoted into generic estate tooling.
+
 ## Current to target map
 
 | Authority plane | Current location | Target organization |
