@@ -6,6 +6,10 @@ fail_closed = true
 authority_change = false
 ci_wiring = false
 
+[estate]
+manifest = "estate.toml"
+template = "estate-repository-v1"
+
 [authority]
 primary_languages = ["Mojo"]
 supporting_languages = ["Lean", "Haskell", "Python", "Julia"]

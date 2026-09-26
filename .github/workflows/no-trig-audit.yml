@@ -12,6 +12,8 @@ jobs:
       - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
         with:
           cache: true
+      - name: Audit estate repository architecture
+        run: pixi run estate-audit
       - name: Build the canonical Mojo smoke binary
         run: pixi run mojo-build
       - name: Verify vendored package digests

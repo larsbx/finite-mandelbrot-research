@@ -1,13 +1,17 @@
 # Polyglot migration scaffold
 
 **Status:** migration scaffold; non-normative and non-executable  
-**Branch:** `polyglot/migration-v1`
+**Origin branch:** `polyglot/migration-v1`
+
+The estate-wide repository structure and authority mapping are now declared by
+`estate.toml`. This polyglot manifest is a specialized extension of that contract,
+not a competing architecture source.
 
 ## Repository allocation
 
 - **Repository:** `larsbx/finite-mandelbrot-research`
 - **Primary language authority:** Mojo
-- **Supporting languages:** Lean, Haskell, Python
+- **Supporting languages:** Lean, Haskell, Python, Julia
 - **Assigned responsibility:** Finite certificate checking with existing fail-closed boundaries
 
 ## Authority rules
@@ -21,17 +25,16 @@
 
 ## Intended source layout
 
-The following paths are reserved. They are not created until a buildable slice needs them:
+The reusable estate layout is defined in
+`docs/architecture/estate-repository-template-v1.md`. For this repository the
+active transition map is `docs/architecture/finite-mandelbrot-application.md`.
 
-- `kernel/` — canonical executable validation, only when this repository owns it.
-- `proof/` — theorem packages and proof-to-implementation refinement.
-- `reference/` — pure executable semantics and golden-vector generators.
-- `runtime/` — operational services and effect execution.
-- `native/` — hardened native, cryptographic, host, or device boundaries.
-- `adapters/` — generated or mechanically constrained interoperability code.
+Polyglot-specific paths remain:
+
 - `oracles/` — explicitly non-authoritative Julia/Python/research implementations.
 - `schemas/` — versioned wire forms and canonical serialization contracts.
 - `conformance/` — accepted, rejected, malformed, boundary, and cross-version vectors.
+- `adapters/` — generated or mechanically constrained interoperability code, only when needed.
 
 Only applicable paths should be introduced. Empty language silos are prohibited.
 

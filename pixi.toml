@@ -1,7 +1,7 @@
 [workspace]
 authors = ["Codex <codex@openai.com>"]
 channels = ["https://conda.modular.com/max", "conda-forge"]
-name = "finite-mandlebrot-research"
+name = "finite-mandelbrot-research"
 platforms = ["linux-64"]
 version = "0.1.0"
 
@@ -15,6 +15,7 @@ property = "python tools/exact_arithmetic_property_oracle.py"
 distribution = "python tools/exact_arithmetic_property_oracle.py --distribution"
 carrier-density = "python tools/carrier_density_profile_reference.py"
 regime-audit = "python tools/audit_regime_correspondences.py"
+estate-audit = "python tools/audit_estate_layout.py"
 vendored = "python tools/check_vendored_sync.py"
 ledgers = "python tools/make_ledger.py"
 ledgers-check = "python tools/make_ledger.py --check"
