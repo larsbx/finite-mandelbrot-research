@@ -42,11 +42,7 @@ id = "reference"
 target = "reference"
 authority = "non_authoritative_reference"
 required = true
-current_globs = [
-  "tools/*_reference.py",
-  "tools/*_oracle.py",
-  "tools/poly_reference.py",
-]
+current = ["reference"]
 
 [[plane]]
 id = "oracles"
@@ -157,7 +153,6 @@ acceptance_authority = false
 mode = "boundary_first"
 mass_move = false
 next = [
-  "separate mathematical references from repository tools",
   "move local Mojo into domain namespaces",
   "make vendored packages physically explicit",
   "split CI by authority plane",

@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_interval_exclusion_reference_passes():
     result = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "interval_exclusion_reference.py")],
+        [sys.executable, str(ROOT / "reference" / "python" / "interval" / "interval_exclusion_reference.py")],
         cwd=ROOT,
         text=True,
         capture_output=True,

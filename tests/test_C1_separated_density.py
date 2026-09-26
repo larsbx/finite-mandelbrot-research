@@ -12,9 +12,9 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import separated_density_reference as sd  # noqa: E402
+from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_separated_pair_density.md"
 SRC = ROOT / "src" / "C1_separated_density.mojo"

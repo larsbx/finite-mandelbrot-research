@@ -22,12 +22,12 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import kneading_reference as kr  # noqa: E402
-import misiurewicz_catalogue_reference as mc  # noqa: E402
-import misiurewicz_prefix_graph_reference as pg  # noqa: E402
-import separated_density_reference as sd  # noqa: E402
+from reference.python.c1 import kneading_reference as kr  # noqa: E402
+from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
+from reference.python.c1 import misiurewicz_prefix_graph_reference as pg  # noqa: E402
+from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 SRC = ROOT / "src" / "atlas_dataset.mojo"
 

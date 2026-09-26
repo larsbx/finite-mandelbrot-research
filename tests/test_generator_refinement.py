@@ -16,10 +16,11 @@ from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
 
-import carrier_density_profile_reference as cdp  # noqa: E402
-import exact_arithmetic_property_oracle as probe  # noqa: E402
+from reference.python.c1 import carrier_density_profile_reference as cdp  # noqa: E402
+from reference.python.arithmetic import exact_arithmetic_property_oracle as probe  # noqa: E402
 from oracle_refinement import audit_all  # noqa: E402
 
 

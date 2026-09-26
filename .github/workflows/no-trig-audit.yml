@@ -45,10 +45,10 @@ jobs:
       - name: Audit exact arithmetic boundary
         run: python3 tools/audit_exact_arithmetic.py
       - name: Validate exact polynomial reference identities
-        run: python3 tools/poly_reference.py
+        run: python3 reference/python/polynomial/poly_reference.py
       - name: Validate interval exclusion reference checks
-        run: python3 tools/interval_exclusion_reference.py
+        run: python3 reference/python/interval/interval_exclusion_reference.py
       - name: Validate the carrier density profile reference
-        run: python3 tools/carrier_density_profile_reference.py
+        run: python3 reference/python/c1/carrier_density_profile_reference.py
       - name: Declared input distributions of the differential oracles
-        run: python3 tools/exact_arithmetic_property_oracle.py --distribution
+        run: python3 reference/python/arithmetic/exact_arithmetic_property_oracle.py --distribution

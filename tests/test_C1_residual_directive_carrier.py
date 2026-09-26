@@ -1,6 +1,6 @@
 """Conformance of the residual directive carrier with docs/C1_residual_directive_carrier.md.
 
-The Python reference in tools/kneading_reference.py pins the same instances as
+The Python reference in reference/python/c1/kneading_reference.py pins the same instances as
 the Mojo smoke target; exact angle tuning is the independent oracle.
 """
 
@@ -12,9 +12,9 @@ from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import kneading_reference as kr  # noqa: E402
+from reference.python.c1 import kneading_reference as kr  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_residual_directive_carrier.md"
 SRC = ROOT / "src" / "C1_residual_directive_carrier.mojo"

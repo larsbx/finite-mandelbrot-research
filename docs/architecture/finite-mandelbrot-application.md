@@ -59,11 +59,12 @@ proof/c1/
 
 Generators contain mechanism, not the authoritative theorem-status table. This first migration satisfies that rule; moving generated projections under `proof/c1/generated/` is deferred until consumers can move atomically.
 
-### 2. Reference/tool split
+### 2. Reference/tool split — implemented
 
-Move independently written mathematical semantics from `tools/` to
-`reference/python/`. Keep repository maintenance, audits and generators in
-`tools/`.
+Independently written mathematical semantics now live under `reference/python/`
+by domain. Repository maintenance, audits and generators remain under `tools/`.
+Historical `tools/*_reference.py` and `tools/*_oracle.py` entrypoints are thin
+compatibility shims only; CI and new tests target the reference plane directly.
 
 ### 3. Kernel namespaces
 
