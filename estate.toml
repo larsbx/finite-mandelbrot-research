@@ -35,7 +35,7 @@ id = "proof"
 target = "proof"
 authority = "claim_state"
 required = true
-current = ["ledger.json", "tla"]
+current = ["proof", "ledger.json", "tla"]
 
 [[plane]]
 id = "reference"
@@ -157,7 +157,6 @@ acceptance_authority = false
 mode = "boundary_first"
 mass_move = false
 next = [
-  "make C1 proof records declarative",
   "separate mathematical references from repository tools",
   "move local Mojo into domain namespaces",
   "make vendored packages physically explicit",
