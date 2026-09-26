@@ -157,3 +157,11 @@ next = [
   "make vendored packages physically explicit",
   "split CI by authority plane",
 ]
+
+[governance]
+repository = "larsbx/estate-governance"
+revision = "bd0a9491488f54f28b4a3b9076051349092383bb"
+
+[governance.sha256]
+"docs/architecture/estate-repository-template-v1.md" = "b5eab7543c877484a159b47cbe36aa6255c51bd6ec5863dbb9fe13d9a2c06f6b"
+"tools/audit_estate_layout.py" = "f462c397dee8a596a2a7a8c40fd5ded2989652322186c568b712366294251003"
