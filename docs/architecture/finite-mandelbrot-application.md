@@ -36,9 +36,14 @@ Therefore v1 adds the authority model first and keeps all existing paths live.
 
 ## Follow-on migrations
 
-### 1. Declarative C1 proof plane
+### 1. Declarative C1 proof plane — implemented source boundary
 
-Move claim-state data out of generator implementation. The intended shape is:
+The authoritative C1 claim-state data now lives in `proof/c1/records.toml`.
+`tools/make_ledger.py` validates and renders it; the generator no longer embeds
+the theorem-status table. Generated surfaces remain at their historical paths
+for now so this slice does not mix source-of-truth extraction with path moves.
+
+The eventual fully migrated shape remains:
 
 ```text
 proof/c1/
@@ -52,7 +57,7 @@ proof/c1/
     mojo/
 ```
 
-Generators should contain mechanism, never the authoritative theorem-status table.
+Generators contain mechanism, not the authoritative theorem-status table. This first migration satisfies that rule; moving generated projections under `proof/c1/generated/` is deferred until consumers can move atomically.
 
 ### 2. Reference/tool split
 
