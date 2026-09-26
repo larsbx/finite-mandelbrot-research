@@ -25,9 +25,10 @@ not a competing architecture source.
 
 ## Intended source layout
 
-The reusable estate layout is defined in
-`docs/architecture/estate-repository-template-v1.md`. For this repository the
-active transition map is `docs/architecture/finite-mandelbrot-application.md`.
+The reusable estate layout/audit is pinned from
+`larsbx/finite-math-kernels/audit/estate_repository/v1` by `estate.toml`. For
+this repository the active transition map is
+`docs/architecture/finite-mandelbrot-application.md`.
 
 Polyglot-specific paths remain:
 
