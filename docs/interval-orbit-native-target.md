@@ -6,7 +6,7 @@ This note defines the next concrete coding task after the Python interval-exclus
 
 ## Goal
 
-Replace `tools/interval_exclusion_reference.py` with a Mojo-native evaluator that uses only normalized rational endpoints and interval arithmetic.
+Replace `reference/python/interval/interval_exclusion_reference.py` with a Mojo-native evaluator that uses only normalized rational endpoints and interval arithmetic.
 
 The target file is:
 
@@ -87,7 +87,7 @@ The native evaluator must also pass the no-trig audit.
 
 ## Deletion criterion for Python oracle
 
-`tools/interval_exclusion_reference.py` may be demoted to historical reference only after the Mojo-native evaluator:
+`reference/python/interval/interval_exclusion_reference.py` may be demoted to historical reference only after the Mojo-native evaluator:
 
 1. uses proof-grade arbitrary-precision rationals;
 2. evaluates the interval recurrence exactly;

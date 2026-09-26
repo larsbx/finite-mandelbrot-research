@@ -1,6 +1,6 @@
 # Polynomial Reference Oracle
 
-`tools/poly_reference.py` is a development-time oracle for polynomial identities.
+`reference/python/polynomial/poly_reference.py` is a development-time oracle for polynomial identities.
 
 It is not the certificate engine and must not become the source of truth for the
 finite calculus. Its role is to check that the Mojo implementation preserves the

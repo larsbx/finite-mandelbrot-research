@@ -52,7 +52,7 @@ These terms are allowed freely only inside files whose path begins with `docs/C1
 - `side-assignment witness`
 - `separator code`
 - `prefix obstruction`
-- `exact-type catalogue` — home files also include `src/misiurewicz_catalogue.mojo`, `tools/misiurewicz_catalogue_reference.py`, and `spec/regime_correspondences.toml`.
+- `exact-type catalogue` — home files also include `src/misiurewicz_catalogue.mojo`, `reference/python/c1/misiurewicz_catalogue_reference.py`, and `spec/regime_correspondences.toml`.
 
 Deprecated migration-only term:
 

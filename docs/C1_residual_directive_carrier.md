@@ -38,7 +38,7 @@ The parity twist shipped by the vendored kernel as `TuningPattern.dgp` (Derridaâ
 
 ## Exact checks
 
-The Mojo smoke target and `tests/test_C1_residual_directive_carrier.py` (through `tools/kneading_reference.py`) pin the same instances. For each, the carrier's kneading prefix equals the kneading prefix of the address obtained by exact angle tuning (binary-block substitution by the component's two root angles):
+The Mojo smoke target and `tests/test_C1_residual_directive_carrier.py` (through `reference/python/c1/kneading_reference.py`) pin the same instances. For each, the carrier's kneading prefix equals the kneading prefix of the address obtained by exact angle tuning (binary-block substitution by the component's two root angles):
 
 | Levels (addresses) | Tuned address | Kneading prefix |
 | --- | --- | --- |
