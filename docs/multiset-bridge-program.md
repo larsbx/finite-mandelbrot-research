@@ -90,18 +90,28 @@ A_{4,1}(C) =
 deg(F_7)=7.
 ```
 
-Repeated exact division removes the known lower-type contribution
-`5[0]+[-2]` and produces a degree-10 residual candidate divisor
+The cubic is not new at level `(4,1)`: it is already a factor of the
+previous relation,
 
 ```text
-div_0((C^3+2C^2+2C+2)F_7(C)).
+A_{3,1}(C) = C^4(C+2)(C^3+2C^2+2C+2),
 ```
 
-The executable `R41ResidualDivisorMultiset` checks the factorization and
-degree accounting. It deliberately does not label the residual divisor as
-exact type `(4,1)`: the exact-type status of those ten algebraic roots remains
-open until collision exclusions, factor squarefreeness/coprimality, embeddings,
-and localization are supplied.
+so each of its three roots collides at `(3,1)` and cannot have exact type
+`(4,1)`. Repeated exact division removes every known lower-type contribution
+`5[0]+[-2]+div_0(C^3+2C^2+2C+2)`, of total multiplicity nine, and produces a
+degree-7 residual candidate divisor
+
+```text
+div_0(F_7(C)).
+```
+
+The executable `R41ResidualDivisorMultiset` checks the factorization, the
+divisibility of `A_{3,1}` by the cubic, and the degree accounting
+`16 = 5 + 1 + 3 + 7`. It deliberately does not label the residual divisor as
+exact type `(4,1)`: the exact-type status of those seven algebraic roots
+remains open until collision exclusions, factor squarefreeness/coprimality,
+embeddings, and localization are supplied.
 
 ### B2 — Good-reduction and lifting certificate
 
