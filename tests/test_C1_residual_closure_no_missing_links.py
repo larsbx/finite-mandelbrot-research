@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_residual_closure_no_missing_links.md"
-SRC = ROOT / "src" / "C1_residual_closure_no_missing_links.mojo"
+SRC = ROOT / "kernel/mojo/c1/residual/residual_closure_no_missing_links.mojo"
 CRITERION = ROOT / "docs" / "C1_proof_definition_and_priority.md"
 
 

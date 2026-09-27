@@ -8,7 +8,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = ROOT / "spec" / "regime_correspondences.toml"
+SPEC = ROOT / "schemas/regime_correspondences.toml"
 SYMBOL_RE = re.compile(r"^(?:struct|def|fn)\s+([A-Za-z_][A-Za-z0-9_]*)", re.MULTILINE)
 REQUIRED_FIELDS = {"id", "analytic_concepts", "finite_term", "class", "status", "preserves", "does_not_inherit", "domain_conditions", "symbols", "evidence", "proof_boundary"}
 
@@ -37,7 +37,7 @@ def tagged_symbols(path: Path) -> dict[str, set[str]]:
 
 def audit() -> list[str]:
     if not SPEC.exists():
-        return ["spec/regime_correspondences.toml is missing"]
+        return ["schemas/regime_correspondences.toml is missing"]
     try:
         data = load_spec()
     except (OSError, tomllib.TOMLDecodeError) as exc:
@@ -88,7 +88,7 @@ def audit() -> list[str]:
             if symbol not in tagged_symbols(path).get(entry_id, set()):
                 errors.append(f"{entry_id}: {reference} lacks its source correspondence tag")
             bindings.add((path_text, symbol, entry_id))
-    for path in (ROOT / "src").glob("*.mojo"):
+    for path in (ROOT / "kernel" / "mojo").rglob("*.mojo"):
         path_text = path.relative_to(ROOT).as_posix()
         for entry_id, symbols in tagged_symbols(path).items():
             if entry_id not in ids:

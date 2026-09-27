@@ -6,7 +6,7 @@ Heads audited, on the shared branch `claude/library-extraction-candidates-d9lp6i
 
 | Tag | Repository | Head | Executable surface |
 | --- | --- | --- | --- |
-| `NLAP:` | `larsbx/finite-mandlebrot-research` | `ac7f8f9` | Mojo `src/`, compiled by CI through the closure of `src/smoke_tests.mojo`; Python `tools/` audits and `tests/` |
+| `NLAP:` | `larsbx/finite-mandlebrot-research` | `ac7f8f9` | Mojo `src/`, compiled by CI through the closure of `kernel/mojo/smoke/smoke_tests.mojo`; Python `tools/` audits and `tests/` |
 | `PSC:` | `larsbx/pisot-substitution-conjecture-research` | `970f214` | Mojo `mojo/psc/`, compiled and tested by CI (`pixi run test`, `verify`, censuses); Python `src/psc_research/` oracle |
 
 Markers: `[V]` was checked in this session by reading or executing the repository; `[U]` could not be checked here. Both CI workflows are green on their `main` heads `[V]` (NLAP run 679, PSC runs 884/721/665). Locally, PSC's Python suite passes in full and finite-mandlebrot-research's passes except the one test that requires a `mojo` binary, which this container lacks `[V]`.
@@ -19,7 +19,7 @@ Markers: `[V]` was checked in this session by reading or executing the repositor
 | P0 | Substitution-dynamics kernel (`substitution_dynamics`) | `PSC: mojo/psc/{words,bpa,derived_system,...}.mojo` | PSC censuses, other symbolic-dynamics work | after alphabet generalization and uniform symbol validation |
 | P1 | Closed rational intervals (`interval/closed_q`) | `NLAP: src/interval_q.mojo` (+ PSC checked-operation tests) | both programs | after `finite_exact`; spec hook already exists |
 | P1 | Exact finite-dimensional linear algebra (`finite_linear_algebra`) | `PSC: mojo/psc/{mat3,qlinalg,tensor3,w3}.mojo` | spectral, wedge, incidence experiments | after moving scalars onto `finite_exact` |
-| P1 | Finite proof-record infrastructure (`finite_proof_records`) | `NLAP: src/mojo_theorem_kernel.mojo` and the C1 ledgers | both programs | specification first; the current code is outside the compiled closure |
+| P1 | Finite proof-record infrastructure (`finite_proof_records`) | `NLAP: kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo` and the C1 ledgers | both programs | specification first; the current code is outside the compiled closure |
 | P2 | Claim-governance and language audits (`math_repo_audit`) | `NLAP: tools/audit_*.py`, `tools/source_tokens.py` | every mathematical repository | nearly ready; policies must move to per-repository configuration |
 
 Three arithmetic authorities exist today `[V]`: PSC's unchecked machine-width `Rat`, PSC's checked machine-width `CheckedRat`, and NLAP's unbounded `BigZ`-backed `Q`. The purpose of P0 is to reduce that to one.
@@ -32,7 +32,7 @@ Three arithmetic authorities exist today `[V]`: PSC's unchecked machine-width `R
 | --- | --- | --- |
 | integers | `BigZ`: dynamic little-endian limbs in base `10^9`, sign in `{-1,0,1}`, add/sub/mul, order, quotient/remainder, exact division with rejection, Euclidean gcd, canonical `Z(sign, byte_len, big_endian_magnitude)` bytes, and `bigz_is_canonical` `[V]` | machine `Int` only |
 | rationals | `Q`: normalized `BigZ` fraction, `den > 0`, `gcd = 1`, `rejected` flag propagated through every operation and through `q_canonical_bytes` `[V]` | `Rat` in `mojo/psc/rational.mojo`: normalized machine `Int`, unchecked overflow, `abort` on zero denominator `[V]`; `CheckedRat` in `mojo/psc/rational_interval.mojo`: normalized machine `Int` with overflow checks that `raise` `[V]` |
-| polynomials | `PolyZ` in `src/poly_z.mojo`: fixed `MAX_DEGREE`, machine `Int` coefficients, not yet on `BigZ` `[V]` | integer coefficient lists inside `mat3.charpoly` and `rational_interval.eval_int_poly_at_rat` `[V]` |
+| polynomials | `PolyZ` in `kernel/mojo/polynomial/poly_z.mojo`: fixed `MAX_DEGREE`, machine `Int` coefficients, not yet on `BigZ` `[V]` | integer coefficient lists inside `mat3.charpoly` and `rational_interval.eval_int_poly_at_rat` `[V]` |
 
 Dependency chain as it stands:
 
@@ -45,9 +45,9 @@ Rat (Int)  -->  qlinalg / tensor3 / w3 ;  CheckedRat (Int)  -->  RatInterval  --
 ### 1.2 Verified findings on the NLAP stack
 
 - `bigz_abs_divmod` is binary shift-and-subtract: it doubles the divisor until it exceeds the dividend, then halves and subtracts. Every step is a full limb-vector add or small-divide, so the cost is quadratic in limb count times the bit length of the quotient. It is correct on the smoke inputs and checked by `bigz_divmod_identity_holds`, but it is not a general backend division `[V]`.
-- `Q.add`, `Q.sub`, `Q.lt`, `Q.le` cross-multiply raw numerators and denominators, and `Q.mul` multiplies before normalizing. No denominator-gcd or cross-cancellation is applied `[V]`. The transitional `src/checked_q.mojo` already implements both (denominator gcd in `checked_q_add`, cross-cancellation in `checked_q_mul`) over `Int64` `[V]`, so the fix is a port, not a design task.
+- `Q.add`, `Q.sub`, `Q.lt`, `Q.le` cross-multiply raw numerators and denominators, and `Q.mul` multiplies before normalizing. No denominator-gcd or cross-cancellation is applied `[V]`. The transitional `kernel/mojo/arithmetic/checked_q.mojo` already implements both (denominator gcd in `checked_q_add`, cross-cancellation in `checked_q_mul`) over `Int64` `[V]`, so the fix is a port, not a design task.
 - `IQ.point` and `ComplexIQ.point` exist as `@staticmethod` constructors `[V]`. `docs/no-points-invariant.md` permits a `point(...)` helper only when it means a singleton-box constructor and only with a comment saying so; `src/interval_q.mojo` carries no such comment `[V]`. The allowlist entries in `tools/audit_no_points.py` still spell the declarations `fn point(...)`, which no longer match the `def` text; the audit passes only because its regex does not match `def point(` `[V]`. Renaming to `singleton` removes the exception rather than repairing it.
-- The 2026-09-14 project audit (`docs/project-audit-2026-09-14.md`, F1 and F2) predates the BigZ series. As of run 630 CI compiles and runs the smoke closure and all subsequent runs pass `[V]`. Modules outside that closure, in particular `src/mojo_theorem_kernel.mojo` and `src/canonical_serialization.mojo`, still use `inout self` and `fn` signatures and have not been compiled `[V]`.
+- The 2026-09-14 project audit (`docs/project-audit-2026-09-14.md`, F1 and F2) predates the BigZ series. As of run 630 CI compiles and runs the smoke closure and all subsequent runs pass `[V]`. Modules outside that closure, in particular `kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo` and `kernel/mojo/certificates/canonical_serialization.mojo`, still use `inout self` and `fn` signatures and have not been compiled `[V]`.
 
 ### 1.3 Required before extraction
 
@@ -111,7 +111,7 @@ Required before extraction:
 
 ## 5. Finite proof-record infrastructure: `finite_proof_records`
 
-Reusable ideas `[V]`: `src/mojo_theorem_kernel.mojo` (statement, theorem-tag import, rule application, proof object, checked status), the theorem-tag import ledger and assumption-payload records, proof-block status records, the canonical-serialization gate, and the finite-certificate composition gates.
+Reusable ideas `[V]`: `kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo` (statement, theorem-tag import, rule application, proof object, checked status), the theorem-tag import ledger and assumption-payload records, proof-block status records, the canonical-serialization gate, and the finite-certificate composition gates.
 
 The generalizable content is the classification, not the C1 vocabulary:
 

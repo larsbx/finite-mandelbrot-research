@@ -4,14 +4,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_ray_address_value_types_are_centralized():
-    canonical = (ROOT / "src" / "ray_address.mojo").read_text(encoding="utf-8")
+    canonical = (ROOT / "kernel/mojo/dynamics/ray_address.mojo").read_text(encoding="utf-8")
     assert "struct RayAddr(" in canonical
     assert "struct RayAddr64(" in canonical
     for relative in [
-        "src/separation_grammar.mojo",
-        "src/C1_separator_codes.mojo",
-        "src/C1_rational_separator_coding.mojo",
-        "src/rational_trig.mojo",
+        "kernel/mojo/c1/separator/separation_grammar.mojo",
+        "kernel/mojo/c1/separator/separator_codes.mojo",
+        "kernel/mojo/c1/separator/rational_separator_coding.mojo",
+        "kernel/mojo/arithmetic/rational_trig.mojo",
     ]:
         text = (ROOT / relative).read_text(encoding="utf-8")
         assert "struct RayAddrFinite" not in text
@@ -20,7 +20,7 @@ def test_ray_address_value_types_are_centralized():
 
 
 def test_ray_address_metadata_record_remains_distinct():
-    metadata = (ROOT / "src" / "misiurewicz_certificate.mojo").read_text(encoding="utf-8")
+    metadata = (ROOT / "kernel/mojo/certificates/misiurewicz_certificate.mojo").read_text(encoding="utf-8")
     assert "struct RayAddressDatum" in metadata
     assert "var preperiod: Int" in metadata
     assert "var ray_period: Int" in metadata

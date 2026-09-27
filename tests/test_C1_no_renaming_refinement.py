@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_no_renaming_as_refinement.md"
-SRC = ROOT / "src" / "C1_no_renaming_refinement.mojo"
+SRC = ROOT / "kernel/mojo/c1/carrier/no_renaming_refinement.mojo"
 
 
 def text(path):

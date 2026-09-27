@@ -17,7 +17,7 @@ branches, so a failure printed a single bare `FAIL`. Which contract broke, and
 whether anything after it also broke, were both invisible; the first failure
 masked the rest.
 
-`src/smoke_report.mojo` replaces the chain with a named case. `SmokeReport`
+`kernel/mojo/smoke/smoke_report.mojo` replaces the chain with a named case. `SmokeReport`
 records a name and a verdict, prints `[PASS] name` or `[FAIL] name` as it
 goes, and keeps counting after a failure, so one run names every broken
 contract. The suite now reports 58 cases, up from the roughly fifty the chain
@@ -41,7 +41,7 @@ says the text is present. It does not say the case ran, and it does not say it
 passed; it also breaks on any rewrite that preserves behaviour, which is how
 this change first surfaced them.
 
-`tests/conftest.py` now exposes `mojo_smoke`, which runs `src/smoke_tests.mojo`
+`tests/conftest.py` now exposes `mojo_smoke`, which runs `kernel/mojo/smoke/smoke_tests.mojo`
 once per session and parses the named verdicts. Each of those assertions became
 `assert mojo_smoke.case_passed("<case>")`. The difference is not cosmetic:
 breaking `checked_q_smoke` so that it returns `False` leaves the old assertion
@@ -59,7 +59,7 @@ product against the resulting angles as literals — `2/5`, `7/17`, `8/17`,
 `10/63`, `82/511` — so the substitution side was executed here and the angle
 side was not.
 
-`src/angle_tuning.mojo` computes it: `angle_period` reads the exact period of
+`kernel/mojo/dynamics/angle_tuning.mojo` computes it: `angle_period` reads the exact period of
 a rational address under doubling, `binary_block` reads its leading digits, and
 `tuned_angle` substitutes the two root-ray blocks of a component into the
 digits of the tuned angle, over `2^(nq) - 1`. All arithmetic is checked

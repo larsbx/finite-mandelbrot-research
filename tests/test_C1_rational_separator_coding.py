@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_rational_separator_coding_completeness.md"
-SRC = ROOT / "src" / "C1_rational_separator_coding.mojo"
+SRC = ROOT / "kernel/mojo/c1/separator/rational_separator_coding.mojo"
 
 
 def read(path: Path) -> str:

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "vertex_incidence.mojo"
+SRC = ROOT / "kernel/mojo/dynamics/vertex_incidence.mojo"
 AUDIT = ROOT / "tools" / "audit_no_points.py"
 
 

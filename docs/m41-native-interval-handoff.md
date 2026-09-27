@@ -2,7 +2,7 @@
 
 Status: implementation handoff.
 
-The native interval evaluator in `src/interval_orbit.mojo` now computes the critical-orbit recurrence and forbidden-collision exclusions over `ComplexIQ` for fixed horizons. The `c=-2` smoke test is wired to the native evaluator. The `M_{4,1}` status is still a contract placeholder and must not be treated as a completed proof witness.
+The native interval evaluator in `kernel/mojo/dynamics/interval_orbit.mojo` now computes the critical-orbit recurrence and forbidden-collision exclusions over `ComplexIQ` for fixed horizons. The `c=-2` smoke test is wired to the native evaluator. The `M_{4,1}` status is still a contract placeholder and must not be treated as a completed proof witness.
 
 ## Target
 
@@ -66,4 +66,4 @@ The replacement is accepted only when:
 
 ## Current dependency blocker
 
-`rat_q.mojo` remains backed by `Int64`, so large boxes and deep orbit intervals are not certificate-ready. The implementation may use small dyadic denominators for scaffolding, but proof-grade acceptance requires the bigint backend described in `src/big_int_boundary.mojo`.
+`rat_q.mojo` remains backed by `Int64`, so large boxes and deep orbit intervals are not certificate-ready. The implementation may use small dyadic denominators for scaffolding, but proof-grade acceptance requires the bigint backend described in `kernel/mojo/arithmetic/big_int_boundary.mojo`.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python reference for src/C1_separated_density.mojo.
+"""Python reference for kernel/mojo/c1/separator/separated_density.mojo.
 
 Exact rational arithmetic only. A catalogue prefix is a finite list of two-ray
 separators; each assigns every external angle a side, and two angles are

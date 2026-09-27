@@ -7,54 +7,54 @@ The repository pins Mojo 1.0.0 and pytest 8.3.5 through `pixi.toml` and
 
 The compiler-checked dependency closure currently consists of:
 
-- `src/smoke_tests.mojo`;
-- `src/poly_z.mojo`;
-- `src/cert_types.mojo`;
-- `src/finite_exact/rat_q.mojo`;
-- `src/integer_gcd.mojo`;
-- `src/ray_address.mojo`;
-- `src/rational_trig.mojo`;
-- `src/alignment_audit_status.mojo`;
-- `src/mojo_optimization_contract.mojo`;
-- `src/finite_exact/closed_q.mojo`;
-- `src/poly_interval_eval.mojo`;
-- `src/krawczyk_witness.mojo`.
-- `src/C1_final_proof_block_ledger.mojo`.
-- `src/C1_residual_closure_no_missing_links.mojo`.
-- `src/C1_theorem_tag_assumption_payloads.mojo`.
-- `src/C1_theorem_tag_import_ledger.mojo`.
-- `src/C1_final_proof_object_skeleton.mojo`.
-- `src/checked_int64_backend.mojo`.
-- `src/checked_q.mojo`.
-- `src/checked_interval_q.mojo`.
-- `src/checked_complex_interval.mojo`.
-- `src/checked_krawczyk_witness.mojo`.
-- `src/checked_interval_exclusion.mojo`.
-- `src/cert_backend.mojo`.
-- `src/certificate_arithmetic_migration_gate.mojo`.
-- `src/checked_ray_address.mojo`.
-- `src/checked_finite_certificate_gate.mojo`.
-- `src/C1_theorem_tag_payload_instances.mojo`.
-- `src/checked_landing_target_adapter.mojo`.
-- `src/finite_exact/bigint_z.mojo`.
-- `src/bigint_adapter.mojo`.
-- `src/smoke_report.mojo`.
-- `src/angle_tuning.mojo`.
-- `src/bigq_ray_address.mojo`.
-- `src/bigq_landing_target_adapter.mojo`.
-- `src/bigq_theorem_tag_payload_instances.mojo`.
-- `src/bigq_finite_certificate_gate.mojo`.
-- `src/bigq_certificate_incidence.mojo`.
-- `src/substitution_dynamics/substitution.mojo`.
-- `src/substitution_dynamics/tuning.mojo`.
-- `src/C1_residual_directive_carrier.mojo`.
-- `src/C1_separated_density.mojo`.
-- `src/misiurewicz_catalogue.mojo`.
-- `src/C1_misiurewicz_prefix_graph.mojo`.
-- `src/proof_grade_landing_target_association.mojo`.
-- `src/proof_grade_misiurewicz_trivial_fiber_classification.mojo`.
+- `kernel/mojo/smoke/smoke_tests.mojo`;
+- `kernel/mojo/polynomial/poly_z.mojo`;
+- `kernel/mojo/certificates/cert_types.mojo`;
+- `vendor/mojo/finite_exact/rat_q.mojo`;
+- `kernel/mojo/arithmetic/integer_gcd.mojo`;
+- `kernel/mojo/dynamics/ray_address.mojo`;
+- `kernel/mojo/arithmetic/rational_trig.mojo`;
+- `kernel/mojo/theorem_kernel/alignment_audit_status.mojo`;
+- `kernel/mojo/theorem_kernel/mojo_optimization_contract.mojo`;
+- `vendor/mojo/finite_exact/closed_q.mojo`;
+- `kernel/mojo/polynomial/poly_interval_eval.mojo`;
+- `kernel/mojo/certificates/krawczyk_witness.mojo`.
+- `kernel/mojo/c1/proof/final_proof_block_ledger.mojo`.
+- `kernel/mojo/c1/residual/residual_closure_no_missing_links.mojo`.
+- `kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo`.
+- `kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo`.
+- `kernel/mojo/c1/proof/final_proof_object_skeleton.mojo`.
+- `kernel/mojo/arithmetic/checked_int64_backend.mojo`.
+- `kernel/mojo/arithmetic/checked_q.mojo`.
+- `kernel/mojo/arithmetic/checked_interval_q.mojo`.
+- `kernel/mojo/arithmetic/checked_complex_interval.mojo`.
+- `kernel/mojo/certificates/checked_krawczyk_witness.mojo`.
+- `kernel/mojo/certificates/checked_interval_exclusion.mojo`.
+- `kernel/mojo/arithmetic/cert_backend.mojo`.
+- `kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo`.
+- `kernel/mojo/dynamics/checked_ray_address.mojo`.
+- `kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo`.
+- `kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo`.
+- `kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo`.
+- `vendor/mojo/finite_exact/bigint_z.mojo`.
+- `kernel/mojo/arithmetic/bigint_adapter.mojo`.
+- `kernel/mojo/smoke/smoke_report.mojo`.
+- `kernel/mojo/dynamics/angle_tuning.mojo`.
+- `kernel/mojo/dynamics/bigq_ray_address.mojo`.
+- `kernel/mojo/certificates/c_minus_2/bigq_landing_target_adapter.mojo`.
+- `kernel/mojo/certificates/c_minus_2/bigq_theorem_tag_payload_instances.mojo`.
+- `kernel/mojo/certificates/c_minus_2/bigq_finite_certificate_gate.mojo`.
+- `kernel/mojo/certificates/c_minus_2/bigq_certificate_incidence.mojo`.
+- `vendor/mojo/substitution_dynamics/substitution.mojo`.
+- `vendor/mojo/substitution_dynamics/tuning.mojo`.
+- `kernel/mojo/c1/residual/residual_directive_carrier.mojo`.
+- `kernel/mojo/c1/separator/separated_density.mojo`.
+- `kernel/mojo/certificates/misiurewicz_catalogue.mojo`.
+- `kernel/mojo/c1/wake/misiurewicz_prefix_graph.mojo`.
+- `kernel/mojo/certificates/c_minus_2/proof_grade_landing_target_association.mojo`.
+- `kernel/mojo/certificates/c_minus_2/proof_grade_misiurewicz_trivial_fiber_classification.mojo`.
 
-A second compile target, `src/exact_arithmetic_property_probe.mojo`, imports
+A second compile target, `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`, imports
 `bigint_z`, `rat_q`, and `interval_q` and is executed by `pixi run property`,
 which pipes its transcript into `reference/python/arithmetic/exact_arithmetic_property_oracle.py`.
 

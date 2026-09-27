@@ -14,7 +14,7 @@ from pathlib import Path
 from source_tokens import mask_comments_and_strings
 
 ROOT = Path(__file__).resolve().parents[1]
-CORE_PATHS = [ROOT / "src"]
+CORE_PATHS = [ROOT / "kernel", ROOT / "vendor" / "mojo"]
 TOKEN_RE = re.compile(
     r"\b(?:sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|exp|log|sqrt|radians?)\b"
     r"|unit circle|polar angle|\b(?:angle[_ ]?degrees?|degrees?[_ ]?angle)\b",

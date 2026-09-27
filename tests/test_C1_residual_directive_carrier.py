@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 from reference.python.c1 import kneading_reference as kr  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_residual_directive_carrier.md"
-SRC = ROOT / "src" / "C1_residual_directive_carrier.mojo"
+SRC = ROOT / "kernel/mojo/c1/residual/residual_directive_carrier.mojo"
 F = Fraction
 
 
@@ -44,7 +44,7 @@ def test_carrier_term_is_declared_with_genealogy_and_leaks():
     for field in ("Genealogy:", "Bridge claim:", "Known leaks:", "Use discipline:"):
         assert field in body
     assert "definition-only" in body
-    assert "TuningKneadingSubstitution" in body and "TuningKneadingSubstitution" in text(ROOT / "src" / "C1_theorem_tag_import_ledger.mojo")
+    assert "TuningKneadingSubstitution" in body and "TuningKneadingSubstitution" in text(ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo")
 
 
 def test_non_claims_return_false_in_mojo():
@@ -57,12 +57,12 @@ def test_non_claims_return_false_in_mojo():
 
 
 def test_regime_correspondence_binds_the_carrier_symbols():
-    spec = tomllib.loads(text(ROOT / "spec" / "regime_correspondences.toml"))
+    spec = tomllib.loads(text(ROOT / "schemas/regime_correspondences.toml"))
     entry = next(c for c in spec["correspondence"] if c["id"] == "angle-kneading-prefix")
     assert entry["class"] == "symbolic_encoding" and "fibre triviality" in entry["does_not_inherit"]
     for symbol in entry["symbols"]:
         path, name = symbol.split("::")
-        assert path == "src/C1_residual_directive_carrier.mojo" and f"def {name}(" in text(SRC)
+        assert path == "kernel/mojo/c1/residual/residual_directive_carrier.mojo" and f"def {name}(" in text(SRC)
     assert text(SRC).count("# Regime correspondence: angle-kneading-prefix") == len(entry["symbols"])
 
 

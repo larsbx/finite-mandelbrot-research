@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_wake_ambiguity_elimination.md"
-SRC = ROOT / "src" / "C1_wake_ambiguity_elimination.mojo"
+SRC = ROOT / "kernel/mojo/c1/wake/wake_ambiguity_elimination.mojo"
 
 
 def read(path):

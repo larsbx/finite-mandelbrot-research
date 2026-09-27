@@ -10,7 +10,7 @@ Replace `reference/python/interval/interval_exclusion_reference.py` with a Mojo-
 
 The target file is:
 
-- `src/interval_orbit.mojo`
+- `kernel/mojo/dynamics/interval_orbit.mojo`
 
 It must consume the rational interval primitives in:
 

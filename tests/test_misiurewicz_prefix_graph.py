@@ -14,7 +14,7 @@ from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E
 from reference.python.c1 import misiurewicz_prefix_graph_reference as pg  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_misiurewicz_prefix_graph.md"
-SRC = ROOT / "src" / "C1_misiurewicz_prefix_graph.mojo"
+SRC = ROOT / "kernel/mojo/c1/wake/misiurewicz_prefix_graph.mojo"
 
 DEN13 = 14  # the denominator of exact type (1, 3)
 
@@ -59,13 +59,13 @@ def test_non_claims_return_false_in_mojo():
 
 
 def test_regime_correspondence_binds_the_extractor_symbols():
-    spec = tomllib.loads(text(ROOT / "spec" / "regime_correspondences.toml"))
+    spec = tomllib.loads(text(ROOT / "schemas/regime_correspondences.toml"))
     entry = next(c for c in spec["correspondence"] if c["id"] == "misiurewicz-prefix-obstruction")
     for absent in ("fibre triviality", "persistent non-separation", "parameter location"):
         assert absent in entry["does_not_inherit"]
     for symbol in entry["symbols"]:
         path, name = symbol.split("::")
-        assert path == "src/C1_misiurewicz_prefix_graph.mojo" and f"def {name}(" in text(SRC)
+        assert path == "kernel/mojo/c1/wake/misiurewicz_prefix_graph.mojo" and f"def {name}(" in text(SRC)
     tag = "# Regime correspondence: misiurewicz-prefix-obstruction"
     assert text(SRC).count(tag) == len(entry["symbols"])
 
@@ -309,7 +309,7 @@ def test_the_smoke_target_pins_the_same_instances():
                      "if separated(low, high, one_low, one_high, den):",
                      "if bare.cycles() != 0 or bare.terminal_sinks() != 2 or bare.sink_components() != 2:"):
         assert fragment in src
-    assert "misiurewicz_prefix_graph_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
+    assert "misiurewicz_prefix_graph_smoke" in text(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
 
 
 def test_a_refusal_is_never_an_empty_obstruction_set():

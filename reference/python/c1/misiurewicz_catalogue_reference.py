@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python reference for src/misiurewicz_catalogue.mojo.
+"""Python reference for kernel/mojo/certificates/misiurewicz_catalogue.mojo.
 
 Integer arithmetic only. The exact preperiod and period of a ray address
 `p/q` under doubling are read off `q` in lowest terms: write `q = 2^l m` with

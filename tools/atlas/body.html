@@ -8,11 +8,11 @@
   and dyadic boxes with the collisions they exclude. Three views show them: the parameter plane, the
   circle the addresses actually live on, and the finite incidence package that stands in for a point.</p>
   <div class="caveat"><b>What is exact and what is not.</b> Every exact number here is printed by
-  <span class="num">mojo src/atlas_dataset.mojo</span>, the canonical implementation, and checked
+  <span class="num">pixi run atlas-dataset</span>, the canonical implementation, and checked
   object by object against independent Python oracles. The <i>positions</i> are not: each one is a
   conventional numeric computation, a traced parameter ray finished by Newton on the equation the point
   satisfies. Associating an address with a parameter is the imported landing theorem. The repository
-  computes no parameter locations and claims none — no module under <span class="num">src/</span> may
+  computes no parameter locations and claims none — no module under <span class="num">kernel/</span> may
   produce a floating-point number at all, which is why the positions are computed outside it. What the
   repository does locate is a <i>box</i>: an exclusion certificate is an exact dyadic rectangle, and what
   it proves is stated in its own row.</div>
@@ -105,7 +105,7 @@
 <section>
   <h2>The numbers</h2>
   <p class="note">Nine tables, every entry an integer or a rational, all of them printed by
-  <span class="num">mojo src/atlas_dataset.mojo</span>. Rows that name a plotted object select it.</p>
+  <span class="num">pixi run atlas-dataset</span>. Rows that name a plotted object select it.</p>
 <div class="grid2">
 
   <div class="tablebox">
@@ -215,7 +215,7 @@
 </div>
 </section>
 
-<footer>Every exact number on this page is printed by <span class="num">mojo src/atlas_dataset.mojo</span>,
+<footer>Every exact number on this page is printed by <span class="num">pixi run atlas-dataset</span>,
 the canonical implementation, and checked object by object against independent Python oracles. The
 positions are the one thing Mojo may not compute: they are traced at double precision and polished onto
 the defining equation, accurate to plotting precision and no further.</footer>

@@ -133,7 +133,7 @@ K_P(beta) subset int(beta)
 
 ## Agent rule
 
-Any coding agent that introduces trigonometric functions into `src/` must treat that as a blocking invariant violation unless the file is explicitly marked as a non-core comparison artifact.
+Any coding agent that introduces trigonometric functions into `kernel/` must treat that as a blocking invariant violation unless the file is explicitly marked as a non-core comparison artifact.
 
 Acceptable replacements are:
 

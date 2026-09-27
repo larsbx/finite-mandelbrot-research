@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = ROOT / "src" / "mojo_optimization_contract.mojo"
+CONTRACT = ROOT / "kernel/mojo/theorem_kernel/mojo_optimization_contract.mojo"
 POLICY = ROOT / "docs" / "mojo_first_execution_policy.md"
 
 

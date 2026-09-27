@@ -17,9 +17,9 @@ sys.path.insert(0, str(ROOT))
 from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_separated_pair_density.md"
-SRC = ROOT / "src" / "C1_separated_density.mojo"
+SRC = ROOT / "kernel/mojo/c1/separator/separated_density.mojo"
 LEDGER_DOC = ROOT / "docs" / "C1_theorem_tag_import_ledger.md"
-LEDGER_SRC = ROOT / "src" / "C1_theorem_tag_import_ledger.mojo"
+LEDGER_SRC = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo"
 
 
 def text(path: Path) -> str:
@@ -69,13 +69,13 @@ def test_harmonic_measure_tag_is_class_specific_scaffolded_and_cannot_discharge_
 
 
 def test_regime_correspondence_binds_the_density_symbol():
-    spec = tomllib.loads(text(ROOT / "spec" / "regime_correspondences.toml"))
+    spec = tomllib.loads(text(ROOT / "schemas/regime_correspondences.toml"))
     entry = next(c for c in spec["correspondence"] if c["id"] == "separated-pair-density")
     assert "harmonic measure on the boundary" in entry["does_not_inherit"]
     assert "separation of a named pair" in entry["does_not_inherit"]
     # The kernel and the carrier profile of docs/C1_separated_pair_density.md
     # share this correspondence; each symbol is tagged in its own file.
-    assert "src/C1_separated_density.mojo::separated_pair_density" in entry["symbols"]
+    assert "kernel/mojo/c1/separator/separated_density.mojo::separated_pair_density" in entry["symbols"]
     for symbol in entry["symbols"]:
         path, name = symbol.split("::")
         source = text(ROOT / path)
@@ -140,4 +140,4 @@ def test_mojo_smoke_pins_the_same_instances():
     for fragment in ('_is(single, 4, 9)', '_is(disjoint, 5, 8)', '_is(nested, 4, 7)', '_is(refined, 2, 3)',
                      'disjoint.atoms == 4 and disjoint.classes == 3', 'disjoint.density.lt(Q(3, 4))'):
         assert fragment in src
-    assert "separated_density_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
+    assert "separated_density_smoke" in text(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")

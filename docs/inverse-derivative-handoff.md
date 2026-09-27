@@ -16,7 +16,7 @@ No analytic trigonometry, angle measurement, transcendental functions, or floati
 
 ## Completed
 
-- `src/complex_inverse.mojo` defines `ComplexQ` and exact rational inverse by conjugate/quadrance.
+- `kernel/mojo/arithmetic/complex_inverse.mojo` defines `ComplexQ` and exact rational inverse by conjugate/quadrance.
 - `inverse_p21_derivative_at_minus_2()` records the exact inverse for `P21'(-2)=-2`, namely `-1/2`.
 - `inverse_derivative_m41_pending()` remains unaccepted until exact point evaluation of `P41'(m)` is available.
 - CI runs `tests/test_complex_inverse.py`.

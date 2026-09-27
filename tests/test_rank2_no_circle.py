@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RANK2_DOC = ROOT / "docs" / "rank2-coordinate-substrate.md"
-RANK2_SRC = ROOT / "src" / "rank2_operator.mojo"
+RANK2_SRC = ROOT / "kernel/mojo/arithmetic/rank2_operator.mojo"
 
 
 def text(path):

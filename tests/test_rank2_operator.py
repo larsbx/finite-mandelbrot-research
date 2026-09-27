@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "rank2_operator.mojo"
+SRC = ROOT / "kernel/mojo/arithmetic/rank2_operator.mojo"
 DOC = ROOT / "docs" / "rank2-coordinate-substrate.md"
 
 

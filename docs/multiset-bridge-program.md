@@ -3,7 +3,7 @@
 **Status:** staged theorem program. The algebraic identities in stages B0 and
 B1, the simple-residue-root subcertificate, one replayable Hensel step from
 modulo `p` to modulo `p^2` are executable in
-`src/critical_relation_bridge.mojo`, together with bounded factor provenance
+`kernel/mojo/dynamics/critical_relation_bridge.mojo`, together with bounded factor provenance
 for monic linear factors. The unbounded lift, general factor correspondence,
 and later stages require the stated certificates or imported theorems. This program keeps
 multisets in the primary research toolbox without identifying an arbitrary
@@ -147,7 +147,7 @@ in the project ledger.
 | projective intersection multiplicity at infinity | divisor-theoretic escape data | relation to the marked critical section |
 | certified dyadic escape-witness count | subset of the classical complement | coverage and overlap normalization |
 
-The basin multiset introduced in `src/projective_multiset.mojo` therefore
+The basin multiset introduced in `kernel/mojo/dynamics/projective_multiset.mojo` therefore
 remains in the toolbox. It is not discarded; it occupies a different bridge
 column from algebraic root multiplicity.
 

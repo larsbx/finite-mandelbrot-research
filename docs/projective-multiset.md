@@ -112,7 +112,7 @@ cardinality, while both remain available coefficient semantics.
 
 ## Executable contract
 
-`src/projective_multiset.mojo` provides:
+`kernel/mojo/dynamics/projective_multiset.mojo` provides:
 
 - exact critical tail and period over a caller-supplied prime field;
 - exact critical-basin cardinality;

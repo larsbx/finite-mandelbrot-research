@@ -1,8 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BIG = ROOT / "src" / "bigint_adapter.mojo"
-RAT = ROOT / "src" / "rat_backend_plan.mojo"
+BIG = ROOT / "kernel/mojo/arithmetic/bigint_adapter.mojo"
+RAT = ROOT / "kernel/mojo/arithmetic/rat_backend_plan.mojo"
 
 
 def read(path: Path) -> str:
@@ -28,8 +28,8 @@ def test_int64_demo_backend_is_not_proof_ready():
 
 def test_dynamic_limb_phase_one_is_explicitly_incomplete(mojo_smoke):
     src = read(BIG)
-    z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    z = read(ROOT / "vendor/mojo/finite_exact/bigint_z.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "dynamic_limb_phase_one_backend_status" in src
     assert '"MojoDynamicLimbBigZPhaseOne"' in src
     assert "struct BigZ(Copyable)" in z
@@ -47,8 +47,8 @@ def test_dynamic_limb_phase_one_is_explicitly_incomplete(mojo_smoke):
 
 def test_dynamic_limb_phase_two_adds_division_and_gcd_but_stays_blocked(mojo_smoke):
     src = read(BIG)
-    z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    z = read(ROOT / "vendor/mojo/finite_exact/bigint_z.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "dynamic_limb_phase_two_backend_status" in src
     assert '"MojoDynamicLimbBigZPhaseTwo"' in src
     for operation in ["bigz_abs_divmod", "bigz_divmod", "bigz_div_exact", "bigz_gcd"]:
@@ -64,8 +64,8 @@ def test_dynamic_limb_phase_two_adds_division_and_gcd_but_stays_blocked(mojo_smo
 
 def test_dynamic_limb_bigz_adds_canonical_serialization_and_is_integer_ready(mojo_smoke):
     src = read(BIG)
-    z = read(ROOT / "src" / "finite_exact" / "bigint_z.mojo")
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    z = read(ROOT / "vendor/mojo/finite_exact/bigint_z.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "dynamic_limb_bigz_backend_status" in src
     assert '"MojoDynamicLimbBigZ"' in src
     for operation in ["bigz_is_canonical", "bigz_canonical_bytes", "canonical_bytes_equal"]:
@@ -110,13 +110,13 @@ def test_current_q_uses_bigz_but_blocks_proof_acceptance(mojo_smoke):
     assert "acceptance flag remains false" in src
     assert "not status.backend.allows_certificate_acceptance" in src
     assert "q_backend_blocks_proof_acceptance(status)" in src
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert mojo_smoke.case_passed("Q backend migration")
 
 
 def test_q_storage_is_normalized_bigz_and_fail_closed(mojo_smoke):
-    src = read(ROOT / "src" / "finite_exact" / "rat_q.mojo")
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    src = read(ROOT / "vendor/mojo/finite_exact/rat_q.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "struct Q(Copyable)" in src
     assert "var num: BigZ" in src
     assert "var den: BigZ" in src
@@ -134,9 +134,9 @@ def test_q_storage_is_normalized_bigz_and_fail_closed(mojo_smoke):
 
 
 def test_bigz_interval_layer_enforces_spec_fail_closed_contracts():
-    src = read(ROOT / "src" / "finite_exact" / "closed_q.mojo")
-    rat = read(ROOT / "src" / "finite_exact" / "rat_q.mojo")
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    src = read(ROOT / "vendor/mojo/finite_exact/closed_q.mojo")
+    rat = read(ROOT / "vendor/mojo/finite_exact/rat_q.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "var rejected: Bool" in src
     assert "if not self.rejected and not lo.le(hi):" in src
     assert "struct IQBoolResult(Copyable)" in src
@@ -151,9 +151,9 @@ def test_bigz_interval_layer_enforces_spec_fail_closed_contracts():
 
 
 def test_interval_migration_does_not_enable_certificate_or_c1_acceptance():
-    adapter = read(ROOT / "src" / "bigint_adapter.mojo")
-    gate = read(ROOT / "src" / "certificate_arithmetic_migration_gate.mojo")
-    ledger = read(ROOT / "src" / "C1_final_proof_block_ledger.mojo")
+    adapter = read(ROOT / "kernel/mojo/arithmetic/bigint_adapter.mojo")
+    gate = read(ROOT / "kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo")
+    ledger = read(ROOT / "kernel/mojo/c1/proof/final_proof_block_ledger.mojo")
     assert "not status.allows_certificate_acceptance" in adapter
     assert "checked.checked_width_accepted() and not checked.proof_grade_accepted()" in gate
     assert 'ProofBlockStatus("ResidualClosureNoMissingLinks", False, False, True, False, True)' in ledger

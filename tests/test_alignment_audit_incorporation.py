@@ -3,8 +3,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "docs" / "alignment_audit_deep_research_findings.md"
 MOJO_POLICY = ROOT / "docs" / "mojo_first_execution_policy.md"
-STATUS = ROOT / "src" / "alignment_audit_status.mojo"
-KERNEL = ROOT / "src" / "mojo_theorem_kernel.mojo"
+STATUS = ROOT / "kernel/mojo/theorem_kernel/alignment_audit_status.mojo"
+KERNEL = ROOT / "kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo"
 CALCULUS = ROOT / "docs" / "finite-certificate-calculus.md"
 
 

@@ -15,7 +15,8 @@ The ordering rule is:
 authority -> mathematical/domain concern -> implementation language
 ```
 
-The current tree is intentionally transitional. Existing paths remain authoritative
-until a dedicated migration PR moves them. Directory renames alone must not change
-theorem status, certificate acceptance, imported-theorem assumptions, or the
-Mojo finite-checker boundary.
+The layout is canonical: every plane in `estate.toml` maps exactly its `target`
+(root-level files aside), every top-level directory is some plane's target, and
+no migration step is pending; the audit enforces all three. Directory renames
+alone must not change theorem status, certificate acceptance, imported-theorem
+assumptions, or the Mojo finite-checker boundary.

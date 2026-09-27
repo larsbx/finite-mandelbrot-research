@@ -3,8 +3,8 @@
 This is a picture, not a certificate. It is floating point and it uses the
 analytic machinery the executable core refuses: a parameter ray is traced by
 Newton down a decreasing potential, then finished on the equation the point
-satisfies. That is why it lives here and not under `src/`, why nothing in
-`src/` imports it, and why the audits that police the core do not need to
+satisfies. That is why it lives here and not under `kernel/`, why nothing in
+`kernel/` imports it, and why the audits that police the core do not need to
 except it.
 
 What it computes is a placement. Associating a ray address with a parameter is

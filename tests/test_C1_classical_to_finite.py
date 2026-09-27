@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_classical_separation_to_finite_witness.md"
-SRC = ROOT / "src" / "C1_classical_to_finite.mojo"
+SRC = ROOT / "kernel/mojo/c1/bridge/classical_to_finite.mojo"
 
 
 def test_hard_direction_document_names_exact_target():

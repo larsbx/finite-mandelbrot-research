@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_canonical_content_refinement_order.md"
-SRC = ROOT / "src" / "C1_canonical_content_refinement_order.mojo"
+SRC = ROOT / "kernel/mojo/c1/carrier/canonical_content_refinement_order.mojo"
 
 
 def read(path: Path) -> str:

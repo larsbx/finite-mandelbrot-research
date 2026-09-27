@@ -41,7 +41,7 @@ def test_boundary_document_declares_names_semantics_and_promise():
 
 
 def test_long_division_replaces_shift_and_subtract_and_keeps_the_reference(mojo_smoke):
-    z = text("src/finite_exact/bigint_z.mojo")
+    z = text("vendor/mojo/finite_exact/bigint_z.mojo")
     assert "def bigz_abs_divmod_shift_subtract(" in z
     assert "def bigz_abs_divmod(" in z
     assert "Knuth Algorithm D" in z
@@ -54,13 +54,13 @@ def test_an_exact_number_can_be_read_in_base_ten(mojo_smoke):
     """Limbs are base 10^9, so the decimal form is exact and needs no division;
     it is how an exact rational leaves the repository readable. It sits outside
     the vendored kernel, which stays byte-identical to its upstream."""
-    assert "def bigz_decimal(" in text("src/exact_decimal.mojo")
-    assert "def bigz_decimal(" not in text("src/finite_exact/bigint_z.mojo")
+    assert "def bigz_decimal(" in text("kernel/mojo/arithmetic/exact_decimal.mojo")
+    assert "def bigz_decimal(" not in text("vendor/mojo/finite_exact/bigint_z.mojo")
     assert mojo_smoke.case_passed("exact decimal")
 
 
 def test_rational_operations_cancel_before_multiplying(mojo_smoke):
-    q = text("src/finite_exact/rat_q.mojo")
+    q = text("vendor/mojo/finite_exact/rat_q.mojo")
     assert "struct QCrossTerms(Copyable)" in q
     assert "def q_cross_terms(" in q
     assert "var g1 = bigz_gcd(self.num, other.den)" in q
@@ -72,7 +72,7 @@ def test_rational_operations_cancel_before_multiplying(mojo_smoke):
 
 
 def test_singleton_replaces_point_everywhere_in_core():
-    iq = text("src/finite_exact/closed_q.mojo")
+    iq = text("vendor/mojo/finite_exact/closed_q.mojo")
     assert "def singleton(x: Q) -> IQ:" in iq
     assert "def singleton(re: Q, im: Q) -> ComplexIQ:" in iq
     assert "No ideal point" in iq
@@ -94,10 +94,10 @@ def test_property_probe_is_wired_into_pixi_ci_and_binding_table():
     assert manifest["tasks"]["property"] == "python reference/python/arithmetic/exact_arithmetic_property_oracle.py"
     assert "pixi run property" in text(".github/workflows/no-trig-audit.yml")
     spec = text("docs/rational-interval-arithmetic-spec.md")
-    assert "`src/exact_arithmetic_property_probe.mojo`" in spec
+    assert "`kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`" in spec
     assert "`reference/python/arithmetic/exact_arithmetic_property_oracle.py`" in spec
-    assert "src/exact_arithmetic_property_probe.mojo" in text("docs/mojo-toolchain-boundary.md")
-    probe = text("src/exact_arithmetic_property_probe.mojo")
+    assert "kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo" in text("docs/mojo-toolchain-boundary.md")
+    probe = text("kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo")
     assert "docs/rational-interval-arithmetic-spec.md" in probe
     assert "from finite_exact.bigint_z import" in probe and "from finite_exact.rat_q import" in probe and "from finite_exact.closed_interval import" in probe
 

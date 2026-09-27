@@ -4,7 +4,7 @@
 Specification: docs/rational-interval-arithmetic-spec.md (section 7, law tests).
 Public boundary: docs/exact-arithmetic-public-boundary.md.
 
-The Mojo probe ``src/exact_arithmetic_property_probe.mojo`` prints a transcript
+The Mojo probe ``kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`` prints a transcript
 of canonical byte encodings. This script regenerates the same operands from
 the same xorshift64* stream, recomputes every result with Python ``int`` and
 ``fractions.Fraction``, encodes the expectation with the canonical
@@ -38,10 +38,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
+from mojo_include import mojo_run  # noqa: E402
 
 from oracle_refinement import Class, Refinement, audit_all  # noqa: E402
 
-PROBE = ROOT / "src" / "exact_arithmetic_property_probe.mojo"
+PROBE = ROOT / "kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo"
 
 BASE = 10**9
 MASK64 = (1 << 64) - 1
@@ -304,7 +306,7 @@ def run_probe() -> list[str] | None:
     mojo = shutil.which("mojo")
     if mojo is None:
         return None
-    result = subprocess.run([mojo, str(PROBE)], cwd=ROOT, capture_output=True, text=True, check=False)
+    result = subprocess.run(mojo_run(str(PROBE.relative_to(ROOT)), mojo), cwd=ROOT, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         raise RuntimeError(f"mojo probe failed with status {result.returncode}:\n{result.stderr}")
     return [line for line in result.stdout.splitlines() if line.strip()]
