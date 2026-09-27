@@ -3,7 +3,9 @@
 Status: compiling initial slice; repository-wide port incomplete.
 
 The repository pins Mojo 1.0.0 and pytest 8.3.5 through `pixi.toml` and
-`pixi.lock`. CI performs both a JIT smoke run and an ahead-of-time build.
+`pixi.lock`. Every package the lock takes from the Modular channel (`mojo`,
+`mojo-compiler`, `mojo-python`, `mblack`) is pinned by `==` in the manifest,
+and `tests/test_mojo_toolchain.py` checks the two agree. CI performs both a JIT smoke run and an ahead-of-time build.
 
 The compiler-checked dependency closure currently consists of:
 

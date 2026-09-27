@@ -17,7 +17,7 @@
 #   density             C1_separated_density
 #   incidence           bigq_certificate_incidence and the gate beneath it
 #
-# Usage: mojo kernel/mojo/entrypoints/atlas_dataset.mojo > dataset.json
+# Usage: pixi run atlas-dataset > dataset.json
 
 from dynamics.angle_tuning import angle_period, binary_block, tuned_angle
 from certificates.c_minus_2.bigq_certificate_incidence import bigq_c_minus_2_certificate_incidence

@@ -7,7 +7,7 @@ The split is the repository's policy, not a convenience.
 Exact objects -- the catalogue and its counts, kneading sequences and internal
 addresses, tuned angles, the obstruction extractions with their pairs, the
 decided measures, the incidence packages -- come from one run of
-`mojo kernel/mojo/entrypoints/atlas_dataset.mojo`, the canonical implementation, which
+`pixi run atlas-dataset`, the canonical implementation, which
 `tests/test_atlas_dataset.py` checks against the Python oracles.
 
 Positions cannot come from there: they are floating point, and no module under

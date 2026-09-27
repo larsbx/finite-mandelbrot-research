@@ -76,7 +76,9 @@ def test_singleton_replaces_point_everywhere_in_core():
     assert "def singleton(x: Q) -> IQ:" in iq
     assert "def singleton(re: Q, im: Q) -> ComplexIQ:" in iq
     assert "No ideal point" in iq
-    for path in sorted((ROOT / "src").glob("*.mojo")):
+    core = sorted((ROOT / "kernel" / "mojo").rglob("*.mojo"))
+    assert len(core) > 50, "the core scan must not be vacuous"
+    for path in core:
         body = path.read_text(encoding="utf-8")
         assert ".point(" not in body, path
         assert "def point(" not in body and "fn point(" not in body, path

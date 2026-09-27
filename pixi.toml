@@ -21,7 +21,11 @@ ledgers = "python tools/make_ledger.py"
 ledgers-check = "python tools/make_ledger.py --check"
 
 [dependencies]
+# Mojo 1.0.0 release: every Modular package pinned (tests check against pixi.lock).
 mojo = "==1.0.0"
+mojo-compiler = "==1.0.0"
+mojo-python = "==1.0.0"
+mblack = "==26.5.0"
 
 [pypi-dependencies]
 pytest = "==8.3.5"
