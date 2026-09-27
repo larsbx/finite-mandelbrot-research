@@ -10,6 +10,7 @@ relevant conformance gate; it does not transfer authority to Python.
 - `polynomial/` — integer-polynomial reference identities.
 - `interval/` — rational interval exclusion semantics.
 - `c1/` — finite C1 combinatorics, catalogues, prefix graphs, tuning and density.
+- `atlas/` — exact checks for the names atlas (`spec/structure_names.toml`).
 
 Files of the same historical names under `tools/` are compatibility shims.
 New code, tests, and CI use `reference/python/` directly.

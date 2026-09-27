@@ -87,6 +87,10 @@ The page shows three views:
 Rebuild with `pixi run atlas-page`. The HTML is generated and is not committed;
 the templates beside the builder are the source.
 
+The common names of the structures the page shows — main cardioid, bulbs,
+valleys, the rabbit — are keyed to exact data in
+`docs/mandelbrot-structure-names-atlas.md`.
+
 A page is a picture of finite evidence. It proves nothing by itself, and the
 boundary of claims in `README.md` applies to it unchanged.
 
