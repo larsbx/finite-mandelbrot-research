@@ -81,6 +81,28 @@ Thus root multiplicity is not exact-type multiplicity. The executable
 `CriticalRelationDivisorMultiset` records both cycles and checks that the raw
 multiplicities sum to the degree before applying the exact-type filter.
 
+The next relation demonstrates where the rational subcase stops. Exact
+factorization gives
+
+```text
+A_{4,1}(C) =
+  C^5(C+2)(C^3+2C^2+2C+2)F_7(C),
+deg(F_7)=7.
+```
+
+Repeated exact division removes the known lower-type contribution
+`5[0]+[-2]` and produces a degree-10 residual candidate divisor
+
+```text
+div_0((C^3+2C^2+2C+2)F_7(C)).
+```
+
+The executable `R41ResidualDivisorMultiset` checks the factorization and
+degree accounting. It deliberately does not label the residual divisor as
+exact type `(4,1)`: the exact-type status of those ten algebraic roots remains
+open until collision exclusions, factor squarefreeness/coprimality, embeddings,
+and localization are supplied.
+
 ### B2 — Good-reduction and lifting certificate
 
 A residue-class root may be used in the bridge only with a certificate that
