@@ -63,6 +63,24 @@ require exclusions of every earlier or unintended collision. The repository's
 existing intended/forbidden collision partition is the required starting
 certificate.
 
+The first multiplicity calculation is now executable. For
+`A_{2,1}(C)=C^3(C+2)`, repeated exact division gives
+
+```text
+div_0(A_{2,1}) = 3[0] + [-2].
+```
+
+Filtering by the minimal collision pattern removes `C=0`, whose critical
+orbit already has type `(0,1)`, and retains `C=-2` with exact type `(2,1)`:
+
+```text
+D^{exact}_{2,1} = [-2].
+```
+
+Thus root multiplicity is not exact-type multiplicity. The executable
+`CriticalRelationDivisorMultiset` records both cycles and checks that the raw
+multiplicities sum to the degree before applying the exact-type filter.
+
 ### B2 — Good-reduction and lifting certificate
 
 A residue-class root may be used in the bridge only with a certificate that
