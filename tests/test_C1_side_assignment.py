@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "C1_side_assignment.mojo"
+SRC = ROOT / "kernel/mojo/c1/separator/side_assignment.mojo"
 DOC = ROOT / "docs" / "C1_side_assignment_witnesses.md"
 
 

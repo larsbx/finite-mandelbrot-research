@@ -1,7 +1,7 @@
 # The atlas: every exact object, printed once, and the page built from it
 
 **Scope.** An engineering change. No mathematical claim changes and no verdict
-moves: `src/atlas_dataset.mojo` asks each module for the answer it already
+moves: `kernel/mojo/entrypoints/atlas_dataset.mojo` asks each module for the answer it already
 computes and prints it as JSON. It is the boundary where the exact objects
 leave this repository, and it holds the policy at that boundary.
 
@@ -28,7 +28,7 @@ module exists.
 ## 2. What is not in it
 
 Positions in the parameter plane. They are floating point, no module under
-`src/` may produce one, and `tools/audit_exact_arithmetic.py` enforces that.
+`kernel/` may produce one, and `tools/audit_exact_arithmetic.py` enforces that.
 A consumer that wants to draw the objects computes positions itself and says
 so; `tests/test_atlas_dataset.py` fails if a float ever reaches a section.
 
@@ -50,7 +50,7 @@ membership test reads that list, so the address shown and the address tested
 are the same object. The basilica is 1 → 2, the rabbit 1 → 3, the airplane
 1 → 2 → 3.
 
-**Exact numbers can be read in base ten.** `src/exact_decimal.mojo` renders a
+**Exact numbers can be read in base ten.** `kernel/mojo/arithmetic/exact_decimal.mojo` renders a
 `BigZ` and a `Q` as decimal digits. Limbs are base `10^9`, so this is
 concatenation, not division: no rounding, no floating point, and a rejected `Q`
 renders as `rejected` rather than as a number. It sits outside `finite_exact/`
@@ -70,7 +70,7 @@ sources, and the split above is exactly the seam:
   equation the object satisfies.
 
 `trace_positions.py` is floating point and uses the analytic machinery the core
-refuses. That is why it sits in `tools/`, why nothing under `src/` imports it,
+refuses. That is why it sits in `tools/`, why nothing under `kernel/` imports it,
 and why the audits that police the core need no exception for it. It computes a
 placement, not an association: tying a ray address to a parameter is the
 imported landing theorem, which this repository does not compute and does not

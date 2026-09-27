@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python reference for src/C1_residual_directive_carrier.mojo.
+"""Python reference for kernel/mojo/c1/residual/residual_directive_carrier.mojo.
 
 Exact rational arithmetic only. `kneading_prefix(theta)` is the 0/1 kneading
 sequence of a periodic angle up to its `*`; `continuation_last_letter` picks

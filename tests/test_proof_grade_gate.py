@@ -1,8 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BACKEND = ROOT / "src" / "cert_backend.mojo"
-PROOF = ROOT / "src" / "proof_grade_gate.mojo"
+BACKEND = ROOT / "kernel/mojo/arithmetic/cert_backend.mojo"
+PROOF = ROOT / "kernel/mojo/certificates/c_minus_2/proof_grade_gate.mojo"
 
 
 def read(path: Path) -> str:
@@ -28,7 +28,7 @@ def test_int64_demo_backend_not_certificate_ready():
 
 
 def test_checked_width_and_proof_grade_are_separate_gates():
-    src = read(ROOT / "src" / "certificate_arithmetic_migration_gate.mojo")
+    src = read(ROOT / "kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo")
     assert "def checked_width_accepted" in src
     assert "def proof_grade_accepted" in src
     assert "self.backend.certificate_ready()" in src

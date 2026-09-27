@@ -153,7 +153,7 @@ No generic boundary tag is allowed as an instance.
 
 ## First source-specific instances
 
-`src/C1_theorem_tag_payload_instances.mojo` binds the checked c=-2 finite data
+`kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo` binds the checked c=-2 finite data
 to two explicit bibliography records:
 
 - `SchleicherRationalParameterRays`, covering preperiodic rational parameter

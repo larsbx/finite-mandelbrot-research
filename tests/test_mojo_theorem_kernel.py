@@ -3,7 +3,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "docs" / "mojo_first_execution_policy.md"
 REGISTRY = ROOT / "docs" / "terminology-registry.md"
-KERNEL = ROOT / "src" / "mojo_theorem_kernel.mojo"
+KERNEL = ROOT / "kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo"
 
 
 def text(path: Path) -> str:

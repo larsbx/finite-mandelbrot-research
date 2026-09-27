@@ -44,7 +44,7 @@ The last row is decisive: `Q.zero()`, `IQ.point()`, `ComplexIQ.point()`, `Coord2
 
 ### F3. The hardcoded `P_{4,1}` coefficients are wrong (high)
 
-`src/poly_interval_eval.mojo` returns
+`kernel/mojo/polynomial/poly_interval_eval.mojo` returns
 
 ```text
 [0, 8, 20, 36, 56, 72, 76, 68, 52, 32, 16, 6, 1]
@@ -72,7 +72,7 @@ Verified in passing: `R_{4,1} = C^5 (C+2) (C^3+2C^2+2C+2) F_7` holds, `P_{4,1}` 
 
 | Source | "next immediate block" |
 | --- | --- |
-| `src/C1_final_proof_block_ledger.mojo` | `TheoremTagPayloadInstances` |
+| `kernel/mojo/c1/proof/final_proof_block_ledger.mojo` | `TheoremTagPayloadInstances` |
 | `docs/C1_final_proof_block_ledger.md` | `TheoremTagImportLedger` |
 | `tests/test_C1_final_proof_block_ledger.py` | `TheoremTagImportLedger` |
 
@@ -109,7 +109,7 @@ The scanners are lexical over comments, strings, and test fixtures alike. They n
 
 ### F10. Documentation drift (low)
 
-- `src/README.md` says "Prototype implementation will go here after the certificate grammar stabilizes" and lists `poly/`, `interval/`, `krawczyk/` subdirectories that do not exist; `src/` holds 69 flat files.
+- `kernel/mojo/README.md` says "Prototype implementation will go here after the certificate grammar stabilizes" and lists `poly/`, `interval/`, `krawczyk/` subdirectories that do not exist; `src/` holds 69 flat files.
 - `ROADMAP.md` Phase 5 names Lean/Rocq, Rust or Zig, and Python/Sage; `README.md` declares Mojo-first. Phase 0's "computed multi-ray stress test" is unchecked although `M_{4,1}` material exists.
 - Three Mojo files are referenced by no test, tool, or document: `interval_exclusion_plan.mojo`, `poly_division_plan.mojo`, `smoke_tests.mojo`.
 - The CI workflow file is named `no-trig-audit.yml` but the workflow is `finite-regime-core-audit`, and it enumerates 59 test files by hand instead of `pytest tests/`.
@@ -138,6 +138,6 @@ The scanners are lexical over comments, strings, and test fixtures alike. They n
 4. **Correct the Galois sentence** in `docs/finite-certificate-calculus.md` and cite the bridge document's proof. (F9)
 5. **Replace literal-returning policy functions** with data checked by the kernel, and string kinds with enums, so a ledger state is derived rather than declared. Collapse the duplicate `gcd`, rational, and ray-address types. (F8)
 6. **Implement the bigint boundary** before any certificate is marked proof-grade; add overflow tests at `Q_8`. (F7)
-7. **Add `LICENSE`, `.gitignore`, `pyproject.toml`**, `permissions: contents: read` in the workflow, and reconcile `src/README.md` and `ROADMAP.md` with `README.md`. (F10, F11)
+7. **Add `LICENSE`, `.gitignore`, `pyproject.toml`**, `permissions: contents: read` in the workflow, and reconcile `kernel/mojo/README.md` and `ROADMAP.md` with `README.md`. (F10, F11)
 
 Items 1 and 2 are small and unblock everything else. Until item 3 is done, no statement of the form "checked by the Mojo theorem kernel" is true.

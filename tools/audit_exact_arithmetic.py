@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC_REL = "docs/rational-interval-arithmetic-spec.md"
 SPEC = ROOT / SPEC_REL
 ALLOWLIST = ROOT / "tools" / "exact_arithmetic_allowlist.md"
-SCAN_ROOTS = [ROOT / "src"]
+SCAN_ROOTS = [ROOT / "kernel", ROOT / "vendor" / "mojo"]
 BINDING_HEADING = "### 6.2 `larsbx/finite-mandlebrot-research`"
 
 REQUIRED_SECTIONS = [
@@ -58,8 +58,8 @@ ARITHMETIC_IMPORT_RE = re.compile(
     re.MULTILINE,
 )
 VENDORED_FACADES = {
-    "src/finite_exact/rational.mojo",
-    "src/finite_exact/closed_interval.mojo",
+    "vendor/mojo/finite_exact/rational.mojo",
+    "vendor/mojo/finite_exact/closed_interval.mojo",
 }
 
 

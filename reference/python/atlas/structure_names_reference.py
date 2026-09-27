@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact checks for the names atlas, `spec/structure_names.toml`.
+"""Exact checks for the names atlas, `schemas/structure_names.toml`.
 
 Every common name in the atlas is keyed to exact data, and every datum is
 recomputed here over `Fraction`: exact types of rational angles under
@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT))
 from reference.python.c1 import kneading_reference as kr  # noqa: E402
 from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
 
-TABLE = ROOT / "spec" / "structure_names.toml"
+TABLE = ROOT / "schemas/structure_names.toml"
 NAME_STATUSES = ("field", "eponym", "folk")
 KINDS = (
     "class",

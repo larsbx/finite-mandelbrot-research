@@ -6,7 +6,7 @@ id = "larsbx/finite-mandelbrot-research"
 kind = "research"
 lifecycle = "active"
 default_branch = "main"
-layout_status = "transitional"
+layout_status = "canonical"
 
 [principles]
 ordering = ["authority", "domain", "language"]
@@ -16,26 +16,29 @@ generated_surfaces = "derived_only"
 vendor_code = "non_local"
 experimental_code = "non_authoritative"
 
+# Policy is five root manifests; the tools locate them at the root, so no policy/ silo exists.
 [[plane]]
 id = "policy"
-target = "policy"
+target = "estate.toml"
 authority = "governance"
 required = true
-current = ["backend.toml", "claim_governance.toml", "polyglot.manifest.toml", "vendored.toml"]
+current = ["estate.toml", "backend.toml", "claim_governance.toml", "polyglot.manifest.toml", "vendored.toml"]
 
+# Mojo in domain packages under kernel/mojo (include roots: -I kernel/mojo -I vendor/mojo).
 [[plane]]
 id = "kernel"
 target = "kernel"
 authority = "canonical_executable"
 required = true
-current = ["src"]
+current = ["kernel"]
 
+# proof/c1/records.toml is the source; ledger.json is its generated projection.
 [[plane]]
 id = "proof"
 target = "proof"
 authority = "claim_state"
 required = true
-current = ["proof", "ledger.json", "tla"]
+current = ["proof", "ledger.json"]
 
 [[plane]]
 id = "reference"
@@ -56,54 +59,44 @@ id = "experiments"
 target = "experiments"
 authority = "non_authoritative_experiment"
 required = true
-current = ["spikes"]
+current = ["experiments"]
 
+# The polyglot boundary schemas stay in the hidden .polyglot/ scaffold shared across the estate.
 [[plane]]
 id = "schemas"
 target = "schemas"
 authority = "contract"
 required = true
-current = ["spec"]
-current_globs = [".polyglot/*.schema.json"]
+current = ["schemas"]
 
 [[plane]]
 id = "conformance"
-target = "conformance"
+target = "tests"
 authority = "evidence"
 required = true
-current = ["tests", ".polyglot/conformance-v1.json"]
+current = ["tests"]
 
+# vendor/mojo and vendor/python are the roots named in vendored.toml.
 [[plane]]
 id = "vendor"
 target = "vendor"
 authority = "pinned_external"
 required = true
-current = [
-  "src/finite_exact",
-  "src/substitution_dynamics",
-  "tools/claim_governance",
-  "tools/proof_records",
-  "tools/oracle_refinement",
-]
+current = ["vendor"]
 
 [[plane]]
 id = "tooling"
 target = "tools"
 authority = "repository_tooling"
 required = true
-current_globs = [
-  "tools/audit_*.py",
-  "tools/check_vendored_sync.py",
-  "tools/make_ledger.py",
-  "tools/atlas",
-]
+current = ["tools"]
 
 [[plane]]
 id = "docs"
 target = "docs"
 authority = "exposition"
 required = true
-current = ["docs"]
+current = ["docs", "README.md", "ARCHITECTURE.md", "MIGRATION.md", "ROADMAP.md"]
 
 [[plane]]
 id = "paper"
@@ -152,8 +145,12 @@ acceptance_authority = false
 [migration]
 mode = "boundary_first"
 mass_move = false
-next = [
-  "move local Mojo into domain namespaces",
-  "make vendored packages physically explicit",
-  "split CI by authority plane",
-]
+next = []
+
+[governance]
+repository = "larsbx/estate-governance"
+revision = "283b6955395ea17f022412aa1539db7aa0448e08"
+
+[governance.sha256]
+"docs/architecture/estate-repository-template-v1.md" = "e2a136e7779290224c1c4a73f4fefb9da51e1b0881fd460e911611db59da08d5"
+"tools/audit_estate_layout.py" = "8037f9366da3eeb03f928944c9688ea3ef14a6861c8a8950d9351692e22f37da"

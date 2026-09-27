@@ -5,7 +5,8 @@ This repository is the first adopter of the estate repository template.
 The machine-readable source of repository structure and authority is
 [`estate.toml`](estate.toml). The reusable contract is
 [`docs/architecture/estate-repository-template-v1.md`](docs/architecture/estate-repository-template-v1.md),
-and this repository's staged application is
+vendored from `larsbx/estate-governance` and pinned by sha256 in the
+`[governance]` table of `estate.toml`; this repository's staged application is
 [`docs/architecture/finite-mandelbrot-application.md`](docs/architecture/finite-mandelbrot-application.md).
 
 The ordering rule is:
@@ -14,7 +15,8 @@ The ordering rule is:
 authority -> mathematical/domain concern -> implementation language
 ```
 
-The current tree is intentionally transitional. Existing paths remain authoritative
-until a dedicated migration PR moves them. Directory renames alone must not change
-theorem status, certificate acceptance, imported-theorem assumptions, or the
-Mojo finite-checker boundary.
+The layout is canonical: every plane in `estate.toml` maps exactly its `target`
+(root-level files aside), every top-level directory is some plane's target, and
+no migration step is pending; the audit enforces all three. Directory renames
+alone must not change theorem status, certificate acceptance, imported-theorem
+assumptions, or the Mojo finite-checker boundary.

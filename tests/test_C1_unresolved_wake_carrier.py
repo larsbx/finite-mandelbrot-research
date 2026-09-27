@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_unresolved_wake_to_carrier_obstruction.md"
-SRC = ROOT / "src" / "C1_unresolved_wake_carrier.mojo"
+SRC = ROOT / "kernel/mojo/c1/wake/unresolved_wake_carrier.mojo"
 
 
 def text(path):

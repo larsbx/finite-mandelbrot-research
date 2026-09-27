@@ -1,22 +1,41 @@
 #!/usr/bin/env python3
-"""Validate the estate repository architecture manifest.
+"""Validate the estate repository architecture manifest (estate-repository-v1).
 
-This audit is intentionally domain-agnostic. Domain theorem status and certificate
-acceptance remain consumer responsibilities.
+Canonical source: larsbx/estate-governance, kernel/audit_estate_layout.py.
+Consumers carry a byte-identical copy at tools/audit_estate_layout.py, pinned
+by sha256 in the [governance] table of their estate.toml. Never edit a
+vendored copy; change the source and re-vendor.
+
+This audit is intentionally domain-agnostic. Domain theorem status and
+certificate acceptance remain consumer responsibilities.
 """
 
 from __future__ import annotations
 
+import argparse
 import glob
+import hashlib
 import re
 import sys
 import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "estate.toml"
 
-ALLOWED_PLANE_AUTHORITIES = {
+GOVERNANCE_REPOSITORY = "larsbx/estate-governance"
+
+#: Consumer path -> source path in the governance repository.
+VENDORED: dict[str, str] = {
+    "tools/audit_estate_layout.py": "kernel/audit_estate_layout.py",
+    "docs/architecture/estate-repository-template-v1.md": "docs/architecture/estate-repository-template-v1.md",
+}
+
+#: Top-level directories outside every plane: hidden ones and build artifacts.
+UNTRACKED = re.compile(r"\..*|__pycache__|.*\.egg-info")
+
+ENTRYPOINTS = ("ARCHITECTURE.md", "docs/architecture/estate-repository-template-v1.md")
+
+ALLOWED_PLANE_AUTHORITIES = frozenset({
     "governance",
     "canonical_executable",
     "claim_state",
@@ -30,140 +49,179 @@ ALLOWED_PLANE_AUTHORITIES = {
     "exposition",
     "publication",
     "example",
-}
-ALLOWED_LANGUAGE_AUTHORITIES = {"canonical", "supporting"}
+})
+ALLOWED_LANGUAGE_AUTHORITIES = frozenset({"canonical", "supporting"})
 
 
 def fail(message: str) -> None:
     raise AssertionError(message)
 
 
-def load(path: Path = MANIFEST) -> dict:
-    if not path.is_file():
-        fail(f"missing estate manifest: {path.relative_to(ROOT)}")
+def require(condition: object, message: str) -> None:
+    if not condition:
+        fail(message)
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load(path: Path | None = None) -> dict:
+    path = path or ROOT / "estate.toml"
+    require(path.is_file(), f"missing estate manifest: {path}")
     return tomllib.loads(path.read_text(encoding="utf-8"))
 
 
-def matches(pattern: str) -> list[Path]:
-    return [Path(p) for p in glob.glob(str(ROOT / pattern), recursive=True)]
-
-
-def validate(data: dict) -> None:
-    if data.get("version") != 1:
-        fail("estate.toml version must be 1")
-    if data.get("template") != "estate-repository-v1":
-        fail("estate.toml template must be estate-repository-v1")
-
+def validate_identity(data: dict) -> str:
+    require(data.get("version") == 1, "estate.toml version must be 1")
+    require(data.get("template") == "estate-repository-v1",
+            "estate.toml template must be estate-repository-v1")
     repository = data.get("repository", {})
     repository_id = repository.get("id", "")
-    if not re.fullmatch(r"[^/\s]+/[^/\s]+", repository_id):
-        fail("repository.id must be OWNER/REPOSITORY")
-    if repository.get("layout_status") not in {"transitional", "canonical"}:
-        fail("repository.layout_status must be transitional or canonical")
+    require(re.fullmatch(r"[^/\s]+/[^/\s]+", repository_id),
+            "repository.id must be OWNER/REPOSITORY")
+    require(repository.get("layout_status") in {"transitional", "canonical"},
+            "repository.layout_status must be transitional or canonical")
+    return repository_id
 
+
+def validate_principles(data: dict) -> None:
     principles = data.get("principles", {})
-    if principles.get("ordering") != ["authority", "domain", "language"]:
-        fail("principles.ordering must be authority, domain, language")
-    if principles.get("cross_language_disagreement") != "fail_closed":
-        fail("cross-language disagreement must fail closed")
-    if principles.get("empty_silos") != "forbidden":
-        fail("empty silos must be forbidden")
+    require(principles.get("ordering") == ["authority", "domain", "language"],
+            "principles.ordering must be authority, domain, language")
+    require(principles.get("cross_language_disagreement") == "fail_closed",
+            "cross-language disagreement must fail closed")
+    require(principles.get("empty_silos") == "forbidden", "empty silos must be forbidden")
 
+
+def validate_planes(data: dict, root: Path) -> None:
     planes = data.get("plane", [])
-    if not planes:
-        fail("at least one authority plane is required")
+    require(planes, "at least one authority plane is required")
 
     ids: set[str] = set()
     targets: set[str] = set()
     for plane in planes:
-        plane_id = plane.get("id", "")
-        target = plane.get("target", "")
-        authority = plane.get("authority", "")
-        if not plane_id:
-            fail("plane.id is required")
-        if plane_id in ids:
-            fail(f"duplicate plane id: {plane_id}")
+        plane_id, target = plane.get("id", ""), plane.get("target", "")
+        require(plane_id, "plane.id is required")
+        require(plane_id not in ids, f"duplicate plane id: {plane_id}")
+        require(target, f"plane {plane_id}: target is required")
+        require(target not in targets, f"duplicate plane target: {target}")
         ids.add(plane_id)
-        if not target:
-            fail(f"plane {plane_id}: target is required")
-        if target in targets:
-            fail(f"duplicate plane target: {target}")
         targets.add(target)
-        if authority not in ALLOWED_PLANE_AUTHORITIES:
-            fail(f"plane {plane_id}: unknown authority {authority!r}")
+        require(plane.get("authority") in ALLOWED_PLANE_AUTHORITIES,
+                f"plane {plane_id}: unknown authority {plane.get('authority')!r}")
 
         current = plane.get("current", [])
         current_globs = plane.get("current_globs", [])
-        if plane.get("required", False) and not (current or current_globs):
-            fail(f"plane {plane_id}: required plane needs a current mapping")
-
+        require(not plane.get("required", False) or current or current_globs,
+                f"plane {plane_id}: required plane needs a current mapping")
         for rel in current:
-            if not (ROOT / rel).exists():
-                fail(f"plane {plane_id}: missing current path {rel}")
+            require((root / rel).exists(), f"plane {plane_id}: missing current path {rel}")
         for pattern in current_globs:
-            if not matches(pattern):
-                fail(f"plane {plane_id}: current_globs pattern matches nothing: {pattern}")
+            require(glob.glob(str(root / pattern), recursive=True),
+                    f"plane {plane_id}: current_globs pattern matches nothing: {pattern}")
 
-    if "kernel" not in ids:
-        fail("kernel plane is required for this template")
-    if "policy" not in ids:
-        fail("policy plane is required for this template")
+    for mandatory in ("kernel", "policy"):
+        require(mandatory in ids, f"{mandatory} plane is required for this template")
 
-    languages = data.get("language", [])
+    if data["repository"]["layout_status"] == "canonical":
+        validate_canonical(data, root)
+
+
+def validate_canonical(data: dict, root: Path) -> None:
+    """Canonical: every plane maps its target (root-level files aside), and every
+    top-level directory is some plane's target."""
+    for plane in data["plane"]:
+        current = plane.get("current", [])
+        extras = [rel for rel in current if rel != plane["target"]]
+        require(
+            plane["target"] in current
+            and not plane.get("current_globs")
+            and all("/" not in rel and (root / rel).is_file() for rel in extras),
+            f"canonical layout: plane {plane['id']} must map its target {plane['target']!r} "
+            "plus only root-level files",
+        )
+    require(not data.get("migration", {}).get("next"), "canonical layout must have no pending migration")
+    targets = {plane["target"] for plane in data["plane"]}
+    for entry in sorted(root.iterdir()):
+        if entry.is_dir() and not UNTRACKED.fullmatch(entry.name):
+            require(entry.name in targets,
+                    f"canonical layout: top-level directory {entry.name!r} belongs to no plane")
+
+
+def validate_languages(data: dict) -> None:
     names: set[str] = set()
-    canonical = []
-    for language in languages:
-        name = language.get("name", "")
-        authority = language.get("authority", "")
-        if not name:
-            fail("language.name is required")
-        if name in names:
-            fail(f"duplicate language: {name}")
+    for language in data.get("language", []):
+        name, authority = language.get("name", ""), language.get("authority", "")
+        require(name, "language.name is required")
+        require(name not in names, f"duplicate language: {name}")
         names.add(name)
-        if authority not in ALLOWED_LANGUAGE_AUTHORITIES:
-            fail(f"language {name}: invalid authority {authority!r}")
-        if authority == "canonical":
-            canonical.append(language)
-        if language.get("acceptance_authority") and authority != "canonical":
-            fail(f"language {name}: supporting language cannot have acceptance authority")
+        require(authority in ALLOWED_LANGUAGE_AUTHORITIES,
+                f"language {name}: invalid authority {authority!r}")
+        require(not language.get("acceptance_authority") or authority == "canonical",
+                f"language {name}: supporting language cannot have acceptance authority")
 
-    if len(canonical) != 1:
-        fail("exactly one canonical language is required")
-    if "kernel" not in canonical[0].get("roles", []):
-        fail("canonical language must own the kernel role")
+    canonical = [x for x in data.get("language", []) if x.get("authority") == "canonical"]
+    require(len(canonical) == 1, "exactly one canonical language is required")
+    require("kernel" in canonical[0].get("roles", []),
+            "canonical language must own the kernel role")
 
-    for required in ("ARCHITECTURE.md", "docs/architecture/estate-repository-template-v1.md"):
-        if not (ROOT / required).is_file():
-            fail(f"missing architecture entrypoint: {required}")
 
-    workspace = ROOT / "pixi.toml"
+def validate_governance(data: dict, repository_id: str, root: Path) -> None:
+    governance = data.get("governance")
+    if repository_id == GOVERNANCE_REPOSITORY:
+        require(governance is None, "governance source repository must not pin itself")
+        return
+
+    require(governance and governance.get("repository") == GOVERNANCE_REPOSITORY,
+            f"[governance] must pin repository {GOVERNANCE_REPOSITORY}")
+    require(re.fullmatch(r"[0-9a-f]{40}", governance.get("revision", "")),
+            "governance.revision must be a 40-hex commit")
+    digests = governance.get("sha256", {})
+    require(set(digests) == set(VENDORED),
+            f"governance.sha256 must cover exactly the vendored file set {sorted(VENDORED)}")
+    for rel, digest in sorted(digests.items()):
+        require((root / rel).is_file(), f"missing vendored governance file: {rel}")
+        require(sha256(root / rel) == digest,
+                f"vendored governance file digest mismatch (local edit?): {rel}")
+
+
+def validate_workspaces(repository_id: str, root: Path) -> None:
+    workspace = root / "pixi.toml"
     if workspace.is_file():
-        wdata = tomllib.loads(workspace.read_text(encoding="utf-8"))
-        expected_name = repository_id.split("/", 1)[1]
-        if wdata.get("workspace", {}).get("name") != expected_name:
-            fail(
-                "pixi workspace identity disagrees with estate.toml: "
-                f"expected {expected_name!r}"
-            )
+        expected = repository_id.split("/", 1)[1]
+        name = tomllib.loads(workspace.read_text(encoding="utf-8")).get("workspace", {}).get("name")
+        require(name == expected, f"pixi workspace identity disagrees with estate.toml: expected {expected!r}")
 
-    polyglot = ROOT / "polyglot.manifest.toml"
+    polyglot = root / "polyglot.manifest.toml"
     if polyglot.is_file():
         pdata = tomllib.loads(polyglot.read_text(encoding="utf-8"))
-        if pdata.get("repository") != repository_id:
-            fail("polyglot.manifest.toml repository disagrees with estate.toml")
-        estate_link = pdata.get("estate", {}).get("manifest")
-        if estate_link != "estate.toml":
-            fail("polyglot.manifest.toml must link to estate.toml")
-
-        if (ROOT / "oracles/julia").exists():
-            supporting = pdata.get("authority", {}).get("supporting_languages", [])
-            if "Julia" not in supporting:
-                fail("Julia oracle lane exists but polyglot supporting_languages omits Julia")
+        require(pdata.get("repository") == repository_id,
+                "polyglot.manifest.toml repository disagrees with estate.toml")
+        require(pdata.get("estate", {}).get("manifest") == "estate.toml",
+                "polyglot.manifest.toml must link to estate.toml")
+        if (root / "oracles/julia").exists():
+            require("Julia" in pdata.get("authority", {}).get("supporting_languages", []),
+                    "Julia oracle lane exists but polyglot supporting_languages omits Julia")
 
 
-def main() -> int:
+def validate(data: dict, root: Path = ROOT) -> None:
+    repository_id = validate_identity(data)
+    validate_principles(data)
+    validate_planes(data, root)
+    validate_languages(data)
+    for required in ENTRYPOINTS:
+        require((root / required).is_file(), f"missing architecture entrypoint: {required}")
+    validate_governance(data, repository_id, root)
+    validate_workspaces(repository_id, root)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--root", type=Path, default=ROOT, help="repository root (default: this checkout)")
+    root = parser.parse_args(argv).root.resolve()
     try:
-        validate(load())
+        validate(load(root / "estate.toml"), root)
     except (AssertionError, tomllib.TOMLDecodeError) as exc:
         print(f"estate-layout audit failed: {exc}", file=sys.stderr)
         return 1

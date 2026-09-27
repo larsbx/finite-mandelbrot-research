@@ -1,6 +1,6 @@
 """The names atlas, checked entry by entry against exact oracles.
 
-`spec/structure_names.toml` keys every common name for a structure of the
+`schemas/structure_names.toml` keys every common name for a structure of the
 Mandelbrot set to exact data: rational external angles, internal addresses,
 integer polynomials, rational parameters and rational isolating intervals.
 `docs/mandelbrot-structure-names-atlas.md` is the prose it binds to. Every

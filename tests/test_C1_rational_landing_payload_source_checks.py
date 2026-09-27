@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "C1_theorem_tag_payload_instances.mojo"
+SRC = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo"
 
 
 def read(path: Path) -> str:

@@ -17,10 +17,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
 import make_ledger as ml  # noqa: E402
 
-MOJO = (ROOT / "src" / "C1_final_proof_block_ledger.mojo").read_text(encoding="utf-8")
+MOJO = (ROOT / "kernel/mojo/c1/proof/final_proof_block_ledger.mojo").read_text(encoding="utf-8")
 DOC = (ROOT / "docs" / "C1_final_proof_block_ledger.md").read_text(encoding="utf-8")
 POLICY = tomllib.loads((ROOT / "claim_governance.toml").read_text(encoding="utf-8"))
 LEDGER = json.loads((ROOT / "ledger.json").read_text(encoding="utf-8"))
@@ -48,7 +49,7 @@ def test_every_generated_surface_is_current():
 
 def test_generation_is_a_pure_function_of_the_declarative_records():
     """Running the generator twice changes nothing."""
-    before = {p: p.read_text(encoding="utf-8") for p in (ROOT / "src" / "C1_final_proof_block_ledger.mojo",
+    before = {p: p.read_text(encoding="utf-8") for p in (ROOT / "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
                                                          ROOT / "docs" / "C1_final_proof_block_ledger.md",
                                                          ROOT / "claim_governance.toml", ROOT / "ledger.json")}
     assert subprocess.run([sys.executable, str(ROOT / "tools" / "make_ledger.py")], capture_output=True).returncode == 0

@@ -3,14 +3,14 @@
 
 Round-two item R2 of `docs/cross-pollination-round-two-2026-09-16.md`, the half
 that was still owed here: this repository's ledgers were hand-maintained on
-three surfaces at once -- the Mojo mirror `src/C1_final_proof_block_ledger.mojo`,
+three surfaces at once -- the Mojo mirror `kernel/mojo/c1/proof/final_proof_block_ledger.mojo`,
 the Markdown table of `docs/C1_final_proof_block_ledger.md`, and the `[[claim]]`
 entries of `claim_governance.toml` -- and the claim-governance `consistency`
 check could only report drift after it had happened. `proof/c1/records.toml` is
 now the single source. Every surface is a function of it, so drift is impossible
 rather than detected.
 
-`tools/proof_records` is vendored byte-for-byte from `larsbx/finite-math-kernels`
+`vendor/python/proof_records` is vendored byte-for-byte from `larsbx/finite-math-kernels`
 (`docs/ledger-generation-spec.md` and `docs/typed-relationship-graph-spec.md`
 there) and renders the TLA+ ledger and its TLC models, the Markdown index, the
 typed relationship graph, and the spliced `[[claim]]` block. The Mojo mirror and
@@ -35,13 +35,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
 from proof_records import generate_ledgers as gl  # noqa: E402
 from proof_records.records import Edge, Kind, Record, identified  # noqa: E402
 
 LEDGER = ROOT / "ledger.json"
 POLICY = ROOT / "claim_governance.toml"
-MOJO = ROOT / "src" / "C1_final_proof_block_ledger.mojo"
+MOJO = ROOT / "kernel/mojo/c1/proof/final_proof_block_ledger.mojo"
 BLOCK_DOC = ROOT / "docs" / "C1_final_proof_block_ledger.md"
 SPEC_PATH = ROOT / "proof" / "c1" / "records.toml"
 
@@ -96,7 +97,7 @@ def surface(path: str, anchor: str, window_lines: int = 0, expect: str = "labell
 # notices going missing.
 SURFACES = {
     name: [surface("docs/C1_final_proof_block_ledger.md", f"| `{name}` |"),
-           surface("src/C1_final_proof_block_ledger.mojo", f'ProofBlockStatus("{name}",')]
+           surface("kernel/mojo/c1/proof/final_proof_block_ledger.mojo", f'ProofBlockStatus("{name}",')]
     for name in TABLE if name != ROOT_RECORD
 }
 SURFACES[ROOT_RECORD] = [

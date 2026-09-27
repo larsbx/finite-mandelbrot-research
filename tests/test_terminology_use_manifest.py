@@ -37,7 +37,7 @@ def test_manifest_scopes_c1_terms_and_marks_legacy_term_deprecated():
         assert term in body
     assert "catalogue extensionality` — use only when explicitly marked deprecated" in body
     assert "docs/C1_" in body
-    assert "src/C1_" in body
+    assert "kernel/mojo/c1/" in body
     assert "tests/test_C1_" in body
 
 

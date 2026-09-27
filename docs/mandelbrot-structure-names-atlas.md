@@ -10,7 +10,7 @@ defining word below is a field term (Route A of
 
 | Layer | File |
 | --- | --- |
-| the table, one entry per structure | `spec/structure_names.toml` |
+| the table, one entry per structure | `schemas/structure_names.toml` |
 | the exact checks | `reference/python/atlas/structure_names_reference.py` |
 | the tests (every field recomputed, plus doc ↔ table binding) | `tests/test_structure_names_atlas.py` |
 | this prose | `docs/mandelbrot-structure-names-atlas.md` |
@@ -198,7 +198,7 @@ consecutive pair Farey neighbours (checked).
 
 ## 9. Adding a name
 
-Add an entry to `spec/structure_names.toml` with a `source`, add its row and
+Add an entry to `schemas/structure_names.toml` with a `source`, add its row and
 anchor here, and run:
 
 ```bash

@@ -3,8 +3,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_admissible_separator_codes.md"
-SRC = ROOT / "src" / "C1_separator_codes.mojo"
+SRC = ROOT / "kernel/mojo/c1/separator/separator_codes.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 from source_tokens import mask_comments_and_strings
 
 

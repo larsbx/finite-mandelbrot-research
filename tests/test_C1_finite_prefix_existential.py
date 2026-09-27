@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "C1_finite_prefix_existential.mojo"
+SRC = ROOT / "kernel/mojo/c1/bridge/finite_prefix_existential.mojo"
 DOC = ROOT / "docs" / "C1_finite_prefix_to_existential_separation.md"
 
 

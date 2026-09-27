@@ -32,7 +32,7 @@ A = -1/2
 
 ## Native witness formula
 
-The committed `src/krawczyk_witness.mojo` now computes
+The committed `kernel/mojo/certificates/krawczyk_witness.mojo` now computes
 
 ```text
 K(beta) = m - A P(m) + (1 - A P'(beta))(beta - m)

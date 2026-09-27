@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src" / "critical_relation_multiset.mojo"
-SMOKE = ROOT / "src" / "smoke_tests.mojo"
+SOURCE = ROOT / "kernel/mojo/dynamics/critical_relation_multiset.mojo"
+SMOKE = ROOT / "kernel/mojo/smoke/smoke_tests.mojo"
 BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
 
 
@@ -48,7 +48,7 @@ def test_bridge_documentation_distinguishes_raw_and_exact_type_cycles():
 def test_critical_relation_multiset_is_compiler_wired(mojo_smoke):
     smoke = read(SMOKE)
     assert (
-        "from critical_relation_multiset import "
+        "from dynamics.critical_relation_multiset import "
         "critical_relation_multiset_smoke" in smoke
     )
     assert 'report.record("critical-relation divisor multiset"' in smoke

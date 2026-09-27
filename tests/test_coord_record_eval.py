@@ -2,8 +2,9 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "coord_record_eval.mojo"
+SRC = ROOT / "kernel/mojo/arithmetic/coord_record_eval.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 from source_tokens import mask_comments_and_strings
 
 

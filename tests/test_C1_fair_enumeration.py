@@ -3,8 +3,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_catalogue_extensionality.md"
-SRC = ROOT / "src" / "C1_fair_enumeration.mojo"
+SRC = ROOT / "kernel/mojo/c1/bridge/fair_enumeration.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 from source_tokens import mask_comments_and_strings
 
 

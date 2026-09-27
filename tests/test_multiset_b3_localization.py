@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src" / "multiset_b3_localization.mojo"
-SMOKE = ROOT / "src" / "smoke_tests.mojo"
+SOURCE = ROOT / "kernel/mojo/dynamics/multiset_b3_localization.mojo"
+SMOKE = ROOT / "kernel/mojo/smoke/smoke_tests.mojo"
 BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
 
 
@@ -57,7 +57,7 @@ def test_b3_bridge_documentation_names_executable_boundary():
 def test_b3_localization_is_compiler_wired(mojo_smoke):
     smoke = read(SMOKE)
     assert (
-        "from multiset_b3_localization import "
+        "from dynamics.multiset_b3_localization import "
         "multiset_b3_localization_smoke" in smoke
     )
     assert 'report.record("multiset B3 localization"' in smoke

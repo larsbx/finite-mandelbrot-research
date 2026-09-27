@@ -52,7 +52,7 @@ def test_carrier_density_direct_execution_does_not_need_the_shim(tmp_path):
 
     tools_dir = tmp_path / "tools"
     tools_dir.mkdir()
-    shutil.copytree(ROOT / "tools" / "oracle_refinement", tools_dir / "oracle_refinement")
+    shutil.copytree(ROOT / "vendor/python/oracle_refinement", tools_dir / "oracle_refinement")
     assert not (tools_dir / "separated_density_reference.py").exists()
 
     result = subprocess.run(

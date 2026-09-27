@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python reference for src/C1_misiurewicz_prefix_graph.mojo.
+"""Python reference for kernel/mojo/c1/wake/misiurewicz_prefix_graph.mojo.
 
 Integer arithmetic only, everything inside `Z/den`.
 

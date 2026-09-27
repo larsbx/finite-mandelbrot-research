@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "bigq_certificate_incidence.mojo"
+SRC = ROOT / "kernel/mojo/certificates/c_minus_2/bigq_certificate_incidence.mojo"
 
 
 def text() -> str:
@@ -51,8 +51,8 @@ def test_c1_and_residual_closure_remain_false():
 
 
 def test_incidence_replay_is_compiler_wired(mojo_smoke):
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     boundary = (ROOT / "docs" / "mojo-toolchain-boundary.md").read_text(encoding="utf-8")
-    assert "from bigq_certificate_incidence import bigq_certificate_incidence_smoke" in smoke
+    assert "from certificates.c_minus_2.bigq_certificate_incidence import bigq_certificate_incidence_smoke" in smoke
     assert mojo_smoke.case_passed("bigq certificate incidence")
-    assert "src/bigq_certificate_incidence.mojo" in boundary
+    assert "kernel/mojo/certificates/c_minus_2/bigq_certificate_incidence.mojo" in boundary

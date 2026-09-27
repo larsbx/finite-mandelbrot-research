@@ -2,7 +2,7 @@
   "format": "finite_proof_records ledger 1",
   "repository": "larsbx/finite-mandlebrot-research",
   "module": "Ledger",
-  "tla_dir": "tla",
+  "tla_dir": "proof/c1/models/tla",
   "index_path": "docs/C1_ledger_index.md",
   "graph_path": "docs/C1_claim_relationship_graph.json",
   "assumption_sets": {
@@ -39,7 +39,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"SeparatorCatalogueSoundness\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -53,7 +53,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"SeparatorCatalogueCompleteness\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -67,7 +67,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"FiberDefinitionAdapter\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -81,7 +81,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"ResidualClosureNoMissingLinks\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -95,7 +95,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"ExitClosureForC1\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -109,7 +109,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"BoundaryEqualitySoundness\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -123,7 +123,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"TheoremTagImportSoundness\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -137,7 +137,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"TheoremTagPayloadInstances\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -151,7 +151,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"TheoremTagImportLedger\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -165,7 +165,7 @@
         "expect": "labelled"
       },
       {
-        "path": "src/C1_final_proof_block_ledger.mojo",
+        "path": "kernel/mojo/c1/proof/final_proof_block_ledger.mojo",
         "anchor": "ProofBlockStatus(\"TheoremTagAssumptionPayloads\",",
         "window_lines": 0,
         "expect": "labelled"
@@ -185,13 +185,13 @@
         "expect": "present"
       },
       {
-        "path": "src/C1_theorem_status.mojo",
+        "path": "kernel/mojo/c1/proof/theorem_status.mojo",
         "anchor": "return C1Status(local, True, True, False, False)",
         "window_lines": 0,
         "expect": "present"
       },
       {
-        "path": "src/C1_theorem_status.mojo",
+        "path": "kernel/mojo/c1/proof/theorem_status.mojo",
         "anchor": "fn bounded_search_proves_c1() -> Bool:\n    return False",
         "window_lines": 0,
         "expect": "present"
@@ -326,7 +326,7 @@
       ]
     },
     "TheoremTagImportLedger": {
-      "id": "sha256:31d03b4643f8f645818a0d28c9d09abdb06e83f58c914f06144d402b0945a84d",
+      "id": "sha256:0d52e9c00cfbacdaae680245951e43a7af2269e6532792af65aadb6d7916d7c3",
       "kind": "repository_theorem",
       "statement": "the theorem-tag import ledger names every imported theorem family with its strength class",
       "scope": "the final C1 proof object",
@@ -338,13 +338,13 @@
         ],
         [
           "source",
-          "src/C1_theorem_tag_import_ledger.mojo; docs/C1_theorem_tag_import_ledger.md"
+          "kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo; docs/C1_theorem_tag_import_ledger.md"
         ]
       ],
       "tags": []
     },
     "TheoremTagAssumptionPayloads": {
-      "id": "sha256:acae1b366ccd42f7da3dc63dbd1941fa275ac15909951a051ba5aaeed0de9b18",
+      "id": "sha256:81e96fe865553748ebaa1242794e9c20df0928ee47b06ec10a6c64e9957c05a9",
       "kind": "repository_theorem",
       "statement": "every theorem tag in the import ledger has a declared assumption-payload schema",
       "scope": "the final C1 proof object",
@@ -356,7 +356,7 @@
         ],
         [
           "source",
-          "src/C1_theorem_tag_assumption_payloads.mojo"
+          "kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo"
         ]
       ],
       "tags": []

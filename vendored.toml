@@ -5,7 +5,7 @@
 name = "finite_exact"
 repository = "larsbx/finite-math-kernels"
 commit = "dc8bee9b130348525802762a70aeeafa92e871a8"
-root = "src"
+root = "vendor/mojo"
 
 [package.files]
 "finite_exact/__init__.mojo" = "6c12cff9ef6a09417bddaa8324372888a30b4c75b2b64438eb47bb17ea9138c9"
@@ -19,7 +19,7 @@ root = "src"
 name = "claim_governance"
 repository = "larsbx/finite-math-kernels"
 commit = "dc8bee9b130348525802762a70aeeafa92e871a8"
-root = "tools"
+root = "vendor/python"
 
 [package.files]
 "claim_governance/__init__.py" = "6aedea2e9e57d34764b0824c4251257a69fba7b5762a2d383647f376477c7664"
@@ -40,7 +40,7 @@ root = "tools"
 name = "substitution_dynamics"
 repository = "larsbx/finite-math-kernels"
 commit = "dc8bee9b130348525802762a70aeeafa92e871a8"
-root = "src"
+root = "vendor/mojo"
 
 [package.files]
 "substitution_dynamics/coincidence.mojo" = "a62aaa0a03d972261a317bfc64619b84541c5b97a8c87c78bdaaba2e85bae77e"
@@ -52,7 +52,7 @@ root = "src"
 name = "proof_records"
 repository = "larsbx/finite-math-kernels"
 commit = "8af9d7aa27bc902e3d68aa867531b48221b23429"
-root = "tools"
+root = "vendor/python"
 
 [package.files]
 "proof_records/__init__.py" = "f6c83591674f7c07bfc0eaf70071cf199317047c8e3a4cb0ad64a8623d876ed7"
@@ -66,7 +66,7 @@ root = "tools"
 name = "oracle_refinement"
 repository = "larsbx/finite-math-kernels"
 commit = "f2a8ef1520d5dc63a1543634ec9089e90e66c1fd"
-root = "tools"
+root = "vendor/python"
 
 [package.files]
 "oracle_refinement/__init__.py" = "ef87305cd6eee2a1c6d0af6b4365edfdae854477f47b8df85daa4f36cd906b99"

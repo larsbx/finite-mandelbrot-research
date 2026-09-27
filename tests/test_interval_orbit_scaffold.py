@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "interval_orbit.mojo"
+SRC = ROOT / "kernel/mojo/dynamics/interval_orbit.mojo"
 
 
 def text() -> str:
@@ -32,8 +32,8 @@ def test_native_interval_recurrence_exists():
 
 def test_bigq_exact_type_replay_uses_shared_box_and_typed_failure(mojo_smoke):
     src = text()
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
-    assert "from krawczyk_witness import c_minus_2_box" in src
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
+    assert "from certificates.krawczyk_witness import c_minus_2_box" in src
     assert "struct BigQExactTypeExclusionResult(Copyable)" in src
     assert "def bigq_p21_exact_type_exclusions(half_width_den_power: Int)" in src
     assert "c_minus_2_box(half_width_den_power)" in src
@@ -70,7 +70,7 @@ def test_same_box_and_exact_endpoint_gate_present():
 
 def test_c_minus_2_uses_native_interval_verifier():
     src = text()
-    assert "from krawczyk_witness import c_minus_2_box" in src
+    assert "from certificates.krawczyk_witness import c_minus_2_box" in src
     assert "verify_exact_type_exclusions_h3(c_minus_2_box(8), 2, 1)" in src
     assert "def demo_native_c_minus_2_accepts" in src
     assert "return demo_c_minus_2_status().accepted()" in src

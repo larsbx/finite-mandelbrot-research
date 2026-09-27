@@ -5,12 +5,12 @@ Status: implemented consumer migration; no theorem-status change.
 finite-mandlebrot-research vendors `finite_exact/` from `larsbx/finite-math-kernels` at the full
 commit recorded in `vendored.toml`. `tools/check_vendored_sync.py` verifies
 every vendored Mojo file by SHA-256 in CI. Arithmetic consumers import the
-package-qualified modules under `src/finite_exact/`; the former root-level
+package-qualified modules under `vendor/mojo/finite_exact/`; the former root-level
 implementations were removed.
 
 The same pin also vendors the monorepo's `substitution_dynamics` tuning,
 directive-prefix, and column-coincidence modules under
-`src/substitution_dynamics/`, consumed by `src/C1_residual_directive_carrier.mojo`
+`vendor/mojo/substitution_dynamics/`, consumed by `kernel/mojo/c1/residual/residual_directive_carrier.mojo`
 (`docs/C1_residual_directive_carrier.md`); the balanced-pair and automaton
 modules are not vendored.
 

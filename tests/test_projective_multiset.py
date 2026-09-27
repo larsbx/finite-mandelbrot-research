@@ -2,11 +2,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src" / "projective_multiset.mojo"
+SOURCE = ROOT / "kernel/mojo/dynamics/projective_multiset.mojo"
 SPEC = ROOT / "docs" / "projective-multiset.md"
 DEFINITION = ROOT / "docs" / "mandelbrot-defining-family.md"
 BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
-BRIDGE_SOURCE = ROOT / "src" / "critical_relation_bridge.mojo"
+BRIDGE_SOURCE = ROOT / "kernel/mojo/dynamics/critical_relation_bridge.mojo"
 
 
 def read(path: Path) -> str:

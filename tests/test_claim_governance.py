@@ -1,7 +1,7 @@
 """The repository's claim-governance policy holds on every surface.
 
 The policy lives in ``claim_governance.toml``; the checker is the vendored
-``tools/claim_governance`` package pinned in ``vendored.toml``.  The Mojo
+``vendor/python/claim_governance`` package pinned in ``vendored.toml``.  The Mojo
 proof-block ledger and its Markdown mirror must agree with the ledger in the
 policy, and C1 must remain recorded as an open frontier.
 """
@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
 from claim_governance import load_policy, run  # noqa: E402
 

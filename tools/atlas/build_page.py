@@ -7,16 +7,16 @@ The split is the repository's policy, not a convenience.
 Exact objects -- the catalogue and its counts, kneading sequences and internal
 addresses, tuned angles, the obstruction extractions with their pairs, the
 decided measures, the incidence packages -- come from one run of
-`mojo src/atlas_dataset.mojo`, the canonical implementation, which
+`pixi run atlas-dataset`, the canonical implementation, which
 `tests/test_atlas_dataset.py` checks against the Python oracles.
 
 Positions cannot come from there: they are floating point, and no module under
-`src/` may produce one. They come from `trace_positions.py` beside this file,
+`kernel/` may produce one. They come from `trace_positions.py` beside this file,
 and the page says so where it shows them.
 
 The exclusion boxes are the exception that proves the split. The boxes and
 their verdicts are exact, from `reference/python/interval/interval_exclusion_reference.py`, the
-oracle for `src/interval_orbit.mojo`; only their placement on a canvas is
+oracle for `kernel/mojo/dynamics/interval_orbit.mojo`; only their placement on a canvas is
 floating point. Exclusion is not existence: a root in the box is a separate
 witness and the page claims none.
 
@@ -35,7 +35,9 @@ from fractions import Fraction
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 sys.path.insert(0, str(HERE))
+from mojo_include import mojo_run  # noqa: E402
 
 import interval_exclusion_reference as ie  # noqa: E402
 import trace_positions as tp  # noqa: E402
@@ -50,7 +52,7 @@ NAMED_ROOT_RAY = {
 
 def exact_sections() -> dict:
     """One Mojo run. Every number in the result is an integer or a rational."""
-    done = subprocess.run(["mojo", "src/atlas_dataset.mojo"], cwd=ROOT,
+    done = subprocess.run(mojo_run("kernel/mojo/entrypoints/atlas_dataset.mojo"), cwd=ROOT,
                           capture_output=True, text=True, check=True)
     return json.loads(done.stdout)
 

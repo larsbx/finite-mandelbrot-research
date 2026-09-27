@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Python reference for src/C1_carrier_density_profile.mojo.
+"""Python reference for kernel/mojo/c1/carrier/carrier_density_profile.mojo.
 
 Round-two item R3, the step `docs/C1_separated_pair_density.md` left open:
 attach a density to each level of a carrier's catalogue prefix, so a refinement
@@ -41,6 +41,7 @@ ROOT = SCRIPT_DIR.parents[2]
 # Keep the canonical sibling modules ahead of temporary compatibility shims.
 # Direct execution cannot use the package-relative import below.
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from oracle_refinement import Class, Refinement, audit_all
@@ -52,7 +53,7 @@ except ImportError:  # direct script execution
 Address = tuple[int, int]
 
 # The landing tags of docs/C1_admissible_separator_codes.md, as the integer
-# codes src/C1_carrier_density_profile.mojo uses. Everything else -- the
+# codes kernel/mojo/c1/carrier/carrier_density_profile.mojo uses. Everything else -- the
 # generic-boundary landing and the MLC binding the spec forbids included --
 # is inadmissible by having no code at all.
 RATIONAL_RAY, PARABOLIC, HYPERBOLIC_BOUNDARY = 1, 2, 3

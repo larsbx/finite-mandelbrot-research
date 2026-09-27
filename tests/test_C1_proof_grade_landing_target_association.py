@@ -2,9 +2,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSOC = ROOT / "src" / "proof_grade_landing_target_association.mojo"
-TAGS = ROOT / "src" / "C1_theorem_tag_payload_instances.mojo"
-SMOKE = ROOT / "src" / "smoke_tests.mojo"
+ASSOC = ROOT / "kernel/mojo/certificates/c_minus_2/proof_grade_landing_target_association.mojo"
+TAGS = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo"
+SMOKE = ROOT / "kernel/mojo/smoke/smoke_tests.mojo"
 
 
 def read(path: Path) -> str:
@@ -94,6 +94,6 @@ def test_c1_landing_payload_uses_proof_grade_association_and_names_successor():
 
 def test_proof_grade_association_is_compiler_wired(mojo_smoke):
     smoke = read(SMOKE)
-    assert "from proof_grade_landing_target_association import proof_grade_landing_target_association_smoke" in smoke
+    assert "from certificates.c_minus_2.proof_grade_landing_target_association import proof_grade_landing_target_association_smoke" in smoke
     assert 'report.record("proof-grade landing target association"' in smoke
     assert mojo_smoke.case_passed("proof-grade landing target association")

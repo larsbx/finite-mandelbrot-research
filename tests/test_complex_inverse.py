@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "complex_inverse.mojo"
+SRC = ROOT / "kernel/mojo/arithmetic/complex_inverse.mojo"
 
 
 def text() -> str:

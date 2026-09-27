@@ -3,7 +3,7 @@
 **Status:** staged theorem program. The algebraic identities in stages B0 and
 B1, the simple-residue-root subcertificate, one replayable Hensel step from
 modulo `p` to modulo `p^2` are executable in
-`src/critical_relation_bridge.mojo`, together with bounded factor provenance
+`kernel/mojo/dynamics/critical_relation_bridge.mojo`, together with bounded factor provenance
 for monic linear factors. The rational `c = -2` subcase now also has an
 executable B3 root-handle replay into the dyadic localization calculus. The
 unbounded lift, general factor correspondence, and later stages require the
@@ -156,7 +156,7 @@ multiplicity; the characteristic-zero localization is what admits it to the
 classical certificate layer.
 
 The first executable B3 subcase is `RationalB3RootHandle` in
-`src/multiset_b3_localization.mojo`. For `c = -2`, it composes:
+`kernel/mojo/dynamics/multiset_b3_localization.mojo`. For `c = -2`, it composes:
 
 1. the modular simple-root and one-step Hensel provenance at `p = 5`;
 2. exact characteristic-zero factor provenance for `C + 2`;
@@ -206,7 +206,7 @@ in the project ledger.
 | projective intersection multiplicity at infinity | divisor-theoretic escape data | relation to the marked critical section |
 | certified dyadic escape-witness count | subset of the classical complement | coverage and overlap normalization |
 
-The basin multiset introduced in `src/projective_multiset.mojo` therefore
+The basin multiset introduced in `kernel/mojo/dynamics/projective_multiset.mojo` therefore
 remains in the toolbox. It is not discarded; it occupies a different bridge
 column from algebraic root multiplicity.
 
