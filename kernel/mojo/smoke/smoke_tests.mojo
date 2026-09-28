@@ -65,6 +65,7 @@ from dynamics.critical_relation_bridge import critical_relation_bridge_smoke
 from dynamics.multiset_b3_localization import multiset_b3_localization_smoke
 from dynamics.critical_relation_multiset import critical_relation_multiset_smoke
 from dynamics.critical_relation_residual_multiset import critical_relation_residual_multiset_smoke
+from dynamics.r41_algebraic_root_certificate import r41_algebraic_root_certificate_smoke
 
 
 def test_rational_field_laws() -> Bool:
@@ -351,6 +352,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("multiset B3 localization", multiset_b3_localization_smoke())
     _ = report.record("critical-relation divisor multiset", critical_relation_multiset_smoke())
     _ = report.record("R41 residual divisor multiset", critical_relation_residual_multiset_smoke())
+    _ = report.record("R41 algebraic roots", r41_algebraic_root_certificate_smoke())
     report.print_summary("finite-regime Mandelbrot smoke suite")
     return report.all_passed()
 

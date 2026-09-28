@@ -98,10 +98,21 @@ div_0((C^3+2C^2+2C+2)F_7(C)).
 ```
 
 The executable `R41ResidualDivisorMultiset` checks the factorization and
-degree accounting. It deliberately does not label the residual divisor as
-exact type `(4,1)`: the exact-type status of those ten algebraic roots remains
-open until collision exclusions, factor squarefreeness/coprimality, embeddings,
-and localization are supplied.
+degree accounting. The follow-on `R41AlgebraicRootCertificate` uses exact
+Euclidean gcd calculations after reduction modulo 5. It verifies that both
+non-rational factors are squarefree and coprime, that the cubic factor divides
+the earlier collision `Q_4-Q_3`, and that `F_7` is coprime to every
+unintended collision through the required horizon. Thus the cubic is a
+lower-type contribution, while
+
+```text
+D^{exact}_{4,1} = div_0(F_7)
+```
+
+has seven distinct algebraic roots of exact critical-orbit type `(4,1)`.
+This is an algebraic factor and collision certificate. It does not choose or
+localize any embedding, so it supplies no B3 root handle and makes no density,
+equidistribution, or C1 claim.
 
 ### B2 — Good-reduction and lifting certificate
 
