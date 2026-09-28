@@ -39,11 +39,13 @@ def test_invalid_strip_power_and_global_claims_fail_closed():
     assert "def proves_c1" in body
 
 
-def test_documentation_names_candidate_not_exact_type_divisor():
+def test_documentation_refines_candidate_into_factorwise_exact_type_result():
     bridge = " ".join(read(BRIDGE).split())
     assert "degree-10 residual candidate divisor" in bridge
     assert "C^3+2C^2+2C+2" in bridge
-    assert "exact-type status of those ten algebraic roots remains open" in bridge
+    assert "the cubic is a lower-type contribution" in bridge
+    assert "D^{exact}_{4,1} = div_0(F_7)" in bridge
+    assert "seven distinct algebraic roots" in bridge
 
 
 def test_r41_residual_multiset_is_compiler_wired(mojo_smoke):
