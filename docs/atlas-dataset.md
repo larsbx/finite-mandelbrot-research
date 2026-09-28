@@ -62,7 +62,7 @@ accessors, not part of the kernel. Binding row in
 ## 4. The page
 
 The page is drawn in [`larsbx/math-vizops`](https://github.com/larsbx/math-vizops)
-(`python -m vizops atlas`), which reads this repository and writes nothing
+(`python -m vizops page mandelbrot-atlas`), which reads this repository and writes nothing
 back. It builds one self-contained HTML file from two sources, and the split
 above is exactly the seam:
 
@@ -89,7 +89,7 @@ The page shows three views:
 | the circle of addresses | `Z/den` with the separator prefix as chords, the nonproductive pairs as arcs, and the cyclic sinks heavy |
 | the incidence package | the three carrier vertices, the `PointVertex` they are the carrier of, and the chain of gates, with the two at the end that do not pass |
 
-Rebuild with `python -m vizops atlas` from a math-vizops checkout beside this
+Rebuild with `python -m vizops page mandelbrot-atlas` from a math-vizops checkout beside this
 one. The HTML is generated and is committed nowhere; the templates in
 `vizops/atlas/templates/` are the source.
 
