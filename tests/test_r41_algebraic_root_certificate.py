@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "src" / "r41_algebraic_root_certificate.mojo"
-SMOKE = ROOT / "src" / "smoke_tests.mojo"
+SOURCE = ROOT / "kernel" / "mojo" / "dynamics" / "r41_algebraic_root_certificate.mojo"
+SMOKE = ROOT / "kernel" / "mojo" / "smoke" / "smoke_tests.mojo"
 BRIDGE = ROOT / "docs" / "multiset-bridge-program.md"
 
 
@@ -55,7 +55,7 @@ def test_documentation_promotes_only_the_algebraic_exact_type_divisor():
 def test_r41_root_certificate_is_compiler_wired(mojo_smoke):
     smoke = read(SMOKE)
     assert (
-        "from r41_algebraic_root_certificate import "
+        "from dynamics.r41_algebraic_root_certificate import "
         "r41_algebraic_root_certificate_smoke" in smoke
     )
     assert 'report.record("R41 algebraic roots"' in smoke
