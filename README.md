@@ -17,6 +17,34 @@ good-reduction and lifting certificates, and characteristic-zero localization;
 it also isolates the additional theorem needed to connect basin-cardinality
 weights to that algebraic route.
 
+### Current algebraic multiset milestone
+
+For the marked critical orbit (Q_0(C)=0),
+(Q_{n+1}(C)=Q_n(C)^2+C), define the return polynomial
+
+```text
+A_{ell,k}(C) = Q_{ell+k}(C) - Q_ell(C).
+```
+
+The executable certificate for (A_{4,1}) now verifies the factorwise
+exact-type refinement over `Z[C]`. The cubic factor
+`C^3+2C^2+2C+2` belongs to the earlier collision `Q_4-Q_3`, while
+
+```text
+D^{exact}_{4,1} = div_0(F_7)
+```
+
+has seven distinct algebraic roots of exact critical-orbit type `(4,1)`.
+Exact integer division establishes factor membership. Reduction modulo 5 is
+used only for squarefreeness and coprimality witnesses, including exclusion of
+every unintended collision through the required horizon.
+
+This is an algebraic divisor certificate, not a localization certificate. It
+does not choose a complex embedding, produce a B3 root handle, or prove
+density, equidistribution, MLC, or C1. The implementation is
+`kernel/mojo/dynamics/r41_algebraic_root_certificate.mojo`; the complete
+bridge boundary is recorded in `docs/multiset-bridge-program.md`.
+
 The project goal is not to replace the classical analytic Mandelbrot set with a false finite exact object. Instead, it formalizes a hierarchy of finite algebraic certificates that reproduce the observable content available at finite resolution while isolating the single generic-boundary obstruction as MLC / fiber triviality.
 
 ## Priority-zero conjecture
@@ -148,6 +176,8 @@ ARCHITECTURE.md
 estate.toml
 ROADMAP.md
 docs/
+  mandelbrot-defining-family.md
+  multiset-bridge-program.md
   C1_proof_definition_and_priority.md
   alignment_audit_deep_research_findings.md
   mojo_first_execution_policy.md
@@ -224,4 +254,4 @@ No finite bounded search, renderer, numerical picture, local carrier refinement,
 
 ## Status
 
-Research scaffold with enforced terminology, rank-2 ontology, C1 proof-status gates, Mojo-first executable certificate policy, and a Mojo finite theorem-kernel boundary.
+Active research kernel with enforced terminology, rank-2 ontology, C1 proof-status gates, a Mojo-first executable certificate policy, and a Mojo finite theorem-kernel boundary. The multiset bridge currently includes the certified seven-root exact-type divisor `D^{exact}_{4,1} = div_0(F_7)`; embedding selection and localization remain open.
