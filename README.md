@@ -192,7 +192,6 @@ tools/
   *_reference.py              # compatibility shims only; semantics live in reference/python
   *_oracle.py                 # compatibility shims only where retained
   audit_*.py
-  atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md
   mojo_include.py            # the Mojo include roots, for every Python call site
   make_ledger.py             # validates records.toml and renders every ledger surface
