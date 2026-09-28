@@ -9,9 +9,12 @@
 
 from polynomial.poly_z import (
     PolyZ,
+    add,
+    constant,
     critical_orbit_poly,
     derivative,
     expected_F7_M41,
+    mul,
     raw_return_poly,
     sub,
 )
@@ -73,6 +76,27 @@ def remainder_mod_prime(
         remainder.normalize()
     return remainder^
 
+
+
+def remainder_monic_over_integers(
+    dividend: PolyZ, divisor: PolyZ
+) -> PolyZ:
+    # Exact long division in Z[C].  The certified factors are monic, so every
+    # quotient coefficient is integral and no modular reduction is involved.
+    var remainder = dividend.copy()
+    if divisor.is_zero() or divisor.coefficient(divisor.degree) != 1:
+        return remainder^
+    while not remainder.is_zero() and remainder.degree >= divisor.degree:
+        var shift = remainder.degree - divisor.degree
+        var scale = remainder.coefficient(remainder.degree)
+        for i in range(divisor.degree + 1):
+            var index = i + shift
+            remainder.coeffs[index] = (
+                remainder.coefficient(index) -
+                scale * divisor.coefficient(i)
+            )
+        remainder.normalize()
+    return remainder^
 
 def gcd_degree_mod_prime(a: PolyZ, b: PolyZ, prime: Int) -> Int:
     if not bounded_prime(prime):
@@ -189,8 +213,8 @@ def verify_r41_algebraic_roots() -> R41AlgebraicRootCertificate:
         factor_is_squarefree_mod_prime(cubic, prime),
         factor_is_squarefree_mod_prime(f7, prime),
         gcd_degree_mod_prime(cubic, f7, prime) == 0,
-        remainder_mod_prime(cubic_collision, cubic, prime).is_zero(),
-        remainder_mod_prime(relation, f7, prime).is_zero(),
+        remainder_monic_over_integers(cubic_collision, cubic).is_zero(),
+        remainder_monic_over_integers(relation, f7).is_zero(),
         factor_excludes_all_unintended_collisions(f7, 4, 1, prime),
         f7.degree,
         False,
@@ -201,14 +225,25 @@ def verify_r41_algebraic_roots() -> R41AlgebraicRootCertificate:
 
 def r41_algebraic_root_certificate_smoke() -> Bool:
     var certificate = verify_r41_algebraic_roots()
+    var cubic = r41_cubic_factor()
     var composite_refused = gcd_degree_mod_prime(
-        r41_cubic_factor(), expected_F7_M41(), 9,
+        cubic, expected_F7_M41(), 9,
     )
+    # A remainder of 5 is zero modulo 5 but nonzero in Z[C].  This control
+    # would have passed the former modular membership predicate.
+    var false_membership = add(mul(cubic, constant(1)), constant(5))
+    var modular_false_positive = remainder_mod_prime(
+        false_membership, cubic, 5,
+    ).is_zero()
+    var exact_negative_control = not remainder_monic_over_integers(
+        false_membership, cubic,
+    ).is_zero()
     return (
         certificate.algebraic_exact_type_accepted() and
         certificate.exact_type_root_count == 7 and
         not certificate.b3_localization_accepted() and
         composite_refused == -1 and
+        modular_false_positive and exact_negative_control and
         not certificate.proves_density() and
         not certificate.proves_equidistribution() and
         not certificate.proves_c1()
