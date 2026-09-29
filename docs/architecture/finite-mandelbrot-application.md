@@ -13,7 +13,7 @@ No mathematical claim changes in this adoption.
 
 | Authority plane | Location |
 | --- | --- |
-| policy | root TOML manifests (`estate.toml`, `backend.toml`, `claim_governance.toml`, `polyglot.manifest.toml`, `vendored.toml`), which the tools locate at the root |
+| policy | root TOML manifests (`ESTATE.toml`, `backend.toml`, `claim_governance.toml`, `polyglot.manifest.toml`, `vendored.toml`), which the tools locate at the root |
 | canonical kernel | `kernel/mojo/<domain>/` |
 | C1 proof state | `proof/c1/` (`records.toml`, `models/tla/`); `ledger.json` is its generated projection at the root |
 | mathematical references | `reference/python/<domain>/` |

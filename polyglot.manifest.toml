@@ -7,8 +7,8 @@ authority_change = false
 ci_wiring = false
 
 [estate]
-manifest = "estate.toml"
-template = "estate-repository-v1"
+manifest = "ESTATE.toml"
+template = "estate-repository-v2"
 
 [authority]
 primary_languages = ["Mojo"]

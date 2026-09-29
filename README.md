@@ -173,7 +173,7 @@ stand in its way.
 ```text
 README.md
 ARCHITECTURE.md
-estate.toml
+ESTATE.toml
 ROADMAP.md
 docs/
   mandelbrot-defining-family.md

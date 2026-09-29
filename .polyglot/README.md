@@ -4,7 +4,7 @@
 **Origin branch:** `polyglot/migration-v1`
 
 The estate-wide repository structure and authority mapping are now declared by
-`estate.toml`. This polyglot manifest is a specialized extension of that contract,
+`ESTATE.toml`. This polyglot manifest is a specialized extension of that contract,
 not a competing architecture source.
 
 ## Repository allocation
@@ -25,8 +25,8 @@ not a competing architecture source.
 
 ## Intended source layout
 
-The reusable estate layout is defined in
-`docs/architecture/estate-repository-template-v1.md`. For this repository the
+The reusable estate layout is defined by the estate-repository-template-v2
+contract in larsbx/estate-governance. For this repository the
 active transition map is `docs/architecture/finite-mandelbrot-application.md`.
 
 Polyglot-specific paths remain:
