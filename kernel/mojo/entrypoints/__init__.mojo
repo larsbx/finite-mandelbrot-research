@@ -1,1 +1,1 @@
-# Package `entrypoints` of the canonical Mojo kernel (estate.toml, plane kernel).
+# Package `entrypoints` of the canonical Mojo kernel (ESTATE.toml, plane kernel).

@@ -145,7 +145,7 @@ stand in its way.
 ```text
 README.md
 ARCHITECTURE.md
-estate.toml
+ESTATE.toml
 ROADMAP.md
 docs/
   C1_proof_definition_and_priority.md

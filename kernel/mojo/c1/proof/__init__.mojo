@@ -1,1 +1,1 @@
-# Package `c1.proof` of the canonical Mojo kernel (estate.toml, plane kernel).
+# Package `c1.proof` of the canonical Mojo kernel (ESTATE.toml, plane kernel).

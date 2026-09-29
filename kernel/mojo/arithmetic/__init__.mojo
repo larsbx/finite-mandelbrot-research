@@ -1,1 +1,1 @@
-# Package `arithmetic` of the canonical Mojo kernel (estate.toml, plane kernel).
+# Package `arithmetic` of the canonical Mojo kernel (ESTATE.toml, plane kernel).
