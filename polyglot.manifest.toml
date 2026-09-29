@@ -8,7 +8,7 @@ ci_wiring = false
 
 [estate]
 manifest = "ESTATE.toml"
-template = "estate-repository-v1"
+template = "estate-repository-v2"
 
 [authority]
 primary_languages = ["Mojo"]
