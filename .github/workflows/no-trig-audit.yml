@@ -12,14 +12,15 @@ jobs:
     - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
       with:
         cache: true
-    - name: Estate audit (pinned estate-governance)
-      env:
-        ESTATE_GOVERNANCE_TOKEN: ${{ secrets.ESTATE_GOVERNANCE_TOKEN }}
+    - name: Estate audit (pinned public artifact)
       run: |
+        set -eu
         rev=$(python3 -c 'import tomllib; print(next(d["rev"] for d in tomllib.load(open("ESTATE.toml", "rb"))["dep"] if d["id"] == "estate-governance"))')
-        git clone -q "https://x-access-token:${ESTATE_GOVERNANCE_TOKEN}@github.com/larsbx/estate-governance" .estate
-        git -C .estate checkout -q "$rev"
-        python3 .estate/kernel/audit_estate_layout.py --root .
+        pin=$(python3 -c 'import tomllib; print(next(d["pin"] for d in tomllib.load(open("ESTATE.toml", "rb"))["dep"] if d["id"] == "estate-governance"))')
+        test "$rev" = "0833929ed82d42cf3674a1565681625a9622827b"
+        curl --fail --location --proto '=https' --tlsv1.2 --output /tmp/estate-audit.py "https://raw.githubusercontent.com/larsbx/finite-math-kernels/4485675c1ed5da52beafad98c5118dc0ffc22456/policy/estate-audits/$rev.py"
+        printf '%s  %s\n' "${pin#sha256:}" /tmp/estate-audit.py | sha256sum --check --strict -
+        python3 /tmp/estate-audit.py --root .
     - name: Verify vendored package digests
       run: pixi run vendored
     - name: Audit governed theorem/claim usage
