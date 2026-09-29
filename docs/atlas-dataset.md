@@ -1,4 +1,4 @@
-# The atlas: every exact object, printed once, and the page built from it
+# The atlas: every exact object, printed once
 
 **Scope.** An engineering change. No mathematical claim changes and no verdict
 moves: `kernel/mojo/entrypoints/atlas_dataset.mojo` asks each module for the answer it already
@@ -61,20 +61,25 @@ accessors, not part of the kernel. Binding row in
 
 ## 4. The page
 
-`tools/atlas/build_page.py` writes one self-contained HTML file from two
-sources, and the split above is exactly the seam:
+The page is drawn in [`larsbx/math-vizops`](https://github.com/larsbx/math-vizops)
+(`python -m vizops page mandelbrot-atlas`), which reads this repository and writes nothing
+back. It builds one self-contained HTML file from two sources, and the split
+above is exactly the seam:
 
-- the exact sections, from one run of the emitter;
-- the positions, from `tools/atlas/trace_positions.py`, which traces a
-  parameter ray by Newton down a decreasing potential and finishes it on the
-  equation the object satisfies.
+- the exact sections, from one run of the emitter here, refused there if a
+  section is missing or a float has leaked in;
+- the positions, from `vizops/atlas/trace.py`, which traces a parameter ray by
+  Newton down a decreasing potential and finishes it on the equation the
+  object satisfies.
 
-`trace_positions.py` is floating point and uses the analytic machinery the core
-refuses. That is why it sits in `tools/`, why nothing under `kernel/` imports it,
-and why the audits that police the core need no exception for it. It computes a
-placement, not an association: tying a ray address to a parameter is the
-imported landing theorem, which this repository does not compute and does not
-claim.
+The tracer is floating point and uses the analytic machinery the core refuses.
+That is why it is not in this repository at all, and why the audits that
+police the core need no exception for it. It computes a placement, not an
+association: tying a ray address to a parameter is the imported landing
+theorem, which this repository does not compute and does not claim. The box
+verdicts on the page are this repository's exclusion oracle,
+`reference/python/interval/interval_exclusion_reference.py`, which vizops loads
+from the checkout rather than copying.
 
 The page shows three views:
 
@@ -84,8 +89,9 @@ The page shows three views:
 | the circle of addresses | `Z/den` with the separator prefix as chords, the nonproductive pairs as arcs, and the cyclic sinks heavy |
 | the incidence package | the three carrier vertices, the `PointVertex` they are the carrier of, and the chain of gates, with the two at the end that do not pass |
 
-Rebuild with `pixi run atlas-page`. The HTML is generated and is not committed;
-the templates beside the builder are the source.
+Rebuild with `python -m vizops page mandelbrot-atlas` from a math-vizops checkout beside this
+one. The HTML is generated and is committed nowhere; the templates in
+`vizops/atlas/templates/` are the source.
 
 The common names of the structures the page shows — main cardioid, bulbs,
 valleys, the rabbit — are keyed to exact data in
@@ -110,5 +116,5 @@ boundary of claims in `README.md` applies to it unchanged.
 - The Mojo smoke suite carries the three additions as named cases and stays at
   59 cases, all passing.
 - Every traced position is checked against the equation its exact type states:
-  the builder reports how many disagree and exits nonzero if any do. At the
-  time of writing that is 0 of 357.
+  vizops refuses the page, and writes nothing, if any disagree. At the time of
+  writing that is 0 of 357.
