@@ -51,7 +51,11 @@ def normalize_checked_q(n: Int64, d: Int64) -> CheckedQResult:
         dd = neg_d.value
     if nn == 0:
         return CheckedQResult(0, 1, False)
-    var divisor = gcd_i64_or_one(nn, dd)
+    var divisor: Int64
+    try:
+        divisor = gcd_i64_or_one(nn, dd)
+    except:
+        return rejected_q()
     return CheckedQResult(nn // divisor, dd // divisor, False)
 
 
@@ -67,7 +71,11 @@ def checked_q_neg(a: CheckedQResult) -> CheckedQResult:
 def checked_q_add(a: CheckedQResult, b: CheckedQResult) -> CheckedQResult:
     if a.rejected or b.rejected:
         return rejected_q()
-    var common = gcd_i64_or_one(a.den, b.den)
+    var common: Int64
+    try:
+        common = gcd_i64_or_one(a.den, b.den)
+    except:
+        return rejected_q()
     var a_scale = b.den // common
     var b_scale = a.den // common
     var left = checked_mul_i64(a.num, a_scale)
@@ -84,7 +92,11 @@ def checked_q_add(a: CheckedQResult, b: CheckedQResult) -> CheckedQResult:
 def checked_q_sub(a: CheckedQResult, b: CheckedQResult) -> CheckedQResult:
     if a.rejected or b.rejected:
         return rejected_q()
-    var common = gcd_i64_or_one(a.den, b.den)
+    var common: Int64
+    try:
+        common = gcd_i64_or_one(a.den, b.den)
+    except:
+        return rejected_q()
     var a_scale = b.den // common
     var b_scale = a.den // common
     var left = checked_mul_i64(a.num, a_scale)
@@ -102,8 +114,13 @@ def checked_q_mul(a: CheckedQResult, b: CheckedQResult) -> CheckedQResult:
     if a.rejected or b.rejected:
         return rejected_q()
     # Cross-cancel before multiplication to avoid rejecting representable results.
-    var g1 = gcd_i64_or_one(a.num, b.den)
-    var g2 = gcd_i64_or_one(b.num, a.den)
+    var g1: Int64
+    var g2: Int64
+    try:
+        g1 = gcd_i64_or_one(a.num, b.den)
+        g2 = gcd_i64_or_one(b.num, a.den)
+    except:
+        return rejected_q()
     var num = checked_mul_i64(a.num // g1, b.num // g2)
     var den = checked_mul_i64(a.den // g2, b.den // g1)
     if num.overflowed or den.overflowed:

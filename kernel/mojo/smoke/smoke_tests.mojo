@@ -176,7 +176,7 @@ def test_typed_theorem_import_kinds() -> Bool:
     )
 
 
-def test_canonical_gcd_helpers() -> Bool:
+def test_canonical_gcd_helpers() raises -> Bool:
     return (
         gcd_int(-54, 24) == 6 and
         gcd_int(0, 0) == 0 and
@@ -282,7 +282,7 @@ def test_theorem_tags() -> Bool:
     return True
 
 
-def run_smoke_tests() -> Bool:
+def run_smoke_tests() raises -> Bool:
     """Run every case, naming each one. Cases are independent, so the
     suite does not stop at the first failure: one run names every broken
     contract instead of only the earliest."""

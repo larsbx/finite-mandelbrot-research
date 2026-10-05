@@ -58,8 +58,12 @@ ARITHMETIC_IMPORT_RE = re.compile(
     re.MULTILINE,
 )
 VENDORED_FACADES = {
+    # These pinned upstream facades/field instances retain upstream's headers;
+    # byte identity is enforced by the vendoring gate rather than local edits.
     "vendor/mojo/finite_exact/rational.mojo",
     "vendor/mojo/finite_exact/closed_interval.mojo",
+    "vendor/mojo/finite_exact/field.mojo",
+    "vendor/mojo/finite_exact/fp.mojo",
 }
 
 

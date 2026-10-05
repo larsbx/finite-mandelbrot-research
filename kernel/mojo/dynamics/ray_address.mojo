@@ -19,7 +19,12 @@ struct RayAddr(ImplicitlyCopyable):
         return self.shape_valid()
 
     def normalized(self) -> Bool:
-        return self.shape_valid() and gcd_int(self.num, self.den) == 1
+        if not self.shape_valid():
+            return False
+        try:
+            return gcd_int(self.num, self.den) == 1
+        except:
+            return False
 
     def doubled(self) -> Self:
         return Self((2 * self.num) % self.den, self.den)

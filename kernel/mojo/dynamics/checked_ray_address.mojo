@@ -48,7 +48,11 @@ def rejected_ray_addr() -> CheckedRayAddrResult:
 def make_checked_ray_addr(num: Int64, den: Int64) -> CheckedRayAddrResult:
     if den <= 0 or num < 0 or num >= den:
         return rejected_ray_addr()
-    var divisor = gcd_i64(num, den)
+    var divisor: Int64
+    try:
+        divisor = gcd_i64(num, den)
+    except:
+        return rejected_ray_addr()
     if divisor == 0:
         return rejected_ray_addr()
     return CheckedRayAddrResult(num // divisor, den // divisor, False)

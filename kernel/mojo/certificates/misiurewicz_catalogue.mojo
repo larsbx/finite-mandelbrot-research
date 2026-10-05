@@ -79,7 +79,11 @@ def exact_type(num: Int, den: Int) -> MisiurewiczType:
     of that type, which is `catalogueable_type`."""
     if den <= 0 or num < 0 or num >= den or den > MAX_CATALOGUE_DENOMINATOR:
         return rejected_type()
-    var divisor = gcd_int(num, den)
+    var divisor: Int
+    try:
+        divisor = gcd_int(num, den)
+    except:
+        return rejected_type()
     if divisor <= 0:
         return rejected_type()
     var reduced = den // divisor

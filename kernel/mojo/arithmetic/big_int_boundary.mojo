@@ -58,7 +58,7 @@ struct BigIntLike:
         return self.small <= other.small
 
 
-fn gcd_bigint_stub(a: BigIntLike, b: BigIntLike) -> BigIntLike:
+fn gcd_bigint_stub(a: BigIntLike, b: BigIntLike) raises -> BigIntLike:
     # Stub over Int64 storage. Replace with backend bigint gcd before using
     # this verifier at high degree or high refinement depth.
     return BigIntLike(gcd_i64(a.small, b.small))

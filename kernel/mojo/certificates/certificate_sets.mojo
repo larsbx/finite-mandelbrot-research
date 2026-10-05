@@ -9,7 +9,7 @@ pairs (num, den), and doubling is arithmetic modulo den.
 from finite_exact.integer_gcd import gcd_int
 
 
-def reduce_num(num0: Int, den0: Int) -> Int:
+def reduce_num(num0: Int, den0: Int) raises -> Int:
     var num = num0 % den0
     if num < 0:
         num += den0
@@ -17,7 +17,7 @@ def reduce_num(num0: Int, den0: Int) -> Int:
     return num // g
 
 
-def reduce_den(num0: Int, den0: Int) -> Int:
+def reduce_den(num0: Int, den0: Int) raises -> Int:
     var num = num0 % den0
     if num < 0:
         num += den0
@@ -25,15 +25,15 @@ def reduce_den(num0: Int, den0: Int) -> Int:
     return den0 // g
 
 
-def doubled_num(num: Int, den: Int) -> Int:
+def doubled_num(num: Int, den: Int) raises -> Int:
     return reduce_num(2 * num, den)
 
 
-def doubled_den(num: Int, den: Int) -> Int:
+def doubled_den(num: Int, den: Int) raises -> Int:
     return reduce_den(2 * num, den)
 
 
-def print_doubling_orbit(label: String, num0: Int, den0: Int, steps: Int):
+def print_doubling_orbit(label: String, num0: Int, den0: Int, steps: Int) raises:
     print(label)
     var num = reduce_num(num0, den0)
     var den = reduce_den(num0, den0)
@@ -70,13 +70,13 @@ def print_intended_forbidden_sets(ell: Int, k: Int, horizon: Int):
                 print("  (", i, ", ", j, ")")
 
 
-def c_minus_2_sets():
+def c_minus_2_sets() raises:
     print("c=-2 horizon H=3")
     print_intended_forbidden_sets(2, 1, 3)
     print_doubling_orbit("ray address 1/2", 1, 2, 3)
 
 
-def m41_sets():
+def m41_sets() raises:
     print("M_{4,1} horizon H=6")
     print_intended_forbidden_sets(4, 1, 6)
     print_doubling_orbit("ray address 9/56", 9, 56, 6)
@@ -84,7 +84,7 @@ def m41_sets():
     print_doubling_orbit("ray address 15/56", 15, 56, 6)
 
 
-def main():
+def main() raises:
     c_minus_2_sets()
     print("---")
     m41_sets()
