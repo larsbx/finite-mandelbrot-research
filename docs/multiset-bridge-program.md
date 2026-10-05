@@ -147,9 +147,53 @@ Two irreducible factors would put a mean near 2. If the Galois action is the
 full symmetric group, the count has variance 1 and a mean has standard error
 near `0.021`. The table is therefore evidence that every Gleason polynomial
 of period at most 8, and every Misiurewicz polynomial with `ell + k <= 8`, is
-irreducible over `Q`. It is not a proof: the reading assumes Chebotarev
-convergence at this prime bound, and no irreducibility certificate is
-produced.
+irreducible over `Q`. On its own it is not a proof, since the reading assumes
+Chebotarev convergence at this prime bound. The certificates below supply
+the proof for the same range.
+
+#### Irreducibility certificates for `ell + k <= 8`
+
+`kernel/mojo/dynamics/exact_type_irreducibility.mojo` certifies that every
+exact-type polynomial `E_{ell,k}` with `ell + k <= 8` is irreducible over `Q`:
+
+- 3 linear types: `C`, `C + 1`, `C + 2`;
+- 26 types of degree 2 through 120, the largest being the period-8 Gleason
+  polynomial.
+
+Over `Z`,
+
+```text
+R_{ell,k} = E_{ell,k} * prod_{mu <= ell, lambda | k, (mu,lambda) != (ell,k)} E_{mu,lambda}^{m}
+```
+
+with every factor monic, so `E_{ell,k} mod p` is an exact quotient over `F_p`.
+
+A certificate lists primes at which `E mod p` is squarefree, together with
+its factor degrees from distinct-degree factorization. Any factorization
+`E = GH` over `Q` has monic integral factors (Gauss), so `deg G` would be a
+subset sum of the factor degrees at every listed prime. The certificate
+holds when the common subset sums are only `0` and `deg E`. Every type needs
+at most three primes, all drawn from `{3, 5, 7, 11}`.
+
+The multiplicities `m` are read off by exact division. They are the true
+multiplicities only once the lower `E` are irreducible, so the types are
+certified in increasing order.
+
+`reference/python/polynomial/exact_type_irreducibility.py` recomputes three
+things independently, and `tests/test_exact_type_irreducibility.py` binds the
+two implementations:
+
+- `E` over `Z`;
+- the multiplicity table, together with the identity above;
+- every factor pattern, with its own factorization.
+
+The smoke checks three further things:
+
+- each pattern's linear factors against a root count;
+- that a product of two exact-type polynomials never certifies;
+- the replay itself.
+
+The certificate says nothing past `ell + k = 8` and names no Galois group.
 
 ### B2 — Good-reduction and lifting certificate
 
