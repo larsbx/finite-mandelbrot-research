@@ -3,8 +3,16 @@
 Status: implemented consumer migration; no theorem-status change.
 
 finite-mandlebrot-research vendors `finite_exact/` from `larsbx/finite-math-kernels` at the full
-commit recorded in `vendored.toml`. `tools/check_vendored_sync.py` verifies
-every vendored Mojo file by SHA-256 in CI. Arithmetic consumers import the
+commit recorded in `vendored.toml`. The checker is itself vendored from the
+same upstream (`vendor/python/vendoring/check_vendored_sync.py`, `pixi run
+vendored`): it verifies every vendored file by SHA-256 in CI, rejects an
+unpinned source file inside a vendored package directory, and checks that the
+`finite-math-kernels` `[[dep]]` pin in `ESTATE.toml` is the digest derived from
+`vendored.toml`. After copying a package from upstream, `check_vendored_sync.py
+pin NAME COMMIT` re-pins its digests and re-derives that pin (a new package is
+first added to `vendored.toml` with its name, repository, root, and an empty
+`[package.files]` table); `check_vendored_sync.py estate` re-derives the pin
+alone. Arithmetic consumers import the
 package-qualified modules under `vendor/mojo/finite_exact/`; the former root-level
 implementations were removed.
 

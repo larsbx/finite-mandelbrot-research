@@ -208,7 +208,7 @@ kernel/mojo/                 # canonical Mojo; include roots -I kernel/mojo -I v
   entrypoints/               # atlas_dataset.mojo (pixi run atlas-dataset), critical_type_sieve.mojo (pixi run type-sieve), run_examples.mojo
 vendor/                      # pinned in vendored.toml; never edited here
   mojo/                      # finite_exact/, substitution_dynamics/, finite_field_orbit/ from larsbx/finite-math-kernels
-  python/                    # claim_governance/, proof_records/, oracle_refinement/, same upstream
+  python/                    # claim_governance/, proof_records/, oracle_refinement/, vendoring/, same upstream
 proof/
   c1/
     records.toml              # canonical C1 claim/proof state
@@ -225,7 +225,6 @@ tools/
   exact_arithmetic_allowlist.md
   mojo_include.py            # the Mojo include roots, for every Python call site
   make_ledger.py             # validates records.toml and renders every ledger surface
-  check_vendored_sync.py
 tests/
   test_*.py
 claim_governance.toml        # repository policy for the vendored audit

@@ -80,3 +80,13 @@ root = "vendor/mojo"
 [package.files]
 "finite_field_orbit/__init__.mojo" = "1caa112fd2ba6b24e047001f79593012f35bddf275533753d99cb64ee11bf7a7"
 "finite_field_orbit/census.mojo" = "629b79592e306b259ac036e800675c57657052b001f9759318c43ecc682b6256"
+
+[[package]]
+name = "vendoring"
+repository = "larsbx/finite-math-kernels"
+commit = "da41c27d547857f543b21898ac891ae531f6944a"
+root = "vendor/python"
+
+[package.files]
+"vendoring/__init__.py" = "959cdf7a89536784da18659db7cfe4099c885f5370249eccc71ce73775f8a584"
+"vendoring/check_vendored_sync.py" = "b3ed66adbaba22f74f5d05b93319fdcd3d022c9dcb3595099a3e23a24e8064a7"
