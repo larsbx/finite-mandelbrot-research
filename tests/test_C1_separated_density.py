@@ -5,16 +5,12 @@ from __future__ import annotations
 import re
 import sys
 import tomllib
-from fractions import Fraction
-from itertools import combinations
 from pathlib import Path
 
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_separated_pair_density.md"
 SRC = ROOT / "kernel/mojo/c1/separator/separated_density.mojo"
@@ -84,55 +80,19 @@ def test_regime_correspondence_binds_the_density_symbol():
             s.startswith(path + "::") for s in entry["symbols"])
 
 
-# --- the reference model --------------------------------------------------------
-
-SEP_13_23 = ((((1, 3)), ((2, 3))),)
-DISJOINT = ((((0, 1)), ((1, 4))), (((1, 2)), ((3, 4))))
+# --- the Mojo smoke case ----------------------------------------------------------
 
 
-def test_pinned_densities():
-    assert sd.main() == 0
-    assert sd.density(SEP_13_23) == Fraction(4, 9)
-    assert sd.density(((((1, 7)), ((2, 7))), (((2, 7)), ((4, 7))))) == Fraction(4, 7)
+def test_the_mojo_case_passes(mojo_smoke):
+    assert mojo_smoke.case_passed("separated density")
 
 
-def test_disjoint_separators_keep_their_outside_atoms_in_one_class():
-    # The finding of the review on PR #3: flattening endpoints into one cut set
-    # counts the two outside atoms as distinct and overstates the measure.
-    assert sd.density(DISJOINT) == Fraction(5, 8)
-    assert sd.flattened_density(DISJOINT) == Fraction(3, 4)
-    assert len(sd.classes(DISJOINT)) == 3 and len(sd.atoms(DISJOINT)) == 4
-    assert sorted(sd.classes(DISJOINT).values()) == [Fraction(1, 4), Fraction(1, 4), Fraction(1, 2)]
-
-
-def test_which_side_is_inside_is_a_convention():
-    for separators in (SEP_13_23, DISJOINT):
-        flipped = tuple((right, left) for left, right in separators)
-        assert sd.density(flipped) == sd.density(separators)
-        assert sorted(sd.classes(flipped).values()) == sorted(sd.classes(separators).values())
-
-
-def test_no_separator_decides_nothing_and_repetition_is_not_refinement():
-    assert sd.density(()) == 0 and sd.atoms(()) == [(Fraction(1), ())]
-    assert sd.density(SEP_13_23 + SEP_13_23) == sd.density(SEP_13_23)
-
-
-def test_malformed_separators_are_refused():
-    for separators in (((((1, 0)), ((1, 3))),), ((((7, 5)), ((1, 3))),), ((((-1, 3)), ((1, 3))),),
-                       ((((1, 3)), ((1, 3))),), ((((1, 3)), ((2, 6))),)):
-        with pytest.raises(ValueError):
-            sd.density(separators)
-
-
-def test_classes_bound_the_density_and_refinement_never_lowers_it():
-    base = [((k, 8), (j, 8)) for k, j in combinations(range(8), 2)]
-    for size in (1, 2, 3):
-        for chosen in combinations(base[:7], size):
-            here = sd.density(chosen)
-            assert here == 1 - sum(x * x for x in sd.classes(chosen).values())
-            assert 0 <= here <= 1 - Fraction(1, len(sd.classes(chosen)))
-            for extra in base[:7]:
-                assert sd.density(chosen + (extra,)) >= here
+def test_the_refinement_laws_run_on_the_kernel():
+    """density = 1 - residue, 0 <= density <= 1 - 1/classes, and refinement never
+    lowers the density, on every prefix of up to three eighth-separators."""
+    src = text(SRC)
+    assert "def refinement_laws_hold() -> Bool:" in src
+    assert "if not refinement_laws_hold():" in src[src.index("def separated_density_smoke"):]
 
 
 def test_mojo_smoke_pins_the_same_instances():

@@ -65,7 +65,7 @@ term = "residual directive carrier"
 home = ["docs/C1_", "kernel/mojo/c1/", "tests/test_C1_", "reference/python/c1/kneading_reference.py", "schemas/regime_correspondences.toml"]
 [[terminology.scoped]]
 term = "separated-pair density"
-home = ["docs/C1_", "kernel/mojo/c1/", "tests/test_C1_", "reference/python/c1/separated_density_reference.py", "schemas/regime_correspondences.toml"]
+home = ["docs/C1_", "kernel/mojo/c1/", "tests/test_C1_", "schemas/regime_correspondences.toml"]
 [[terminology.scoped]]
 term = "persistent non-separation"
 home = ["docs/C1_", "kernel/mojo/c1/", "tests/test_C1_"]

@@ -2,10 +2,11 @@
 
 Round-two item R3: a density per level of a carrier's catalogue prefix, the
 measure each refinement step decided, and the residue recorded as
-non-increasing along the carrier order. The Mojo module is canonical; this
-suite asserts the reference model, the constants the Mojo smoke target pins,
-and the discipline the module must keep -- above all that a level's separator
-is declared, never derived from the level's own address.
+non-increasing along the carrier order. The Mojo module is canonical and its
+smoke case carries the arithmetic, including both identities on every prefix of
+the sweep corpus; this suite asserts the constants it pins and the discipline
+the module must keep -- above all that a level's separator is declared, never
+derived from the level's own address.
 """
 
 from __future__ import annotations
@@ -13,72 +14,37 @@ from __future__ import annotations
 import re
 import sys
 import tomllib
-from fractions import Fraction
-from itertools import combinations
 from pathlib import Path
 
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from reference.python.c1 import carrier_density_profile_reference as cdp  # noqa: E402
-from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_separated_pair_density.md"
 SRC = ROOT / "kernel/mojo/c1/carrier/carrier_density_profile.mojo"
 DENSITY_SRC = ROOT / "kernel/mojo/c1/separator/separated_density.mojo"
-
-BASILICA = ((1, 3), (2, 3))
-RABBIT = ((1, 7), (2, 7))
-AIRPLANE = ((3, 7), (4, 7))
 
 
 def text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# --- the reference model --------------------------------------------------------
+# --- the Mojo smoke case ---------------------------------------------------------
 
 
-def test_the_reference_agrees_with_itself_on_every_pinned_carrier():
-    assert cdp.main() == 0
+def test_the_mojo_case_passes(mojo_smoke):
+    assert mojo_smoke.case_passed("carrier density profile")
 
 
-def test_each_level_reports_the_measure_it_decided():
-    rows = cdp.profile((BASILICA, RABBIT))
-    assert [row["depth"] for row in rows] == [1, 2]
-    assert [row["density"] for row in rows] == [Fraction(4, 9), Fraction(262, 441)]
-    assert [row["decided"] for row in rows] == [Fraction(4, 9), Fraction(22, 147)]
-    assert [row["residue"] for row in rows] == [Fraction(5, 9), Fraction(179, 441)]
-    assert sum(row["decided"] for row in rows) == rows[-1]["density"]
-
-
-def test_a_prefix_of_a_longer_carrier_is_the_shorter_carrier_s_profile():
-    short = cdp.profile((BASILICA, RABBIT))
-    long = cdp.profile((BASILICA, RABBIT, AIRPLANE))
-    assert long[: len(short)] == short
-    assert long[-1]["density"] == Fraction(286, 441) and long[-1]["decided"] == Fraction(8, 147)
-
-
-def test_the_residue_never_rises_along_a_refinement_order():
-    base = [((k, 12), (j, 12)) for k, j in combinations(range(12), 2)][:8]
-    for size in (1, 2, 3):
-        for chosen in combinations(base, size):
-            rows = cdp.profile(chosen)
-            assert cdp.residue_non_increasing(rows), chosen
-            assert cdp.decided_sums_to_the_density(rows), chosen
-            assert all(row["decided"] >= 0 for row in rows), chosen
-
-
-def test_a_level_decides_nothing_when_its_separator_repeats_an_earlier_one():
-    rows = cdp.profile((BASILICA, BASILICA))
-    assert rows[1]["decided"] == 0 and rows[1]["residue"] == rows[0]["residue"]
-
-
-def test_the_profile_is_the_prefix_density_and_nothing_new():
-    for depth, row in enumerate(cdp.profile((BASILICA, RABBIT, AIRPLANE)), start=1):
-        assert row["density"] == sd.density((BASILICA, RABBIT, AIRPLANE)[:depth])
+def test_both_identities_are_checked_on_every_sweep_prefix():
+    """carrier_density_profile refuses a profile whose residue rises or whose
+    increments miss the density, so the smoke requiring every sweep prefix to be
+    accepted checks both identities on the real kernel."""
+    src = text(SRC)
+    assert "def sweep_profiles_accepted() -> Bool:" in src
+    smoke = src[src.index("def carrier_density_profile_smoke"):]
+    assert "if not sweep_profiles_accepted():" in smoke
 
 
 # --- what the module may not do -------------------------------------------------
@@ -111,19 +77,10 @@ def test_the_declared_separator_must_also_be_admissible():
     assert "if not admissible_separator(" in body
 
 
-def test_the_admissibility_gate_is_the_same_on_both_sides():
-    """The oracle applies the gate the Mojo module applies, on the same codes."""
-    assert (cdp.RATIONAL_RAY, cdp.PARABOLIC, cdp.HYPERBOLIC_BOUNDARY) == (1, 2, 3)
+def test_the_admissibility_codes_are_the_spec_codes():
     for name, code in (("LANDING_RATIONAL_RAY", 1), ("LANDING_PARABOLIC", 2),
                        ("LANDING_HYPERBOLIC_BOUNDARY", 3)):
         assert f"comptime {name}: Int64 = {code}" in text(SRC)
-    basilica = ((1, 3), (2, 3))
-    assert cdp.admissible(basilica, cdp.RATIONAL_RAY, True)
-    assert not cdp.admissible(basilica, 0, True)          # the generic-boundary tag has no code
-    assert not cdp.admissible(basilica, cdp.RATIONAL_RAY, False)
-    assert not cdp.admissible(((1, 3), (1, 3)), cdp.RATIONAL_RAY, True)
-    with pytest.raises(ValueError, match="inadmissible separator"):
-        cdp.profile((basilica,), cdp.RATIONAL_RAY, False)
 
 
 def test_the_mojo_smoke_exercises_the_gate_in_both_directions():
