@@ -165,6 +165,7 @@ src/
   atlas_dataset.mojo         # every exact object, printed once as JSON (pixi run atlas-dataset)
   finite_exact/              # vendored from larsbx/finite-math-kernels, pinned in vendored.toml
   substitution_dynamics/     # vendored tuning, directive-prefix, and coincidence kernels, same pin
+  finite_field_orbit/        # vendored orbit-census-v1 kernel (x^2 + c over F_p), pinned in vendored.toml
 tools/
   audit_*.py
   atlas/                     # the atlas page: exact sections from Mojo, positions traced here
