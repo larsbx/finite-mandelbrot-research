@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from reference.python.polynomial.poly_reference import return_poly  # noqa: E402
+from reference.python.polynomial.poly_reference import PolyZ, factor_product, return_poly  # noqa: E402
 
 SRC = ROOT / "kernel/mojo/dynamics/critical_type_sieve.mojo"
 GOLDEN = re.compile(r"GoldenCount\((\d+), (\d+), (\d+), (\d+)\)")
@@ -56,3 +56,23 @@ def test_the_goldens_cover_gleason_misiurewicz_and_the_empty_preperiod():
     assert any(ell == 0 and k >= 3 for _, ell, k, _ in rows)
     assert any(ell >= 2 for _, ell, _, _ in rows)
     assert any(ell == 1 and count == 0 for _, ell, _, count in rows)
+
+
+def test_squarefree_exact_type_factor_can_collide_with_a_lower_type_mod_p():
+    """Own-discriminant good reduction alone does not preserve exact type."""
+    c = PolyZ.c()
+    e22 = PolyZ((1, 0, 1))
+    e21 = PolyZ((2, 1))
+    assert return_poly(2, 2) == factor_product([c, c, c, PolyZ((1, 1)), PolyZ((1, 1)), e21, e22])
+
+    def value(poly: PolyZ, x: int) -> int:
+        return sum(a * x**i for i, a in enumerate(poly.coeffs))
+
+    roots = {x for x in range(5) if value(e22, x) % 5 == 0}
+    assert roots == {2, 3}
+    assert all(value(e22.derivative(), x) % 5 != 0 for x in roots)
+    # For the monic linear factor C+2, the collision resultant is E22(-2).
+    assert value(e22, -2) == 5
+    assert value(e21, 3) % 5 == 0
+    assert exact_type_count(5, 2, 1) == 1
+    assert exact_type_count(5, 2, 2) == 1 < len(roots)

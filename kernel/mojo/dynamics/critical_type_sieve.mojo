@@ -13,11 +13,15 @@
 # Two more exact laws: the counts and the unresolved residues partition F_p,
 # and N_p(1, k) = 0 for odd p (z_{1+k} = z_1 = c forces z_k = -z_0 = 0).
 #
-# Reading.  Where p does not divide the relevant discriminants, N_p(ell, k)
-# counts the F_p-roots of the polynomial whose complex roots are the
-# parameters of exact type (ell, k), so by Chebotarev its mean over primes is
-# the number of Q-irreducible factors of that polynomial.  A mean over finitely
-# many primes is evidence about that number, not a proof of it.
+# Reading.  N_p counts residue parameters once, with exact-type exclusions
+# in F_p.  It counts the roots of the characteristic-zero exact-type polynomial
+# reduced modulo p only away from the relevant discriminants AND collision
+# resultants.  A sufficient exclusion is the discriminant of the squarefree
+# part of R_{ell,k}; the exact-type polynomial's own discriminant is insufficient.
+# Chebotarev identifies the limiting prime mean with the number of distinct
+# Q-irreducible factors.  The entrypoint includes bad primes and supplies no
+# finite-bound error or independent-sampling guarantee.  Its finite mean is
+# research evidence, not an irreducibility, Galois-group, or C1 certificate.
 #
 # The tally types seed 0 with a short orbit buffer, O(horizon^2) per residue,
 # rather than through the census, whose p-word table costs O(p) per call; the
@@ -142,6 +146,11 @@ def critical_type_sieve_smoke() -> Bool:
             var got = t101.at(g.ell, g.k) if g.prime == 101 else t1009.at(g.ell, g.k)
             if got != g.count:
                 return False
-        return t1009.at(0, 1) == 1 and t1009.at(0, 2) == 1 and t1009.at(2, 1) == 1
+        # C^2+1 has roots 2 and 3 mod 5, but 3=-2 has lower type (2,1).
+        var t5 = type_counts(5, 4)
+        return (
+            t1009.at(0, 1) == 1 and t1009.at(0, 2) == 1 and t1009.at(2, 1) == 1
+            and t5.at(2, 2) == 1 and t5.at(2, 1) == 1
+        )
     except:
         return False
