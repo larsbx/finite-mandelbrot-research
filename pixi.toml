@@ -13,7 +13,6 @@ type-sieve = "mojo run -I kernel/mojo -I vendor/mojo kernel/mojo/entrypoints/cri
 mojo-build = "mojo build -I kernel/mojo -I vendor/mojo kernel/mojo/smoke/smoke_tests.mojo -o .pixi/finite-mandelbrot-smoke"
 property = "python reference/python/arithmetic/exact_arithmetic_property_oracle.py"
 distribution = "python reference/python/arithmetic/exact_arithmetic_property_oracle.py --distribution"
-carrier-density = "python reference/python/c1/carrier_density_profile_reference.py"
 regime-audit = "python tools/audit_regime_correspondences.py"
 vendored = "python tools/check_vendored_sync.py"
 ledgers = "python tools/make_ledger.py"

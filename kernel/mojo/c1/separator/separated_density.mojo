@@ -205,6 +205,62 @@ def _is(result: SeparatedDensityResult, num: Int64, den: Int64) -> Bool:
     return result.accepted() and result.density.eq(Q(num, den))
 
 
+def _eighth(k: Int) -> Tuple[Int64, Int64]:
+    """k/8 in lowest terms, with 0 as 0/1."""
+    var g = 8
+    while k % g != 0:
+        g //= 2
+    return (Int64(k // g), Int64(8 // g))
+
+
+def _eighths(chosen: List[Int]) -> SeparatedDensityResult:
+    """The prefix of the eighth-separators (k/8, j/8) indexed by `chosen`, k < j in
+    lexicographic order: (0,1), (0,2), ..., (0,7), (1,2), ..."""
+    var pairs = List[Tuple[Int, Int]]()
+    for k in range(8):
+        for j in range(k + 1, 8):
+            pairs.append((k, j))
+    var ln = List[Int64]()
+    var ld = List[Int64]()
+    var rn = List[Int64]()
+    var rd = List[Int64]()
+    for i in chosen:
+        var lo = _eighth(pairs[i][0])
+        var hi = _eighth(pairs[i][1])
+        ln.append(lo[0])
+        ld.append(lo[1])
+        rn.append(hi[0])
+        rd.append(hi[1])
+    return separated_pair_density(ln, ld, rn, rd)
+
+
+def refinement_laws_hold() -> Bool:
+    """On every prefix of one to three of the first seven eighth-separators:
+    density = 1 - residue, 0 <= density <= 1 - 1/classes, and adding any of the
+    seven never lowers the density."""
+    var subsets = List[List[Int]]()
+    for a in range(7):
+        subsets.append([a])
+        for b in range(a + 1, 7):
+            subsets.append([a, b])
+            for c in range(b + 1, 7):
+                subsets.append([a, b, c])
+    for chosen in subsets:
+        var here = _eighths(chosen)
+        if not here.accepted():
+            return False
+        if not here.density.eq(Q.one().sub(here.residue)) or here.density.lt(Q.zero()):
+            return False
+        if Q.one().sub(Q(1, Int64(here.classes))).lt(here.density):
+            return False
+        for extra in range(7):
+            var longer = chosen.copy()
+            longer.append(extra)
+            if _eighths(longer).density.lt(here.density):
+                return False
+    return True
+
+
 def separated_density_smoke() -> Bool:
     # One separator with endpoints 1/3 and 2/3: arcs 1/3 and 2/3 on opposite sides.
     var one_ln: List[Int64] = [1]
@@ -271,6 +327,15 @@ def separated_density_smoke() -> Bool:
     if separated_pair_density(one_ln, one_ld, over_n, over_d).accepted():
         return False
     if separated_pair_density(two_ln, two_ld, one_rn, one_rd).accepted():
+        return False
+    var neg_n: List[Int64] = [-1]
+    if separated_pair_density(neg_n, one_ld, one_rn, one_rd).accepted():
+        return False
+    var two_sixths_n: List[Int64] = [2]
+    var two_sixths_d: List[Int64] = [6]
+    if separated_pair_density(one_ln, one_ld, two_sixths_n, two_sixths_d).accepted():
+        return False
+    if not refinement_laws_hold():
         return False
     return (
         not density_one_implies_every_pair_separated()

@@ -28,7 +28,6 @@ from mojo_include import mojo_run  # noqa: E402
 from reference.python.c1 import kneading_reference as kr  # noqa: E402
 from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
 from reference.python.c1 import misiurewicz_prefix_graph_reference as pg  # noqa: E402
-from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 SRC = ROOT / "kernel/mojo/entrypoints/atlas_dataset.mojo"
 
@@ -125,11 +124,13 @@ def test_the_pinned_extraction_is_still_the_pinned_one(dataset):
 
 
 def test_densities_are_the_exact_rationals(dataset):
-    for row in dataset["density"]:
-        separators = tuple((tuple(a), tuple(b)) for a, b in row["separators"])
-        assert row["density"] == str(sd.density(separators))
-    printed = {r["density"] for r in dataset["density"]}
-    assert "4/9" in printed and "5/8" in printed        # the two the reference pins by name
+    """The five prefixes the emitter prints, with the densities, residues and
+    class counts the separated-density smoke case pins: basilica alone, two
+    disjoint separators (5/8, not the flattened 3/4), the nested rabbit pair, a
+    refinement of the basilica, and a repeated separator that refines nothing."""
+    rows = [(r["density"], r["residue"], r["classes"], r["atoms"]) for r in dataset["density"]]
+    assert rows == [("4/9", "5/9", 2, 2), ("5/8", "3/8", 3, 4), ("4/7", "3/7", 3, 3),
+                    ("2/3", "1/3", 3, 3), ("4/9", "5/9", 2, 2)]
 
 
 def test_incidence_packages_a_point_as_three_vertices(dataset):

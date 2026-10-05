@@ -25,7 +25,6 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from reference.python.c1 import kneading_reference as kr  # noqa: E402
-from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
 
 TABLE = ROOT / "schemas/structure_names.toml"
 NAME_STATUSES = ("field", "eponym", "folk")
@@ -158,12 +157,20 @@ def angle(text: str) -> Fraction:
     return Fraction(text)
 
 
-def exact_type(theta: Fraction) -> tuple[int, int] | None:
-    return mc.exact_type(theta.numerator, theta.denominator)
-
-
 def doubling(theta: Fraction, n: int = 1) -> Fraction:
     return (theta * 2**n) % 1
+
+
+def exact_type(theta: Fraction) -> tuple[int, int]:
+    """`(preperiod, period)` of `theta` under doubling, read off the orbit's first
+    repeat -- iteration, not the 2-adic valuation and multiplicative order the
+    Mojo catalogue computes."""
+    seen: dict[Fraction, int] = {}
+    point, step = theta % 1, 0
+    while point not in seen:
+        seen[point] = step
+        point, step = doubling(point), step + 1
+    return seen[point], step - seen[point]
 
 
 def internal_address(theta: Fraction) -> list[int]:
