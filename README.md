@@ -205,7 +205,7 @@ kernel/mojo/                 # canonical Mojo; include roots -I kernel/mojo -I v
   certificates/              # finite certificate calculus
     c_minus_2/               # the checked c = -2 path
   theorem_kernel/ smoke/
-  entrypoints/               # atlas_dataset.mojo (pixi run atlas-dataset), run_examples.mojo
+  entrypoints/               # atlas_dataset.mojo (pixi run atlas-dataset), critical_type_sieve.mojo (pixi run type-sieve), run_examples.mojo
 vendor/                      # pinned in vendored.toml; never edited here
   mojo/                      # finite_exact/, substitution_dynamics/, finite_field_orbit/ from larsbx/finite-math-kernels
   python/                    # claim_governance/, proof_records/, oracle_refinement/, same upstream
