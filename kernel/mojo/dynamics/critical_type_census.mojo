@@ -51,6 +51,15 @@ def type_obstructed_mod_p(parameter: Int, ell: Int, k: Int, prime: Int) raises -
     return not (t.resolved and t.mu <= ell and k % t.period == 0)
 
 
+def refusal(parameter: Int, prime: Int, cap: Int) -> String:
+    """The contract's refusal for the request, or "" when it is answered."""
+    try:
+        _ = critical_type_mod_p(parameter, prime, cap)
+        return ""
+    except e:
+        return String(e)
+
+
 def census_agrees_with_the_bridge() raises -> Bool:
     # c = -2 has orbit 0, -2, 2, 2: exact type (2, 1), unobstructed at every p.
     # c = 1 has orbit 0, 1, 2, 5, ...; modulo 2 it is 0, 1, 0, so (2, 1) fails.
@@ -67,6 +76,9 @@ def census_agrees_with_the_bridge() raises -> Bool:
                     var returns = orbit_value_mod(c, horizon, prime) == orbit_value_mod(c, ell, prime)
                     if type_obstructed_mod_p(c, ell, k, prime) == returns:
                         return False
+    for prime in [0, -7, 1, 9]:
+        if refusal(5, prime, 3) != "malformed:p":
+            return False
     return type_obstructed_mod_p(1, 2, 1, 2) and not type_obstructed_mod_p(-1, 0, 2, 1048573)
 
 
