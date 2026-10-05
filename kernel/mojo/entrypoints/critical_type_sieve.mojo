@@ -2,9 +2,10 @@
 #
 # Prints, for every exact type (ell, k) with ell + k <= HORIZON and ell != 1,
 # the total of N_p(ell, k) over the odd primes p <= PRIME_BOUND and the number
-# of those primes (pixi run type-sieve). The mean total/primes estimates the
-# number of Q-irreducible factors of the exact-type polynomial; see
-# kernel/mojo/dynamics/critical_type_sieve.mojo for what that reading assumes.
+# of those primes (pixi run type-sieve). These are raw totals including bad
+# discriminant/resultant primes. Their finite mean is research evidence about
+# the limiting number of distinct Q-irreducible factors; see
+# kernel/mojo/dynamics/critical_type_sieve.mojo for the required hypotheses.
 
 from dynamics.critical_type_sieve import type_counts
 

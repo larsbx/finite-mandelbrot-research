@@ -122,9 +122,10 @@ equidistribution, or C1 claim.
 N_p(ell,k) = #{ c in F_p : the critical orbit of c has exact type (ell,k) mod p }.
 ```
 
-Its coefficient semantics is a root count of the exact-type divisor reduced
-modulo `p`. The smoke checks three exact laws on every residue of the primes
-through `1009` and horizon `8`:
+Each residue parameter is counted once, after imposing the exact-type
+collision exclusions over `F_p`; algebraic root multiplicities are not counted.
+The smoke checks three exact laws on every residue for
+`p in {2, 3, 5, 7, 13, 101, 1009}` and horizon `8`:
 
 - `#roots of R_{ell,k} in F_p = sum_{mu <= ell, lambda | k} N_p(mu,lambda)`;
 - the counts and the unresolved residues partition `F_p`;
@@ -133,23 +134,53 @@ through `1009` and horizon `8`:
 `tests/test_critical_type_sieve.py` recomputes its golden counts from the
 exact integer polynomials, by root counting and inversion over that order.
 
-Where `p` divides no relevant discriminant, `N_p(ell,k)` is the number of
-`F_p`-roots of the exact-type polynomial (for `(4,1)`, the `F_7` above). By
-Chebotarev density, the mean over primes is therefore the number of its
-`Q`-irreducible factors. `pixi run type-sieve` prints the totals over the 2261
-odd primes `p <= 20000` for every `(ell,k)` with `ell + k <= 8`, `ell != 1`:
+Let `E_{ell,k}` be the monic characteristic-zero polynomial whose distinct
+roots have exact type `(ell,k)` (for `(4,1)`, it is the `F_7` above). A sufficient
+good-prime condition is
+
+```text
+p does not divide disc(squarefree_part(A_{ell,k})).
+```
+
+The squarefree part contains every exact-type factor below `(ell,k)` once.
+Its discriminant excludes both multiple roots of each factor and collisions
+between different factors, detected by their pairwise resultants. Under this
+condition, reduction preserves the exact-type root sets and `N_p(ell,k)` equals
+the number of distinct `F_p`-roots of `E_{ell,k} mod p`. The relation-root law
+and its inversion remain exact at bad primes too, but this identification can
+fail there. For example, `E_{2,2}=C^2+1` has discriminant `-4` and two simple
+roots modulo 5, yet `N_5(2,2)=1`: the root `C=3=-2 mod 5` has type `(2,1)`.
+The collision is detected by `Res(C^2+1,C+2)=5`, not by `disc(E_{2,2})`.
+
+Chebotarev density and the orbit-counting lemma give a **limiting** prime mean
+equal to the number of distinct `Q`-irreducible factors of `E_{ell,k}`. The
+finitely many bad primes do not change that limit, but can change a finite
+mean. The exact-type polynomial construction is given by Hutz and Towsley,
+[*Misiurewicz points for polynomial maps and transversality*, Theorem 1.1](https://nyjm.albany.edu/j/2015/21-13v.pdf);
+the prime-mean principle is described by Stevenhagen and Lenstra,
+[*Chebotarev and his density theorem*, p. 32](https://pub.math.leidenuniv.nl/~lenstrahw/PUBLICATIONS/1996d/art.pdf).
+`pixi run type-sieve` prints raw totals over all 2261 odd primes
+`p <= 20000`, including bad primes, for every `(ell,k)` with
+`ell + k <= 8`, `ell != 1`:
 
 - the linear types `(0,1)`, `(0,2)`, `(2,1)` total exactly 2261;
 - every other total lies in `[2166, 2301]`, a mean in `[0.958, 1.018]`;
 - `(4,1)` totals 2219.
 
-Two irreducible factors would put a mean near 2. If the Galois action is the
-full symmetric group, the count has variance 1 and a mean has standard error
-near `0.021`. The table is therefore evidence that every Gleason polynomial
-of period at most 8, and every Misiurewicz polynomial with `ell + k <= 8`, is
-irreducible over `Q`. On its own it is not a proof, since the reading assumes
-Chebotarev convergence at this prime bound. The certificates below supply
-the proof for this range and for `ell + k <= 10`.
+Two distinct irreducible factors would give a limiting mean of 2. A uniform
+permutation in the full symmetric group on `d >= 2` roots has a fixed-point
+count with mean 1 and variance 1 (the linear types have variance 0). If the
+Frobenius observations are additionally modeled as independent samples from
+that distribution, the model standard error is `1/sqrt(2261)`, near `0.021`.
+Chebotarev alone supplies neither that independence assumption nor an error
+bound at `p <= 20000`; this is a heuristic scale, not a confidence interval
+or a Galois-group certificate.
+
+Subject to sufficient convergence at this bound and control of the finite
+bad-prime contribution, the table supports irreducibility as a research
+hypothesis for the Gleason and Misiurewicz polynomials in range. The sweep
+itself proves no irreducibility, Galois-group, or C1 claim. The certificates
+below separately supply the proof for this range and for `ell + k <= 10`.
 
 #### Irreducibility certificates for `ell + k <= 10`
 
