@@ -96,7 +96,7 @@ jobs:
     - name: Run full tests
       run: pixi run test
     - name: Recheck vendored package digests after tests
-      run: python3 tools/check_vendored_sync.py
+      run: python3 vendor/python/vendoring/check_vendored_sync.py
     needs:
     - policy
     - kernel

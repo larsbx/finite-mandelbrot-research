@@ -14,7 +14,7 @@ mojo-build = "mojo build -I kernel/mojo -I vendor/mojo kernel/mojo/smoke/smoke_t
 property = "python reference/python/arithmetic/exact_arithmetic_property_oracle.py"
 distribution = "python reference/python/arithmetic/exact_arithmetic_property_oracle.py --distribution"
 regime-audit = "python tools/audit_regime_correspondences.py"
-vendored = "python tools/check_vendored_sync.py"
+vendored = "python vendor/python/vendoring/check_vendored_sync.py"
 ledgers = "python tools/make_ledger.py"
 ledgers-check = "python tools/make_ledger.py --check"
 

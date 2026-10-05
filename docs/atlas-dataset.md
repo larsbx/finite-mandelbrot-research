@@ -50,13 +50,13 @@ membership test reads that list, so the address shown and the address tested
 are the same object. The basilica is 1 → 2, the rabbit 1 → 3, the airplane
 1 → 2 → 3.
 
-**Exact numbers can be read in base ten.** `kernel/mojo/arithmetic/exact_decimal.mojo` renders a
+**Exact numbers can be read in base ten.** `vendor/mojo/finite_exact/exact_decimal.mojo` renders a
 `BigZ` and a `Q` as decimal digits. Limbs are base `10^9`, so this is
 concatenation, not division: no rounding, no floating point, and a rejected `Q`
-renders as `rejected` rather than as a number. It sits outside `finite_exact/`
-because that package is vendored byte for byte from `larsbx/finite-math-kernels`
-and its digests are checked; a renderer is a consumer of the kernel's public
-accessors, not part of the kernel. Binding row in
+renders as `rejected` rather than as a number. It was first written here,
+outside `finite_exact/`, and now lives upstream in that package of
+`larsbx/finite-math-kernels`, vendored byte for byte with its digests checked;
+it is still a consumer of the kernel's public accessors only. Binding row in
 `docs/rational-interval-arithmetic-spec.md` section 6.2.
 
 ## 4. The page

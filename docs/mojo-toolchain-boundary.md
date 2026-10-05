@@ -13,7 +13,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/polynomial/poly_z.mojo`;
 - `kernel/mojo/certificates/cert_types.mojo`;
 - `vendor/mojo/finite_exact/rat_q.mojo`;
-- `kernel/mojo/arithmetic/integer_gcd.mojo`;
+- `vendor/mojo/finite_exact/integer_gcd.mojo`;
 - `kernel/mojo/dynamics/ray_address.mojo`;
 - `kernel/mojo/arithmetic/rational_trig.mojo`;
 - `kernel/mojo/theorem_kernel/alignment_audit_status.mojo`;
@@ -40,7 +40,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo`.
 - `vendor/mojo/finite_exact/bigint_z.mojo`.
 - `kernel/mojo/arithmetic/bigint_adapter.mojo`.
-- `kernel/mojo/smoke/smoke_report.mojo`.
+- `vendor/mojo/mojo_smoke/report.mojo`.
 - `kernel/mojo/dynamics/angle_tuning.mojo`.
 - `kernel/mojo/dynamics/bigq_ray_address.mojo`.
 - `kernel/mojo/certificates/c_minus_2/bigq_landing_target_adapter.mojo`.

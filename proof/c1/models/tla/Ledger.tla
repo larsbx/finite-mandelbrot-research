@@ -22,17 +22,17 @@ ResultSet == {
 }
 
 RequiresDef == [r \in ResultSet |->
-    CASE r = "BoundaryEqualitySoundness" -> {}
-      [] r = "C1" -> {"SeparatorCatalogueSoundness", "SeparatorCatalogueCompleteness", "FiberDefinitionAdapter", "ResidualClosureNoMissingLinks", "ExitClosureForC1", "BoundaryEqualitySoundness", "TheoremTagImportSoundness", "TheoremTagPayloadInstances"}
-      [] r = "ExitClosureForC1" -> {}
-      [] r = "FiberDefinitionAdapter" -> {}
-      [] r = "ResidualClosureNoMissingLinks" -> {}
-      [] r = "SeparatorCatalogueCompleteness" -> {}
-      [] r = "SeparatorCatalogueSoundness" -> {}
-      [] r = "TheoremTagAssumptionPayloads" -> {}
-      [] r = "TheoremTagImportLedger" -> {}
-      [] r = "TheoremTagImportSoundness" -> {}
-      [] r = "TheoremTagPayloadInstances" -> {}]
+    CASE r = "BoundaryEqualitySoundness" -> {{}}
+      [] r = "C1" -> {{"SeparatorCatalogueSoundness", "SeparatorCatalogueCompleteness", "FiberDefinitionAdapter", "ResidualClosureNoMissingLinks", "ExitClosureForC1", "BoundaryEqualitySoundness", "TheoremTagImportSoundness", "TheoremTagPayloadInstances"}}
+      [] r = "ExitClosureForC1" -> {{}}
+      [] r = "FiberDefinitionAdapter" -> {{}}
+      [] r = "ResidualClosureNoMissingLinks" -> {{}}
+      [] r = "SeparatorCatalogueCompleteness" -> {{}}
+      [] r = "SeparatorCatalogueSoundness" -> {{}}
+      [] r = "TheoremTagAssumptionPayloads" -> {{}}
+      [] r = "TheoremTagImportLedger" -> {{}}
+      [] r = "TheoremTagImportSoundness" -> {{}}
+      [] r = "TheoremTagPayloadInstances" -> {{}}]
 
 ProvedDef == {
     "TheoremTagAssumptionPayloads",

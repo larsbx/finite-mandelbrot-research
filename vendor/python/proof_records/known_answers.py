@@ -1,7 +1,7 @@
 """The known answers of the import-time self-test. Generated; do not edit.
 
 Written by tools/make_vectors.py from the reference ledger that also produces
-fixtures/vectors.json. `make_vectors.py --check` fails when a regeneration
+conformance/vectors.json. `make_vectors.py --check` fails when a regeneration
 differs from the committed file, which is what keeps these from being
 constants the code agrees with by construction.
 """

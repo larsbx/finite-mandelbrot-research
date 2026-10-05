@@ -1,7 +1,7 @@
 # Canonical finite rational-ray address value types.
 # Neither type represents a measured angle.
 
-from arithmetic.integer_gcd import gcd_int
+from finite_exact.integer_gcd import gcd_int
 
 
 struct RayAddr(ImplicitlyCopyable):
@@ -19,7 +19,12 @@ struct RayAddr(ImplicitlyCopyable):
         return self.shape_valid()
 
     def normalized(self) -> Bool:
-        return self.shape_valid() and gcd_int(self.num, self.den) == 1
+        if not self.shape_valid():
+            return False
+        try:
+            return gcd_int(self.num, self.den) == 1
+        except:
+            return False
 
     def doubled(self) -> Self:
         return Self((2 * self.num) % self.den, self.den)

@@ -11,7 +11,7 @@
 # governed term is used in the sense that term carries in
 # docs/terminology-registry.md; naming a case asserts nothing beyond the
 # verdict the case returned. Cases are independent and all of them run, so one
-# failure does not hide the next: see kernel/mojo/smoke/smoke_report.mojo.
+# failure does not hide the next: see vendor/mojo/mojo_smoke/report.mojo.
 
 from polynomial.poly_z import smoke_poly_identities
 from certificates.cert_types import MisCertHeader, JointBoxWitness, TheoremTags
@@ -36,7 +36,7 @@ from c1.carrier.carrier_density_profile import carrier_density_profile_smoke
 from c1.separator.separated_density import separated_density_smoke
 from certificates.misiurewicz_catalogue import misiurewicz_catalogue_smoke
 from c1.wake.misiurewicz_prefix_graph import misiurewicz_prefix_graph_smoke
-from arithmetic.integer_gcd import gcd_int, gcd_i64, gcd_i64_or_one
+from finite_exact.integer_gcd import gcd_int, gcd_i64, gcd_i64_or_one
 from dynamics.ray_address import RayAddr, RayAddr64, same_ray_addr, ray_addr_before
 from arithmetic.rational_trig import demo_spread_orthogonal_axes, demo_ray_addr_doubling_half
 from theorem_kernel.alignment_audit_status import AlignmentPolicy, canonical_alignment_policy, alignment_policy_valid
@@ -54,11 +54,11 @@ from dynamics.checked_ray_address import checked_ray_address_smoke
 from certificates.c_minus_2.checked_finite_certificate_gate import checked_finite_certificate_gate_smoke
 from c1.theorem_tags.theorem_tag_payload_instances import theorem_tag_payload_instances_smoke
 from certificates.c_minus_2.checked_landing_target_adapter import checked_landing_target_adapter_smoke
-from arithmetic.exact_decimal import exact_decimal_smoke
+from finite_exact.exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from arithmetic.bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
 from arithmetic.rat_backend_plan import q_backend_migration_smoke
-from smoke.smoke_report import SmokeReport, smoke_report_smoke
+from mojo_smoke.report import SmokeReport, smoke_report_smoke
 from dynamics.angle_tuning import angle_tuning_smoke
 from dynamics.projective_multiset import projective_multiset_smoke
 from dynamics.critical_relation_bridge import critical_relation_bridge_smoke
@@ -176,7 +176,7 @@ def test_typed_theorem_import_kinds() -> Bool:
     )
 
 
-def test_canonical_gcd_helpers() -> Bool:
+def test_canonical_gcd_helpers() raises -> Bool:
     return (
         gcd_int(-54, 24) == 6 and
         gcd_int(0, 0) == 0 and
@@ -282,7 +282,7 @@ def test_theorem_tags() -> Bool:
     return True
 
 
-def run_smoke_tests() -> Bool:
+def run_smoke_tests() raises -> Bool:
     """Run every case, naming each one. Cases are independent, so the
     suite does not stop at the first failure: one run names every broken
     contract instead of only the earliest."""

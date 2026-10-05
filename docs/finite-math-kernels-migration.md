@@ -3,16 +3,32 @@
 Status: implemented consumer migration; no theorem-status change.
 
 finite-mandlebrot-research vendors `finite_exact/` from `larsbx/finite-math-kernels` at the full
-commit recorded in `vendored.toml`. `tools/check_vendored_sync.py` verifies
-every vendored Mojo file by SHA-256 in CI. Arithmetic consumers import the
+commit recorded in `vendored.toml`. The checker is itself vendored from the
+same upstream (`vendor/python/vendoring/check_vendored_sync.py`, `pixi run
+vendored`): it verifies every vendored file by SHA-256 in CI, rejects an
+unpinned source file inside a vendored package directory, and checks that the
+`finite-math-kernels` `[[dep]]` pin in `ESTATE.toml` is the digest derived from
+`vendored.toml`. After copying a package from upstream, `check_vendored_sync.py
+pin NAME COMMIT` re-pins its digests and re-derives that pin (a new package is
+first added to `vendored.toml` with its name, repository, root, and an empty
+`[package.files]` table); `check_vendored_sync.py estate` re-derives the pin
+alone. Arithmetic consumers import the
 package-qualified modules under `vendor/mojo/finite_exact/`; the former root-level
-implementations were removed.
+implementations were removed. The machine-integer gcd (`integer_gcd`) and the
+base-ten renderer (`exact_decimal`), first written in this repository under
+`kernel/mojo/arithmetic/`, now live upstream in `finite_exact` and are imported
+from there; the local copies were removed.
 
 The same pin also vendors the monorepo's `substitution_dynamics` tuning,
 directive-prefix, and column-coincidence modules under
 `vendor/mojo/substitution_dynamics/`, consumed by `kernel/mojo/c1/residual/residual_directive_carrier.mojo`
 (`docs/C1_residual_directive_carrier.md`); the balanced-pair and automaton
 modules are not vendored.
+
+The smoke suite's named reporter is the vendored `mojo_smoke` package
+(`vendor/mojo/mojo_smoke/report.mojo`); it replaced
+`kernel/mojo/smoke/smoke_report.mojo`, which differed from it only in its
+header comment.
 
 This changes ownership, not mathematical semantics:
 
