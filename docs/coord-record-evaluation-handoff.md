@@ -6,7 +6,7 @@ The finite-regime calculus must not use analytic point primitives. The next nati
 
 ## Current status
 
-`src/coord_record_eval.mojo` now provides:
+`kernel/mojo/arithmetic/coord_record_eval.mojo` now provides:
 
 - `ComplexQ` coordinate-record arithmetic through `complex_inverse.mojo`;
 - Horner evaluation for a fixed 13-coefficient polynomial;

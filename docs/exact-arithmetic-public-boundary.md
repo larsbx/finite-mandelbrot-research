@@ -1,6 +1,6 @@
 # Exact arithmetic public boundary
 
-Status: repository invariant for `src/finite_exact/bigint_z.mojo`, `src/finite_exact/rat_q.mojo`, and `src/finite_exact/closed_q.mojo`. It declares which names, semantics, and encodings downstream modules may rely on, so that the three modules can later move into a shared library without changing their consumers. It states no theorem and enables no certificate acceptance: arithmetic readiness is a property of the backend, acceptance is decided by the consumers named in `docs/bigint-migration-handoff.md`.
+Status: repository invariant for `vendor/mojo/finite_exact/bigint_z.mojo`, `vendor/mojo/finite_exact/rat_q.mojo`, and `vendor/mojo/finite_exact/closed_q.mojo`. It declares which names, semantics, and encodings downstream modules may rely on, so that the three modules can later move into a shared library without changing their consumers. It states no theorem and enables no certificate acceptance: arithmetic readiness is a property of the backend, acceptance is decided by the consumers named in `docs/bigint-migration-handoff.md`.
 
 Specification of the arithmetic itself: `docs/rational-interval-arithmetic-spec.md`. Encodings: `docs/canonical-serialization.md`. Rationale for the boundary: `docs/library-extraction-candidates-2026-09-14.md`, section 1.
 
@@ -35,8 +35,8 @@ Result carriers `BigZDivModResult`, `BigZExactDivisionResult`, `BigZCanonicalByt
 
 ## 4. Verification of the boundary
 
-- `src/smoke_tests.mojo` executes the field laws, interval enclosure laws, `bigz_long_division_smoke`, and `q_cancellation_smoke` on every CI run.
-- `src/exact_arithmetic_property_probe.mojo` draws deterministic pseudo-random operands and prints the canonical bytes of every result; `tools/exact_arithmetic_property_oracle.py` recomputes them with Python `int` and `fractions.Fraction` and compares token by token. Long division is checked in-process against the shift-and-subtract reference on every case, and every produced value is checked for canonical form. CI runs this as `pixi run property`.
+- `kernel/mojo/smoke/smoke_tests.mojo` executes the field laws, interval enclosure laws, `bigz_long_division_smoke`, and `q_cancellation_smoke` on every CI run.
+- `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo` draws deterministic pseudo-random operands and prints the canonical bytes of every result; `reference/python/arithmetic/exact_arithmetic_property_oracle.py` recomputes them with Python `int` and `fractions.Fraction` and compares token by token. Long division is checked in-process against the shift-and-subtract reference on every case, and every produced value is checked for canonical form. CI runs this as `pixi run property`.
 - `tests/test_exact_arithmetic_hardening.py` checks the wiring above, the oracle's own encoder against the documented byte examples, and, when a `mojo` binary is present, runs the full comparison.
 
 ## 5. Stability promise

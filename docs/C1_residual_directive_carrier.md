@@ -2,7 +2,7 @@
 
 Status: definition-level carrier for the residual class; no theorem-status change.
 
-This note binds round-two item R1 of `docs/cross-pollination-round-two-2026-09-16.md` (N1) into the C1 program. After the class-specific theorem tags of `docs/C1_theorem_tag_import_ledger.md`, persistent non-separation between distinct parameters can only occur inside the infinitely renormalizable class. That class has a finite-combinatorial description: an infinite directive sequence of tuning substitutions, one per renormalization level. The carrier defined here is a finite prefix of that sequence, computed exactly from periodic rational ray addresses by `src/C1_residual_directive_carrier.mojo`, with the substitution kernel vendored from `larsbx/finite-math-kernels` (`src/substitution_dynamics/`, pinned in `vendored.toml`).
+This note binds round-two item R1 of `docs/cross-pollination-round-two-2026-09-16.md` (N1) into the C1 program. After the class-specific theorem tags of `docs/C1_theorem_tag_import_ledger.md`, persistent non-separation between distinct parameters can only occur inside the infinitely renormalizable class. That class has a finite-combinatorial description: an infinite directive sequence of tuning substitutions, one per renormalization level. The carrier defined here is a finite prefix of that sequence, computed exactly from periodic rational ray addresses by `kernel/mojo/c1/residual/residual_directive_carrier.mojo`, with the substitution kernel vendored from `larsbx/finite-math-kernels` (`vendor/mojo/substitution_dynamics/`, pinned in `vendored.toml`).
 
 ## Terminology declaration: residual directive carrier
 
@@ -38,7 +38,7 @@ The parity twist shipped by the vendored kernel as `TuningPattern.dgp` (Derridaâ
 
 ## Exact checks
 
-The Mojo smoke target and `tests/test_C1_residual_directive_carrier.py` (through `tools/kneading_reference.py`) pin the same instances. For each, the carrier's kneading prefix equals the kneading prefix of the address obtained by exact angle tuning (binary-block substitution by the component's two root angles):
+The Mojo smoke target and `tests/test_C1_residual_directive_carrier.py` (through `reference/python/c1/kneading_reference.py`) pin the same instances. For each, the carrier's kneading prefix equals the kneading prefix of the address obtained by exact angle tuning (binary-block substitution by the component's two root angles):
 
 | Levels (addresses) | Tuned address | Kneading prefix |
 | --- | --- | --- |

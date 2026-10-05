@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_catalogue_extensionality_proof_consolidation.md"
-SRC = ROOT / "src" / "C1_theorem_status.mojo"
+SRC = ROOT / "kernel/mojo/c1/proof/theorem_status.mojo"
 
 
 def text(path):

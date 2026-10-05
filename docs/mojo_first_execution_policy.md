@@ -51,13 +51,13 @@ a source substring says the text is present, not that the computation ran or
 that it returned what the test expects, and it breaks on any rewrite that
 preserves behaviour. Run the smoke suite and assert the verdict of the named
 case instead: `tests/conftest.py` exposes `mojo_smoke`, which runs
-`src/smoke_tests.mojo` once per session and parses the cases it names. Reading
+`kernel/mojo/smoke/smoke_tests.mojo` once per session and parses the cases it names. Reading
 source is still right for what is genuinely a property of the text, such as
 the absence of floating-point literals or the presence of a regime-
 correspondence marker.
 
 Every case of the Mojo smoke suite is named and reported through
-`src/smoke_report.mojo`, and every case runs even after one fails, so a single
+`kernel/mojo/smoke/smoke_report.mojo`, and every case runs even after one fails, so a single
 run names every broken contract. A case name that is a governed term is used
 in the sense the terminology registry gives it.
 

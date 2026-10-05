@@ -2,7 +2,7 @@
 
 Status: definition-level finite measure; no theorem-status change.
 
-This note binds round-two item R3 of `docs/cross-pollination-round-two-2026-09-16.md` (N2) into the C1 program. The balanced-pair overlap route of `larsbx/pisot-substitution-conjecture-research` carries a quantitative measure of fibre collapse, the common fraction `f_m` and its limit; its parameter-space counterpart here is the measure of the pairs of external angles that a finite separator-catalogue prefix already decides. `src/C1_separated_density.mojo` computes that measure exactly over unbounded rationals.
+This note binds round-two item R3 of `docs/cross-pollination-round-two-2026-09-16.md` (N2) into the C1 program. The balanced-pair overlap route of `larsbx/pisot-substitution-conjecture-research` carries a quantitative measure of fibre collapse, the common fraction `f_m` and its limit; its parameter-space counterpart here is the measure of the pairs of external angles that a finite separator-catalogue prefix already decides. `kernel/mojo/c1/separator/separated_density.mojo` computes that measure exactly over unbounded rationals.
 
 ## Terminology declaration: separated-pair density
 
@@ -35,7 +35,7 @@ density = 1 - sum_c |C_c|^2,     residue = sum_c |C_c|^2.
 - **Orientation independence.** Exchanging a separator's two endpoints leaves the density and the class measures unchanged.
 - **Exactness.** Every length, midpoint, square, and sum is an unbounded rational; no floating point appears, as `docs/rational-interval-arithmetic-spec.md` requires of certificate-relevant numbers.
 
-Pinned instances, asserted identically by the Mojo smoke target and by `tools/separated_density_reference.py`:
+Pinned instances, asserted identically by the Mojo smoke target and by `reference/python/c1/separated_density_reference.py`:
 
 | Separators | Classes | Density |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ with the null class named, which is what the theorem tag records and what its `e
 
 ## Along a carrier
 
-`src/C1_carrier_density_profile.mojo` runs the measure along a residual directive carrier (`docs/C1_residual_directive_carrier.md`): for each level it reports the density and residue of the prefix up to that level, and the measure that level decided. The separator of a level is a declared input, not a quantity read off the level's address: `docs/C1_admissible_separator_codes.md` requires accepted landing tags on both rays and a declared co-landing pair, which an address cannot supply, and deriving one from the level's own address would put every carrier address in its own arc and measure the construction instead. The classical wake pairs the smoke target uses — `1/3` with `2/3`, `1/7` with `2/7`, `3/7` with `4/7` — are imported co-landings.
+`kernel/mojo/c1/carrier/carrier_density_profile.mojo` runs the measure along a residual directive carrier (`docs/C1_residual_directive_carrier.md`): for each level it reports the density and residue of the prefix up to that level, and the measure that level decided. The separator of a level is a declared input, not a quantity read off the level's address: `docs/C1_admissible_separator_codes.md` requires accepted landing tags on both rays and a declared co-landing pair, which an address cannot supply, and deriving one from the level's own address would put every carrier address in its own arc and measure the construction instead. The classical wake pairs the smoke target uses — `1/3` with `2/3`, `1/7` with `2/7`, `3/7` with `4/7` — are imported co-landings.
 
 Declaring a pair is necessary and not sufficient, and the module enforces the rest rather than trusting the caller. Each level also declares a landing tag and whether the pair is a co-landing, and `admissible_separator` rejects the whole profile unless the tag is one of `RationalRayLanding`, `ParabolicLanding` or `HyperbolicBoundaryLanding`, the co-landing is declared, and the two rays are distinct. The tags the spec forbids — `GenericBoundaryLanding`, `MLCBinding` — are inadmissible by having no code at all, which is where an analytic assumption would enter if it entered anywhere. Two arbitrary rational angles cut the circle without anything licensing the cut, and measuring one at a carrier level would report an unproved separation as a decided one.
 

@@ -2,7 +2,7 @@
 
 Round-three item R9: `larsbx/meta_test` requires a generator to declare a
 codomain refinement, and the facility is vendored from
-`larsbx/finite-math-kernels` (`tools/oracle_refinement`, specified in its
+`larsbx/finite-math-kernels` (`vendor/python/oracle_refinement`, specified in its
 `docs/generator-refinement-spec.md`).
 
 Every test here is a negative control as well as a check: each one names the
@@ -16,10 +16,12 @@ from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
-import carrier_density_profile_reference as cdp  # noqa: E402
-import exact_arithmetic_property_oracle as probe  # noqa: E402
+from reference.python.c1 import carrier_density_profile_reference as cdp  # noqa: E402
+from reference.python.arithmetic import exact_arithmetic_property_oracle as probe  # noqa: E402
 from oracle_refinement import audit_all  # noqa: E402
 
 

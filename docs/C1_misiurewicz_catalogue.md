@@ -34,7 +34,7 @@ and counting them gives, since there are `phi(2^l m) = 2^(l-1) phi(m)` numerator
 count(l, k) = 2^(l-1) * sum_{d | k} mu(k/d) (2^d - 1).
 ```
 
-`catalogue(l, k)` enumerates the numerators and `catalogue_matches_count(l, k)` compares the enumeration with the identity. That comparison is the round-one angle-count regression: the Mojo smoke target runs it for every type with `1 <= l, k <= 4`, and `tools/misiurewicz_catalogue_reference.py` for every type with `1 <= l, k <= 7`, forty-nine in all.
+`catalogue(l, k)` enumerates the numerators and `catalogue_matches_count(l, k)` compares the enumeration with the identity. That comparison is the round-one angle-count regression: the Mojo smoke target runs it for every type with `1 <= l, k <= 4`, and `reference/python/c1/misiurewicz_catalogue_reference.py` for every type with `1 <= l, k <= 7`, forty-nine in all.
 
 Pinned catalogues, asserted identically on both sides:
 

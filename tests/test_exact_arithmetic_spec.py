@@ -13,6 +13,7 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
 from audit_exact_arithmetic import (  # noqa: E402
     ALLOWLIST,
@@ -60,9 +61,9 @@ def test_binding_table_covers_the_kernels_and_quarantines_floats():
     by_class = {}
     for cls, paths in rows:
         by_class.setdefault(cls, set()).update(paths)
-    assert "src/poly_interval_eval.mojo" in by_class["DEMO"]
-    assert {"src/finite_exact/rat_q.mojo", "src/finite_exact/closed_q.mojo"} <= by_class["CONFORMS"]
-    assert "src/complex_box.mojo" in by_class["QUARANTINED"]
+    assert "kernel/mojo/polynomial/poly_interval_eval.mojo" in by_class["DEMO"]
+    assert {"vendor/mojo/finite_exact/rat_q.mojo", "vendor/mojo/finite_exact/closed_q.mojo"} <= by_class["CONFORMS"]
+    assert "kernel/mojo/dynamics/complex_box.mojo" in by_class["QUARANTINED"]
     assert by_class["QUARANTINED"] == allowlisted()
     assert ALLOWLIST.exists()
     assert arithmetic_consumers() <= set().union(*by_class.values())
@@ -130,7 +131,7 @@ CASE_NAMES = {
 
 
 def test_mojo_law_tests_are_wired_into_the_smoke_target(mojo_smoke):
-    smoke = text("src/smoke_tests.mojo")
+    smoke = text("kernel/mojo/smoke/smoke_tests.mojo")
     for name in ["test_rational_field_laws", "test_interval_enclosure_laws"]:
         assert f"def {name}()" in smoke
         assert mojo_smoke.case_passed(CASE_NAMES[name])

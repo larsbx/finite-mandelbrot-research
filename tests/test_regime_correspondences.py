@@ -4,7 +4,7 @@ import sys
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = ROOT / "spec" / "regime_correspondences.toml"
+SPEC = ROOT / "schemas/regime_correspondences.toml"
 AUDIT = ROOT / "tools" / "audit_regime_correspondences.py"
 
 

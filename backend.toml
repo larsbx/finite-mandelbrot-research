@@ -4,7 +4,7 @@
 #
 # The finite-regime certificate engine must not accept proof-grade certificates
 # unless this manifest declares a backend that satisfies the full CertIntBackend
-# contract and the corresponding implementation exists in src/.
+# contract and the corresponding implementation exists in kernel/.
 
 [backend]
 name = "Int64DemoBackend"

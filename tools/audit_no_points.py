@@ -16,7 +16,7 @@ from pathlib import Path
 from source_tokens import mask_comments_and_strings
 
 ROOT = Path(__file__).resolve().parents[1]
-CORE_PATHS = [ROOT / "src"]
+CORE_PATHS = [ROOT / "kernel", ROOT / "vendor" / "mojo"]
 
 # Banned as type/function/API names when they indicate analytic singletons or
 # pointwise evaluation. PointVertex is explicitly allowed as finite incidence.

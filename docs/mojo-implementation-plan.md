@@ -8,7 +8,7 @@ The current Mojo layer preserves computation paths and validator control flow. I
 
 ## 1. Current committed computation layer
 
-### `src/complex_box.mojo`
+### `kernel/mojo/dynamics/complex_box.mojo`
 
 Preserves:
 
@@ -17,7 +17,7 @@ Preserves:
 - pairwise collision values `H_{i,j}=Q_j-Q_i`;
 - rectangular complex box placeholder.
 
-### `src/collision_sets.mojo`
+### `kernel/mojo/certificates/collision_sets.mojo`
 
 Preserves the corrected semantic collision partition:
 
@@ -31,7 +31,7 @@ and
 \mathcal F_{\ell,k}(H)=\{(i,j):0\le i<j\le H\}\setminus\mathcal I_{\ell,k}(H).
 \]
 
-### `src/run_examples.mojo`
+### `kernel/mojo/entrypoints/run_examples.mojo`
 
 Preserves:
 
@@ -40,7 +40,7 @@ Preserves:
 - expected polynomial factorizations;
 - angle/kneading period distinction.
 
-### `src/validator_plan.mojo`
+### `kernel/mojo/certificates/validator_plan.mojo`
 
 Preserves validator control flow:
 
@@ -60,7 +60,7 @@ Preserves validator control flow:
 Create:
 
 ```text
-src/poly_z.mojo
+kernel/mojo/polynomial/poly_z.mojo
 ```
 
 Required types:

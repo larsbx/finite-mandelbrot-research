@@ -1,9 +1,9 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "canonical_serialization.mojo"
+SRC = ROOT / "kernel/mojo/certificates/canonical_serialization.mojo"
 DOC = ROOT / "docs" / "canonical-serialization.md"
-BIGZ = ROOT / "src" / "finite_exact" / "bigint_z.mojo"
+BIGZ = ROOT / "vendor/mojo/finite_exact/bigint_z.mojo"
 
 
 def read(path: Path) -> str:

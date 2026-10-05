@@ -1,7 +1,7 @@
-# The atlas: every exact object, printed once, and the page built from it
+# The atlas: every exact object, printed once
 
 **Scope.** An engineering change. No mathematical claim changes and no verdict
-moves: `src/atlas_dataset.mojo` asks each module for the answer it already
+moves: `kernel/mojo/entrypoints/atlas_dataset.mojo` asks each module for the answer it already
 computes and prints it as JSON. It is the boundary where the exact objects
 leave this repository, and it holds the policy at that boundary.
 
@@ -28,7 +28,7 @@ module exists.
 ## 2. What is not in it
 
 Positions in the parameter plane. They are floating point, no module under
-`src/` may produce one, and `tools/audit_exact_arithmetic.py` enforces that.
+`kernel/` may produce one, and `tools/audit_exact_arithmetic.py` enforces that.
 A consumer that wants to draw the objects computes positions itself and says
 so; `tests/test_atlas_dataset.py` fails if a float ever reaches a section.
 
@@ -50,7 +50,7 @@ membership test reads that list, so the address shown and the address tested
 are the same object. The basilica is 1 → 2, the rabbit 1 → 3, the airplane
 1 → 2 → 3.
 
-**Exact numbers can be read in base ten.** `src/exact_decimal.mojo` renders a
+**Exact numbers can be read in base ten.** `kernel/mojo/arithmetic/exact_decimal.mojo` renders a
 `BigZ` and a `Q` as decimal digits. Limbs are base `10^9`, so this is
 concatenation, not division: no rounding, no floating point, and a rejected `Q`
 renders as `rejected` rather than as a number. It sits outside `finite_exact/`
@@ -61,20 +61,25 @@ accessors, not part of the kernel. Binding row in
 
 ## 4. The page
 
-`tools/atlas/build_page.py` writes one self-contained HTML file from two
-sources, and the split above is exactly the seam:
+The page is drawn in [`larsbx/math-vizops`](https://github.com/larsbx/math-vizops)
+(`python -m vizops page mandelbrot-atlas`), which reads this repository and writes nothing
+back. It builds one self-contained HTML file from two sources, and the split
+above is exactly the seam:
 
-- the exact sections, from one run of the emitter;
-- the positions, from `tools/atlas/trace_positions.py`, which traces a
-  parameter ray by Newton down a decreasing potential and finishes it on the
-  equation the object satisfies.
+- the exact sections, from one run of the emitter here, refused there if a
+  section is missing or a float has leaked in;
+- the positions, from `vizops/atlas/trace.py`, which traces a parameter ray by
+  Newton down a decreasing potential and finishes it on the equation the
+  object satisfies.
 
-`trace_positions.py` is floating point and uses the analytic machinery the core
-refuses. That is why it sits in `tools/`, why nothing under `src/` imports it,
-and why the audits that police the core need no exception for it. It computes a
-placement, not an association: tying a ray address to a parameter is the
-imported landing theorem, which this repository does not compute and does not
-claim.
+The tracer is floating point and uses the analytic machinery the core refuses.
+That is why it is not in this repository at all, and why the audits that
+police the core need no exception for it. It computes a placement, not an
+association: tying a ray address to a parameter is the imported landing
+theorem, which this repository does not compute and does not claim. The box
+verdicts on the page are this repository's exclusion oracle,
+`reference/python/interval/interval_exclusion_reference.py`, which vizops loads
+from the checkout rather than copying.
 
 The page shows three views:
 
@@ -84,8 +89,13 @@ The page shows three views:
 | the circle of addresses | `Z/den` with the separator prefix as chords, the nonproductive pairs as arcs, and the cyclic sinks heavy |
 | the incidence package | the three carrier vertices, the `PointVertex` they are the carrier of, and the chain of gates, with the two at the end that do not pass |
 
-Rebuild with `pixi run atlas-page`. The HTML is generated and is not committed;
-the templates beside the builder are the source.
+Rebuild with `python -m vizops page mandelbrot-atlas` from a math-vizops checkout beside this
+one. The HTML is generated and is committed nowhere; the templates in
+`vizops/atlas/templates/` are the source.
+
+The common names of the structures the page shows — main cardioid, bulbs,
+valleys, the rabbit — are keyed to exact data in
+`docs/mandelbrot-structure-names-atlas.md`.
 
 A page is a picture of finite evidence. It proves nothing by itself, and the
 boundary of claims in `README.md` applies to it unchanged.
@@ -106,5 +116,5 @@ boundary of claims in `README.md` applies to it unchanged.
 - The Mojo smoke suite carries the three additions as named cases and stays at
   59 cases, all passing.
 - Every traced position is checked against the equation its exact type states:
-  the builder reports how many disagree and exits nonzero if any do. At the
-  time of writing that is 0 of 357.
+  vizops refuses the page, and writes nothing, if any disagree. At the time of
+  writing that is 0 of 357.

@@ -17,6 +17,34 @@ good-reduction and lifting certificates, and characteristic-zero localization;
 it also isolates the additional theorem needed to connect basin-cardinality
 weights to that algebraic route.
 
+### Current algebraic multiset milestone
+
+For the marked critical orbit (Q_0(C)=0),
+(Q_{n+1}(C)=Q_n(C)^2+C), define the return polynomial
+
+```text
+A_{ell,k}(C) = Q_{ell+k}(C) - Q_ell(C).
+```
+
+The executable certificate for (A_{4,1}) now verifies the factorwise
+exact-type refinement over `Z[C]`. The cubic factor
+`C^3+2C^2+2C+2` belongs to the earlier collision `Q_4-Q_3`, while
+
+```text
+D^{exact}_{4,1} = div_0(F_7)
+```
+
+has seven distinct algebraic roots of exact critical-orbit type `(4,1)`.
+Exact integer division establishes factor membership. Reduction modulo 5 is
+used only for squarefreeness and coprimality witnesses, including exclusion of
+every unintended collision through the required horizon.
+
+This is an algebraic divisor certificate, not a localization certificate. It
+does not choose a complex embedding, produce a B3 root handle, or prove
+density, equidistribution, MLC, or C1. The implementation is
+`kernel/mojo/dynamics/r41_algebraic_root_certificate.mojo`; the complete
+bridge boundary is recorded in `docs/multiset-bridge-program.md`.
+
 The project goal is not to replace the classical analytic Mandelbrot set with a false finite exact object. Instead, it formalizes a hierarchy of finite algebraic certificates that reproduce the observable content available at finite resolution while isolating the single generic-boundary obstruction as MLC / fiber triviality.
 
 ## Priority-zero conjecture
@@ -107,7 +135,7 @@ Every certificate-relevant number is a normalized rational or a rational-endpoin
 docs/rational-interval-arithmetic-spec.md
 ```
 
-That file is mirrored verbatim in the PSC research repository and is enforced here by `tools/audit_exact_arithmetic.py`, the `tools/exact_arithmetic_allowlist.md` quarantine list, the `backend.toml` policy keys, and the law tests in `src/smoke_tests.mojo` and `tests/test_exact_arithmetic_spec.py`.
+That file is mirrored verbatim in the PSC research repository and is enforced here by `tools/audit_exact_arithmetic.py`, the `tools/exact_arithmetic_allowlist.md` quarantine list, the `backend.toml` policy keys, and the law tests in `kernel/mojo/smoke/smoke_tests.mojo` and `tests/test_exact_arithmetic_spec.py`.
 
 ## Fail closed, and which way closed points
 
@@ -127,7 +155,7 @@ Sorted by effect, not by name:
 | A prefix-graph or catalogue cap is reached | refuse to conclude | an exhausted budget is not a verdict; a capped run reports as capped (`UW-2`) |
 | A separator is not admissible | refuse to measure | an unproved cut reported as a decided measure is worse than no measure |
 | A rejected exact value enters an arithmetic chain | refuse and stay rejected | rejection is sticky, so a doubtful number cannot be laundered by later operations |
-| A generated surface disagrees with its table | refuse the run (`make_ledger.py --check`) | the surface is a function of the table, so disagreement is drift, not a new fact |
+| A generated surface disagrees with `proof/c1/records.toml` | refuse the run (`make_ledger.py --check`) | the surface is a projection of the declarative proof state, so disagreement is drift, not a new fact |
 | A proof block is to be demoted or a tag withdrawn | **refuse to demote** | the block stays in the ledger with its status visible; an uncertain withdrawal removes the record the doubt was about |
 | A pinned certificate or reference transcript is to be regenerated | **refuse to overwrite** | the pinned bytes are what a reader replays; a doubtful regeneration destroys the evidence rather than the doubt |
 
@@ -144,8 +172,12 @@ stand in its way.
 
 ```text
 README.md
+ARCHITECTURE.md
+ESTATE.toml
 ROADMAP.md
 docs/
+  mandelbrot-defining-family.md
+  multiset-bridge-program.md
   C1_proof_definition_and_priority.md
   alignment_audit_deep_research_findings.md
   mojo_first_execution_policy.md
@@ -160,40 +192,55 @@ docs/
 examples/
   misiurewicz-c-minus-2.md
   stress-test-m41.md
-src/
-  *.mojo
-  atlas_dataset.mojo         # every exact object, printed once as JSON (pixi run atlas-dataset)
-  finite_exact/              # vendored from larsbx/finite-math-kernels, pinned in vendored.toml
-  substitution_dynamics/     # vendored tuning, directive-prefix, and coincidence kernels, same pin
-  finite_field_orbit/        # vendored orbit-census-v1 kernel (x^2 + c over F_p), pinned in vendored.toml
+reference/
+  python/                     # non-authoritative independent semantics
+    arithmetic/
+    polynomial/
+    interval/
+    c1/
+kernel/mojo/                 # canonical Mojo; include roots -I kernel/mojo -I vendor/mojo
+  c1/                        # the C1 proof track
+    bridge/ separator/ carrier/ residual/ wake/ theorem_tags/ proof/
+  arithmetic/ polynomial/ dynamics/
+  certificates/              # finite certificate calculus
+    c_minus_2/               # the checked c = -2 path
+  theorem_kernel/ smoke/
+  entrypoints/               # atlas_dataset.mojo (pixi run atlas-dataset), run_examples.mojo
+vendor/                      # pinned in vendored.toml; never edited here
+  mojo/                      # finite_exact/, substitution_dynamics/, finite_field_orbit/ from larsbx/finite-math-kernels
+  python/                    # claim_governance/, proof_records/, oracle_refinement/, same upstream
+proof/
+  c1/
+    records.toml              # canonical C1 claim/proof state
+    README.md
+    models/tla/
+      ProofArchitecture.tla   # vendored dependency state machine
+      Ledger.tla, MCLedger*   # generated from ledger.json
+experiments/julia/           # disposable Julia spikes
+schemas/                     # regime correspondences
 tools/
+  *_reference.py              # compatibility shims only; semantics live in reference/python
+  *_oracle.py                 # compatibility shims only where retained
   audit_*.py
-  atlas/                     # the atlas page: exact sections from Mojo, positions traced here
   exact_arithmetic_allowlist.md
-  claim_governance/          # vendored from larsbx/finite-math-kernels audit/, pinned in vendored.toml
-  proof_records/             # vendored proof records and ledger generator, same upstream
-  make_ledger.py             # the one record table; every ledger surface is rendered from it
+  mojo_include.py            # the Mojo include roots, for every Python call site
+  make_ledger.py             # validates records.toml and renders every ledger surface
   check_vendored_sync.py
-tla/
-  ProofArchitecture.tla      # vendored dependency state machine
-  Ledger.tla, MCLedger*      # generated from ledger.json
 tests/
   test_*.py
 claim_governance.toml        # repository policy for the vendored audit
-ledger.json                  # the record table, serialized; generated
+ledger.json                  # serialized proof-record projection; generated
 ```
 
 `claim_governance.toml` restates the terminology, no-trigonometry, no-points,
 rank-2 locus, and paper-language rules as configuration for the vendored
-`tools/claim_governance` package. Its `[[claim]]` block is no longer written by
-hand: the proof-record table of `tools/make_ledger.py` is the single source of
-the C1 proof-block statuses, and the Mojo mirror
-`src/C1_final_proof_block_ledger.mojo`, the block table of
+`vendor/python/claim_governance` package. Its `[[claim]]` block is no longer written by
+hand: `proof/c1/records.toml` is the single source of the C1 proof-block statuses, and the Mojo mirror
+`kernel/mojo/c1/proof/final_proof_block_ledger.mojo`, the block table of
 `docs/C1_final_proof_block_ledger.md`, the claim entries, the index
 `docs/C1_ledger_index.md`, the TLA+ ledger with its TLC models, and the typed
 relationship graph `docs/C1_claim_relationship_graph.json` are all rendered
-from it (`pixi run ledgers`). Whether the final object *requires* a block is
-the dependency edge `C1 -> block`, not a field anyone sets. CI runs
+from it through `tools/make_ledger.py` (`pixi run ledgers`). Whether the final object *requires* a block is the dependency edge `C1 -> block`, not a field anyone sets. CI runs
 `tools/make_ledger.py --check` beside the audit, so a hand-edited surface fails
 the build rather than drifting. The `tools/audit_*.py` scripts remain the
 executable record of the same rules until they are retired.
@@ -206,4 +253,4 @@ No finite bounded search, renderer, numerical picture, local carrier refinement,
 
 ## Status
 
-Research scaffold with enforced terminology, rank-2 ontology, C1 proof-status gates, Mojo-first executable certificate policy, and a Mojo finite theorem-kernel boundary.
+Active research kernel with enforced terminology, rank-2 ontology, C1 proof-status gates, a Mojo-first executable certificate policy, and a Mojo finite theorem-kernel boundary. The multiset bridge currently includes the certified seven-root exact-type divisor `D^{exact}_{4,1} = div_0(F_7)`; embedding selection and localization remain open.

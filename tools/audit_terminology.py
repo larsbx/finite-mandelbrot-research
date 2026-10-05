@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCAN_ROOTS = [ROOT / "docs", ROOT / "src"]
+SCAN_ROOTS = [ROOT / "docs", ROOT / "kernel", ROOT / "vendor" / "mojo"]
 REGISTRY = ROOT / "docs" / "terminology-registry.md"
 USE_MANIFEST = ROOT / "docs" / "terminology-use-manifest.md"
 
@@ -69,7 +69,7 @@ MIGRATION_CONTEXT = [
 
 RANK2_FILES = [
     ROOT / "docs" / "rank2-coordinate-substrate.md",
-    ROOT / "src" / "rank2_operator.mojo",
+    ROOT / "kernel/mojo/arithmetic/rank2_operator.mojo",
 ]
 
 RANK2_BANNED_LOCI = [
@@ -114,7 +114,7 @@ DEPRECATED_TERMS = [
 
 C1_SCOPED_PREFIXES = (
     "docs/C1_",
-    "src/C1_",
+    "kernel/mojo/c1/",
     "tests/test_C1_",
 )
 

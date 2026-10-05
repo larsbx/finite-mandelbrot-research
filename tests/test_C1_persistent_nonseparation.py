@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_persistent_nonseparation.md"
-SRC = ROOT / "src" / "C1_persistent_nonseparation.mojo"
+SRC = ROOT / "kernel/mojo/c1/residual/persistent_nonseparation.mojo"
 
 
 def read(path: Path) -> str:

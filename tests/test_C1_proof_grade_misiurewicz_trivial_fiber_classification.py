@@ -2,10 +2,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CLASSIFICATION = ROOT / "src" / "proof_grade_misiurewicz_trivial_fiber_classification.mojo"
-TAGS = ROOT / "src" / "C1_theorem_tag_payload_instances.mojo"
-GATE = ROOT / "src" / "checked_finite_certificate_gate.mojo"
-SMOKE = ROOT / "src" / "smoke_tests.mojo"
+CLASSIFICATION = ROOT / "kernel/mojo/certificates/c_minus_2/proof_grade_misiurewicz_trivial_fiber_classification.mojo"
+TAGS = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo"
+GATE = ROOT / "kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo"
+SMOKE = ROOT / "kernel/mojo/smoke/smoke_tests.mojo"
 
 
 def read(path: Path) -> str:
@@ -71,6 +71,6 @@ def test_complete_certificate_stays_closed_at_incidence_replay_boundary():
 
 def test_classification_is_compiler_wired(mojo_smoke):
     smoke = read(SMOKE)
-    assert "from proof_grade_misiurewicz_trivial_fiber_classification import proof_grade_misiurewicz_trivial_fiber_classification_smoke" in smoke
+    assert "from certificates.c_minus_2.proof_grade_misiurewicz_trivial_fiber_classification import proof_grade_misiurewicz_trivial_fiber_classification_smoke" in smoke
     assert 'report.record("proof-grade Misiurewicz trivial-fiber classification"' in smoke
     assert mojo_smoke.case_passed("proof-grade Misiurewicz trivial-fiber classification")

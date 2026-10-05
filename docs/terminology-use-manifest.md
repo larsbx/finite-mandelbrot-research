@@ -38,7 +38,7 @@ The following terms may appear without a full local declaration only because the
 
 ## Terms requiring local declaration outside C1 files
 
-These terms are allowed freely only inside files whose path begins with `docs/C1_`, `src/C1_`, or `tests/test_C1_`. Outside that context, they require a local terminology declaration or an explicit pointer to the registry:
+These terms are allowed freely only inside files whose path begins with `docs/C1_`, `kernel/mojo/c1/`, or `tests/test_C1_`. Outside that context, they require a local terminology declaration or an explicit pointer to the registry:
 
 - `finite rational-ray nest`
 - `persistent non-separation`
@@ -52,7 +52,7 @@ These terms are allowed freely only inside files whose path begins with `docs/C1
 - `side-assignment witness`
 - `separator code`
 - `prefix obstruction`
-- `exact-type catalogue` — home files also include `src/misiurewicz_catalogue.mojo`, `tools/misiurewicz_catalogue_reference.py`, and `spec/regime_correspondences.toml`.
+- `exact-type catalogue` — home files also include `kernel/mojo/certificates/misiurewicz_catalogue.mojo`, `reference/python/c1/misiurewicz_catalogue_reference.py`, and `schemas/regime_correspondences.toml`.
 
 Deprecated migration-only term:
 

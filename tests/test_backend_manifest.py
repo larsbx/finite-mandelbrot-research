@@ -41,77 +41,77 @@ def test_manifest_blocks_proof_grade_requirements_on_demo_backend():
 
 
 def test_checked_int64_transition_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_int64_backend.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/arithmetic/checked_int64_backend.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     for operation in ["checked_add_i64", "checked_sub_i64", "checked_mul_i64", "checked_neg_i64"]:
         assert f"def {operation}" in src
     assert "denominator_is_valid_i64" in src
     assert "q8_growth_must_overflow_i64" in src
-    assert "from checked_int64_backend import checked_i64_boundary_smoke" in smoke
+    assert "from arithmetic.checked_int64_backend import checked_i64_boundary_smoke" in smoke
     assert mojo_smoke.case_passed("checked i64 boundary")
 
 
 def test_checked_rational_transition_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_q.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/arithmetic/checked_q.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     for operation in ["checked_q_add", "checked_q_sub", "checked_q_mul", "checked_q_div", "checked_q_lt"]:
         assert f"def {operation}" in src
     assert "normalize_checked_q(1, 0).rejected" in src
-    assert "from checked_q import checked_q_smoke" in smoke
+    assert "from arithmetic.checked_q import checked_q_smoke" in smoke
     assert mojo_smoke.case_passed("checked Q")
 
 
 def test_checked_interval_transition_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_interval_q.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/arithmetic/checked_interval_q.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     for operation in ["checked_iq_add", "checked_iq_sub", "checked_iq_mul", "checked_iq_reciprocal", "checked_iq_sign"]:
         assert f"def {operation}" in src
     assert "if ordered.rejected or not ordered.value" in src
-    assert "from checked_interval_q import checked_iq_smoke" in smoke
+    assert "from arithmetic.checked_interval_q import checked_iq_smoke" in smoke
     assert mojo_smoke.case_passed("checked interval Q")
 
 
 def test_checked_complex_horner_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_complex_interval.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/arithmetic/checked_complex_interval.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     for operation in ["checked_complex_add", "checked_complex_mul", "eval_checked_poly_ascending_horner", "eval_checked_p21"]:
         assert f"def {operation}" in src
     assert "if acc.rejected:" in src
-    assert "from checked_complex_interval import checked_complex_horner_smoke" in smoke
+    assert "from arithmetic.checked_complex_interval import checked_complex_horner_smoke" in smoke
     assert mojo_smoke.case_passed("checked complex Horner")
 
 
 def test_checked_krawczyk_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_krawczyk_witness.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/certificates/checked_krawczyk_witness.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     assert "struct CheckedKrawczykResult(ImplicitlyCopyable)" in src
     assert "if beta.rejected or image.rejected:" in src
     assert "invalid_half_width.rejected" in src
     assert "overflow_half_width.rejected" in src
-    assert "from checked_krawczyk_witness import checked_krawczyk_smoke" in smoke
+    assert "from certificates.checked_krawczyk_witness import checked_krawczyk_smoke" in smoke
     assert mojo_smoke.case_passed("checked Krawczyk")
 
 
 def test_checked_interval_exclusion_is_computed_and_compiler_wired(mojo_smoke):
-    src = (ROOT / "src" / "checked_interval_exclusion.mojo").read_text(encoding="utf-8")
-    gate = (ROOT / "src" / "certificate_arithmetic_migration_gate.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    src = (ROOT / "kernel/mojo/certificates/checked_interval_exclusion.mojo").read_text(encoding="utf-8")
+    gate = (ROOT / "kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     assert "def build_checked_interval_orbit_h3" in src
     assert "def checked_collision_excludes_zero" in src
     assert "for pair_idx in range(5):" in src
     assert "if exclusion.rejected:" in src
     assert "checked_p21_exact_type_exclusions(8)" in gate
     assert "ExactTypeExclusionEvidence(box_name, 5, 5, False)" not in gate
-    assert "from checked_interval_exclusion import checked_interval_exclusion_smoke" in smoke
+    assert "from certificates.checked_interval_exclusion import checked_interval_exclusion_smoke" in smoke
     assert mojo_smoke.case_passed("checked interval exclusion")
 
 
 def test_checked_ray_and_finite_certificate_boundary_are_compiler_wired(mojo_smoke):
-    ray = (ROOT / "src" / "checked_ray_address.mojo").read_text(encoding="utf-8")
-    gate = (ROOT / "src" / "checked_finite_certificate_gate.mojo").read_text(encoding="utf-8")
-    tags = (ROOT / "src" / "C1_theorem_tag_payload_instances.mojo").read_text(encoding="utf-8")
-    association = (ROOT / "src" / "checked_landing_target_adapter.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "src" / "smoke_tests.mojo").read_text(encoding="utf-8")
+    ray = (ROOT / "kernel/mojo/dynamics/checked_ray_address.mojo").read_text(encoding="utf-8")
+    gate = (ROOT / "kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo").read_text(encoding="utf-8")
+    tags = (ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo").read_text(encoding="utf-8")
+    association = (ROOT / "kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo").read_text(encoding="utf-8")
+    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
     assert "checked_mul_i64(address.num, 2)" in ray
     assert "if doubled.overflowed:" in ray
     assert "verify_checked_one_half_orbit" in ray

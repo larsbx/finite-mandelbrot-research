@@ -20,14 +20,14 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import carrier_density_profile_reference as cdp  # noqa: E402
-import separated_density_reference as sd  # noqa: E402
+from reference.python.c1 import carrier_density_profile_reference as cdp  # noqa: E402
+from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_separated_pair_density.md"
-SRC = ROOT / "src" / "C1_carrier_density_profile.mojo"
-DENSITY_SRC = ROOT / "src" / "C1_separated_density.mojo"
+SRC = ROOT / "kernel/mojo/c1/carrier/carrier_density_profile.mojo"
+DENSITY_SRC = ROOT / "kernel/mojo/c1/separator/separated_density.mojo"
 
 BASILICA = ((1, 3), (2, 3))
 RABBIT = ((1, 7), (2, 7))
@@ -161,7 +161,7 @@ def test_the_module_fails_closed_rather_than_returning_an_empty_profile():
 
 
 def test_the_kernel_is_the_one_the_density_note_governs():
-    assert "from C1_separated_density import" in text(SRC)
+    assert "from c1.separator.separated_density import" in text(SRC)
     assert "separated_pair_density" in text(SRC) and "def separated_pair_density(" in text(DENSITY_SRC)
 
 
@@ -169,16 +169,16 @@ def test_the_kernel_is_the_one_the_density_note_governs():
 
 
 def test_the_regime_correspondence_binds_the_profile_symbol():
-    spec = tomllib.loads(text(ROOT / "spec" / "regime_correspondences.toml"))
+    spec = tomllib.loads(text(ROOT / "schemas/regime_correspondences.toml"))
     entry = next(c for c in spec["correspondence"] if c["id"] == "separated-pair-density")
-    assert "src/C1_carrier_density_profile.mojo::carrier_density_profile" in entry["symbols"]
+    assert "kernel/mojo/c1/carrier/carrier_density_profile.mojo::carrier_density_profile" in entry["symbols"]
     assert "any verdict on the carrier whose levels order the prefix" in entry["does_not_inherit"]
     assert text(SRC).count("# Regime correspondence: separated-pair-density") == 1
 
 
 def test_the_note_records_the_step_as_taken():
     body = text(DOC)
-    assert "src/C1_carrier_density_profile.mojo" in body
+    assert "kernel/mojo/c1/carrier/carrier_density_profile.mojo" in body
     assert "Next step" in body
 
 
@@ -188,4 +188,4 @@ def test_mojo_smoke_pins_the_same_constants():
                      "_is(refined.levels[1].decided, 22, 147)", "_is(deeper.levels[2].decided, 8, 147)",
                      "refined.residue_non_increasing"):
         assert fragment in src
-    assert "carrier_density_profile_smoke" in text(ROOT / "src" / "smoke_tests.mojo")
+    assert "carrier_density_profile_smoke" in text(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")

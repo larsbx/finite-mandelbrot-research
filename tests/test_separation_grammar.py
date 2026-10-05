@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "separation_grammar.mojo"
+SRC = ROOT / "kernel/mojo/c1/separator/separation_grammar.mojo"
 CHECKLIST = ROOT / "docs" / "C1_proof_obligation_checklist.md"
 
 
@@ -11,7 +11,7 @@ def read(path: Path) -> str:
 
 def test_separation_grammar_objects_exist():
     src = read(SRC)
-    assert "from ray_address import RayAddr" in src
+    assert "from dynamics.ray_address import RayAddr" in src
     assert "struct LandingTag" in src
     assert "struct LandedRay" in src
     assert "struct SeparationLine" in src

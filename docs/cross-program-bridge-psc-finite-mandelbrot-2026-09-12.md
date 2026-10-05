@@ -120,7 +120,7 @@ Each item names the map, what it preserves, what leaks, and its status.
 
 ### I3. Finite witness and its dual
 
-- Map: a Parikh-prefix zero return (`coincidence_boundaries` in `PSC: mojo/psc/bpa.mojo`) maps to a certified separator code (`SeparationLine` in `NLAP: src/separation_grammar.mojo`).
+- Map: a Parikh-prefix zero return (`coincidence_boundaries` in `PSC: mojo/psc/bpa.mojo`) maps to a certified separator code (`SeparationLine` in `NLAP: kernel/mojo/c1/separator/separation_grammar.mojo`).
 - Preserved: both are finite, canonicalized, monotone-accumulating witnesses; both repositories insist the witness is checkable without the classical object (no analytic point, no realized tiling).
 - Leaks: polarity (section 1.3). The PSC witness is unary on automaton states, the NLAP witness is binary on representatives.
 - Status: DEFINITION.
@@ -153,7 +153,7 @@ Each item names the map, what it preserves, what leaks, and its status.
 ### I7. One Galois lemma, opposite uses `[V]`
 
 - Statement `G`: let `f in Q[x]` be irreducible and let `P` be a predicate on roots defined by `Q`-rational polynomial identities or their negations. Then `P` is constant on the roots of `f`.
-- PSC use: `GaloisWedgePropagation` (source-pending in `PSC: tla/Ledger.tla`) is `G` applied to "`phi_j != 0`" for wedge eigenfunctionals attached to conjugate eigenvalues, valid provided the functional is a `Q`-rational construction from the eigenvector; that provenance audit is exactly the item `PSC: docs/source-imports/issue-45/*` lists as pending.
+- PSC use: `GaloisWedgePropagation` (source-pending in `PSC: proof/c1/models/tla/Ledger.tla`) is `G` applied to "`phi_j != 0`" for wedge eigenfunctionals attached to conjugate eigenvalues, valid provided the functional is a `Q`-rational construction from the eigenvector; that provenance audit is exactly the item `PSC: docs/source-imports/issue-45/*` lists as pending.
 - NLAP use: exact Misiurewicz type is a function of the collision pattern `{(i,j) : Q_i(c) = Q_j(c)}`, each member of which is a `Q`-rational identity; hence exact type is constant on each irreducible factor. NLAP currently asserts the negation (section 3, C1).
 - Status: THEOREM (elementary); the PSC application is CONDITIONAL on the `Q`-rationality audit; the NLAP application refutes a repository claim.
 
@@ -211,8 +211,8 @@ Consequences.
 ### C2. NLAP: the governance layer has outrun the content; main CI is red `[V]`
 
 - The five most recent `main` runs of `finite-regime-core-audit` (run numbers 263–267) all fail at step 3, "Run no-trig core audit", so every downstream step is skipped, including all proof-object tests.
-- Cause: `tools/audit_no_trig.py` bans the token `degree` lexically; the six hits are all *polynomial* degree (`src/poly_witness.mojo:17 var degree: Int64`, `src/poly_interval_eval.mojo:79 # Degree 12`, and four more). A polynomial-certificate project cannot ban the word.
-- `tools/audit_terminology.py` reports 41 further findings on the same head, mostly the deprecated term used without migration context in twenty `docs/C1_*` files, plus scoped terms in `docs/mojo_first_execution_policy.md` and `src/alignment_audit_status.mojo`.
+- Cause: `tools/audit_no_trig.py` bans the token `degree` lexically; the six hits are all *polynomial* degree (`kernel/mojo/polynomial/poly_witness.mojo:17 var degree: Int64`, `kernel/mojo/polynomial/poly_interval_eval.mojo:79 # Degree 12`, and four more). A polynomial-certificate project cannot ban the word.
+- `tools/audit_terminology.py` reports 41 further findings on the same head, mostly the deprecated term used without migration context in twenty `docs/C1_*` files, plus scoped terms in `docs/mojo_first_execution_policy.md` and `kernel/mojo/theorem_kernel/alignment_audit_status.mojo`.
 - `pytest` on the same head: 16 failed, 290 passed, all failures in the same lexical class.
 
 Nothing in NLAP is currently verified by its own gate.
@@ -222,11 +222,11 @@ Nothing in NLAP is currently verified by its own gate.
 - No CI step installs or runs Mojo; the only `subprocess` use in `tests/` runs a Python oracle.
 - `src/*.mojo` uses `fn __init__(inout self, ...)` (17 structs) and `@value` (14 structs). PSC pins `modular >= 26.6` and writes `def __init__(out self, ...)`, `mut`, `ref`, and `Copyable, Movable` traits. The NLAP forms predate that toolchain and are not expected to compile on it.
 - `tests/test_krawczyk_joint_scaffold.py::test_p21_demo_is_computed_not_status_asserted` asserts that a substring `verify_p21_krawczyk_c_minus_2(8)` appears in the source; it does not run it.
-- `src/cert_types.mojo` states of `KrawczykWitness`: "The current fields are metadata; exact interval enclosures will replace them."
+- `kernel/mojo/certificates/cert_types.mojo` states of `KrawczykWitness`: "The current fields are metadata; exact interval enclosures will replace them."
 
 ### C4. PSC: an imported theorem is recorded as proved `[V]`
 
-`PSC: tla/Ledger.tla` places `StandardBPAEquivalence` in `ProvedDef`. It is Akiyama--Barge--Berthé--Lee--Siegel Theorem 5.3, and `docs/bpa-literature-bridge.md` section 3 says the seedwise clause "should be checked in the theorem's proof ... rather than inferred from the word 'any'". `ProofArchitecture.tla` has `Proved`, `Withdrawn`, `Assumed` but no `Imported` category carrying hypotheses, conclusion, and leak note. The v16 source-pending results are handled by exclusion only. NLAP's `TheoremTagImport` (`src/mojo_theorem_kernel.mojo`) is the missing structure.
+`PSC: proof/c1/models/tla/Ledger.tla` places `StandardBPAEquivalence` in `ProvedDef`. It is Akiyama--Barge--Berthé--Lee--Siegel Theorem 5.3, and `docs/bpa-literature-bridge.md` section 3 says the seedwise clause "should be checked in the theorem's proof ... rather than inferred from the word 'any'". `ProofArchitecture.tla` has `Proved`, `Withdrawn`, `Assumed` but no `Imported` category carrying hypotheses, conclusion, and leak note. The v16 source-pending results are handled by exclusion only. NLAP's `TheoremTagImport` (`kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo`) is the missing structure.
 
 ### C5. PSC: two contradictory policies on the contracting space `[V]`
 
@@ -292,9 +292,9 @@ Ranking is by expected leverage on the named repository's own open gate, then by
 
 ### B3. Port the TLA+ dependency ledger to NLAP — NLAP, infrastructure
 
-- `PSC: tla/ProofArchitecture.tla` is generic (`CONSTANTS Results, Requires, Proved, Withdrawn, Assumed`) and needs no change. NLAP supplies a `Ledger.tla` with the seven proof blocks of `docs/C1_proof_definition_and_priority.md`, the theorem tags as `Assumed` in one configuration and absent in another, and invariants such as `C1NotEstablished`, `MissingLinkNeverTerminal`, `MLCStrengthUnreachableWithoutResidualClosure`. TLC then checks what `src/C1_theorem_status.mojo` currently asserts by hand.
+- `PSC: proof/c1/models/tla/ProofArchitecture.tla` is generic (`CONSTANTS Results, Requires, Proved, Withdrawn, Assumed`) and needs no change. NLAP supplies a `Ledger.tla` with the seven proof blocks of `docs/C1_proof_definition_and_priority.md`, the theorem tags as `Assumed` in one configuration and absent in another, and invariants such as `C1NotEstablished`, `MissingLinkNeverTerminal`, `MLCStrengthUnreachableWithoutResidualClosure`. TLC then checks what `kernel/mojo/c1/proof/theorem_status.mojo` currently asserts by hand.
 - Add an `Imported` constant to the shared `ProofArchitecture.tla` while porting (also fixes C4 on the PSC side).
-- First files: new `NLAP: tla/Ledger.tla`, `NLAP: tla/check.sh` copied from PSC.
+- First files: new `NLAP: proof/c1/models/tla/Ledger.tla`, `NLAP: proof/c1/models/tla/check.sh` copied from PSC.
 
 ### B4. Give NLAP a compiling Mojo toolchain and CI — NLAP, infrastructure
 

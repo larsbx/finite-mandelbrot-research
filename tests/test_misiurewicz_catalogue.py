@@ -8,12 +8,12 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
 
-import misiurewicz_catalogue_reference as mc  # noqa: E402
+from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
 
 DOC = ROOT / "docs" / "C1_misiurewicz_catalogue.md"
-SRC = ROOT / "src" / "misiurewicz_catalogue.mojo"
+SRC = ROOT / "kernel/mojo/certificates/misiurewicz_catalogue.mojo"
 
 
 def text(path: Path) -> str:
@@ -43,13 +43,13 @@ def test_non_claims_return_false_in_mojo():
 
 
 def test_regime_correspondence_binds_the_catalogue_symbols():
-    spec = tomllib.loads(text(ROOT / "spec" / "regime_correspondences.toml"))
+    spec = tomllib.loads(text(ROOT / "schemas/regime_correspondences.toml"))
     entry = next(c for c in spec["correspondence"] if c["id"] == "misiurewicz-exact-type")
     assert "parameter location" in entry["does_not_inherit"]
     assert "fibre triviality" in entry["does_not_inherit"]
     for symbol in entry["symbols"]:
         path, name = symbol.split("::")
-        assert path == "src/misiurewicz_catalogue.mojo" and f"def {name}(" in text(SRC)
+        assert path == "kernel/mojo/certificates/misiurewicz_catalogue.mojo" and f"def {name}(" in text(SRC)
     assert text(SRC).count("# Regime correspondence: misiurewicz-exact-type") == len(entry["symbols"])
 
 

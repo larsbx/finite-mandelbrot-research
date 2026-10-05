@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_residual_descent_contradiction.md"
-SRC = ROOT / "src" / "C1_residual_descent_contradiction.mojo"
+SRC = ROOT / "kernel/mojo/c1/residual/residual_descent_contradiction.mojo"
 
 
 def text(path):

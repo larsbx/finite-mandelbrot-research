@@ -2,8 +2,9 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "certificate_incidence.mojo"
+SRC = ROOT / "kernel/mojo/certificates/certificate_incidence.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 from source_tokens import mask_comments_and_strings
 
 

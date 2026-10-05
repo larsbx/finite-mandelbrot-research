@@ -294,5 +294,5 @@ Extraction into its own repository is allowed only after:
 6. finite-mandlebrot-research and PSC each supply a distinct policy adapter in consumer code;
 7. neither consumer changes any mathematical claim status during migration.
 
-Until then, `src/mojo_theorem_kernel.mojo` remains a scaffold and must not be
+Until then, `kernel/mojo/theorem_kernel/mojo_theorem_kernel.mojo` remains a scaffold and must not be
 described as an authoritative proof checker.

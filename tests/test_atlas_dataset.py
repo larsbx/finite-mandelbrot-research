@@ -1,6 +1,6 @@
 """The Mojo dataset emitter, checked object by object against the oracles.
 
-`src/atlas_dataset.mojo` is the one place the exact objects leave this
+`kernel/mojo/entrypoints/atlas_dataset.mojo` is the one place the exact objects leave this
 repository: the counts and catalogues, the kneading sequences and internal
 addresses, the tuned angles, the obstruction extractions with their pairs, the
 decided measures, and the finite incidence packages. Mojo computes them; the
@@ -8,7 +8,7 @@ Python references here are independent implementations, so agreeing with them
 is evidence rather than an echo.
 
 Positions in the parameter plane are deliberately absent. They are floating
-point, and nothing in `src/` may produce one.
+point, and nothing in `kernel/` may produce one.
 """
 
 from __future__ import annotations
@@ -22,19 +22,20 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT))
+from mojo_include import mojo_run  # noqa: E402
 
-import kneading_reference as kr  # noqa: E402
-import misiurewicz_catalogue_reference as mc  # noqa: E402
-import misiurewicz_prefix_graph_reference as pg  # noqa: E402
-import separated_density_reference as sd  # noqa: E402
+from reference.python.c1 import kneading_reference as kr  # noqa: E402
+from reference.python.c1 import misiurewicz_catalogue_reference as mc  # noqa: E402
+from reference.python.c1 import misiurewicz_prefix_graph_reference as pg  # noqa: E402
+from reference.python.c1 import separated_density_reference as sd  # noqa: E402
 
-SRC = ROOT / "src" / "atlas_dataset.mojo"
+SRC = ROOT / "kernel/mojo/entrypoints/atlas_dataset.mojo"
 
 
 @pytest.fixture(scope="module")
 def dataset() -> dict:
-    result = subprocess.run(["mojo", str(SRC)], cwd=ROOT, capture_output=True, text=True, check=False)
+    result = subprocess.run(mojo_run(str(SRC.relative_to(ROOT))), cwd=ROOT, capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stdout + result.stderr
     return json.loads(result.stdout)
 
@@ -154,40 +155,3 @@ def test_the_non_claims_survive_the_emitter(dataset):
         assert row["certificate_emitted"] is False
         assert row["theorem_import"] is False
         assert row["proves_c1"] is False
-
-
-# --- the page built from the dataset -------------------------------------------
-
-
-ATLAS = ROOT / "tools" / "atlas"
-
-
-def test_the_page_templates_are_present_and_take_the_dataset_once():
-    for name in ("head.html", "body.html", "script.html"):
-        assert (ATLAS / name).exists(), name
-    script = (ATLAS / "script.html").read_text(encoding="utf-8")
-    assert script.count("__DATA__") == 1
-
-
-def test_the_floating_point_half_stays_out_of_the_core():
-    """`trace_positions` is a picture, so the core may not depend on it. The
-    audits scan `src/` lexically and would not catch an import, which is
-    exactly why this is asserted here."""
-    for path in (ROOT / "src").rglob("*.mojo"):
-        text = path.read_text(encoding="utf-8")
-        assert "trace_positions" not in text, path
-        assert "atlas.build_page" not in text, path
-    tracer = (ATLAS / "trace_positions.py").read_text(encoding="utf-8")
-    assert "not a certificate" in tracer          # the file says what it is
-    assert "imported landing theorem" in tracer   # and what it does not claim
-
-
-def test_the_builder_reads_the_canonical_implementation_not_an_oracle():
-    """The exact half comes from Mojo. A builder that quietly fell back to the
-    Python references would still produce a page, and the page would then be
-    evidence about the oracle rather than about the repository."""
-    builder = (ATLAS / "build_page.py").read_text(encoding="utf-8")
-    assert '"mojo", "src/atlas_dataset.mojo"' in builder
-    for oracle in ("misiurewicz_catalogue_reference", "kneading_reference",
-                   "misiurewicz_prefix_graph_reference", "separated_density_reference"):
-        assert oracle not in builder

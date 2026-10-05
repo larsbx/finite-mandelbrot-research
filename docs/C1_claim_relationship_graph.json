@@ -109,7 +109,7 @@
       "statement": "every theorem tag in the import ledger has a declared assumption-payload schema",
       "scope": "the final C1 proof object",
       "record_kind": "repository_theorem",
-      "source": "source: src/C1_theorem_tag_assumption_payloads.mojo"
+      "source": "source: kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo"
     },
     {
       "id": "TheoremTagImportLedger",
@@ -119,7 +119,7 @@
       "statement": "the theorem-tag import ledger names every imported theorem family with its strength class",
       "scope": "the final C1 proof object",
       "record_kind": "repository_theorem",
-      "source": "source: src/C1_theorem_tag_import_ledger.mojo; docs/C1_theorem_tag_import_ledger.md"
+      "source": "source: kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo; docs/C1_theorem_tag_import_ledger.md"
     },
     {
       "id": "TheoremTagImportSoundness",

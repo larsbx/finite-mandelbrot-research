@@ -1,6 +1,6 @@
 from pathlib import Path
 
-SRC = Path("src/C1_opposite_side_separation.mojo").read_text()
+SRC = Path("kernel/mojo/c1/separator/opposite_side_separation.mojo").read_text()
 DOC = Path("docs/C1_opposite_side_separation_soundness.md").read_text()
 
 

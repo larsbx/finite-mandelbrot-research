@@ -3,8 +3,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_finite_classical_dictionary.md"
-SRC = ROOT / "src" / "C1_bridge.mojo"
+SRC = ROOT / "kernel/mojo/c1/bridge/bridge.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 from source_tokens import mask_comments_and_strings
 
 

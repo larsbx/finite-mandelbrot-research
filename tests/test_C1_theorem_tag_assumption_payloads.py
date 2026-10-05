@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "C1_theorem_tag_assumption_payloads.md"
-SRC = ROOT / "src" / "C1_theorem_tag_assumption_payloads.mojo"
+SRC = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo"
 
 
 def body(path: Path) -> str:

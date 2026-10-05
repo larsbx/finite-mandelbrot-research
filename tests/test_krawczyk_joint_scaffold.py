@@ -1,8 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-KRAW = ROOT / "src" / "krawczyk_witness.mojo"
-JOINT = ROOT / "src" / "joint_certificate.mojo"
+KRAW = ROOT / "kernel/mojo/certificates/krawczyk_witness.mojo"
+JOINT = ROOT / "kernel/mojo/certificates/joint_certificate.mojo"
 
 
 def read(path: Path) -> str:
@@ -41,7 +41,7 @@ def test_p21_demo_is_computed_not_status_asserted():
 
 def test_bigq_krawczyk_replay_is_typed_and_fail_closed(mojo_smoke):
     src = read(KRAW)
-    smoke = read(ROOT / "src" / "smoke_tests.mojo")
+    smoke = read(ROOT / "kernel/mojo/smoke/smoke_tests.mojo")
     assert "struct BigQKrawczykResult(Copyable)" in src
     assert "def verify_bigq_p21_krawczyk_c_minus_2" in src
     assert "if not beta.accepted() or not image.accepted():" in src

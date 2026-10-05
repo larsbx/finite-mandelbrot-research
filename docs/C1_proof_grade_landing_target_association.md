@@ -117,7 +117,7 @@ frontier.
 ## Successor status
 
 The successor classification is now implemented in
-`src/proof_grade_misiurewicz_trivial_fiber_classification.mojo`. It binds the
+`kernel/mojo/certificates/c_minus_2/proof_grade_misiurewicz_trivial_fiber_classification.mojo`. It binds the
 checked Schleicher class-specific import to the proof-grade `c=-2`, exact
 type-`(2,1)` witness and rejects wrong target, type, source, and payload-kind
 controls. Its global-boundary predicates remain hard-false.
