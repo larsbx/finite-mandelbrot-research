@@ -145,6 +145,20 @@ root modulo `p^2`. This is a finite Hensel step, not an asserted infinite
 correspondence, complex embedding, localization, or discriminant/resultant
 evidence.
 
+The polynomial checker materializes `Q_n` with `Int` coefficients, so it
+answers horizons `ell + k <= 7` and primes `p <= 2^20`: `Q_8` has 72-bit
+coefficients. `verify_simple_residue_root_by_census`
+(`kernel/mojo/dynamics/critical_type_census.mojo`) issues the same simple
+residue root certificate for every prime `p < 2^32` and horizon below `2^32`
+without materializing a polynomial. It evaluates `R_{ell,k}` and `R'_{ell,k}`
+at the residue through the B0 recurrence and `Q'_{n+1} = 2 Q_n Q'_n + 1`,
+both identities in `Z[C]` that reduction modulo `p` preserves, and reads the
+exact collision pattern from the vendored orbit census. It agrees with the
+polynomial checker field by field on that checker's domain for the small
+primes, and its golden vectors past both bounds are recomputed from exact
+integer polynomials in `tests/test_critical_relation_census.py`. The Hensel
+step and factor provenance keep their polynomial bounds.
+
 The first characteristic-zero factor subcase is also executable: for a bounded
 integer root, the checker replays synthetic division by `C - r`, exact
 recomposition, simple-root differentiation, and agreement of `r` with the

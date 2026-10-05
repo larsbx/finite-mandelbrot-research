@@ -17,7 +17,10 @@
 from polynomial.poly_z import PolyZ, critical_orbit_poly, derivative, sub, mul, monic_linear, equal_poly
 
 comptime MAX_BRIDGE_PRIME = 1048576
-comptime MAX_BRIDGE_HORIZON = 8
+# PolyZ coefficients are Int and wrap silently: Q_7 peaks at 35 bits, Q_8 at
+# 72 (its derivative at 78). Past horizon 7, verify_simple_residue_root_by_census
+# in dynamics/critical_type_census.mojo answers without materializing Q_n.
+comptime MAX_BRIDGE_HORIZON = 7
 comptime MAX_HENSEL_PRIME = 4096
 comptime MAX_HENSEL_HORIZON = 6
 comptime MAX_LINEAR_FACTOR_HORIZON = 3
@@ -404,6 +407,8 @@ def critical_relation_bridge_smoke() -> Bool:
     var repeated = verify_simple_residue_root(0, 2, 1, 5)
     var composite = verify_simple_residue_root(3, 2, 1, 9)
     var wrong_type = verify_simple_residue_root(3, 1, 1, 5)
+    # Q_8 has 72-bit coefficients: past Int, so horizon 8 is refused, not wrapped.
+    var past_int = verify_simple_residue_root(1, 4, 4, 1009)
     var lift = verify_hensel_step(-2, 2, 1, 5)
     var refused_lift = verify_hensel_step(0, 2, 1, 5)
     var factor = verify_linear_factor_provenance(-2, 2, 1, 5)
@@ -414,6 +419,7 @@ def critical_relation_bridge_smoke() -> Bool:
         not repeated.derivative_nonzero and
         not composite.accepted() and composite.rejected and
         not wrong_type.accepted() and
+        past_int.rejected and
         lift.accepted() and lift.base_residue == 3 and
         lift.correction_digit == 4 and lift.lifted_residue == 23 and
         lift.modulus_squared == 25 and
