@@ -14,7 +14,10 @@ first added to `vendored.toml` with its name, repository, root, and an empty
 `[package.files]` table); `check_vendored_sync.py estate` re-derives the pin
 alone. Arithmetic consumers import the
 package-qualified modules under `vendor/mojo/finite_exact/`; the former root-level
-implementations were removed.
+implementations were removed. The machine-integer gcd (`integer_gcd`) and the
+base-ten renderer (`exact_decimal`), first written in this repository under
+`kernel/mojo/arithmetic/`, now live upstream in `finite_exact` and are imported
+from there; the local copies were removed.
 
 The same pin also vendors the monorepo's `substitution_dynamics` tuning,
 directive-prefix, and column-coincidence modules under

@@ -10,7 +10,7 @@
 # Hard invariant: no analytic functions enter this layer. This is signed integer
 # arithmetic plus order, divisibility, and Euclidean gcd only.
 
-from arithmetic.integer_gcd import gcd_i64
+from finite_exact.integer_gcd import gcd_i64
 
 
 struct BigIntLike:

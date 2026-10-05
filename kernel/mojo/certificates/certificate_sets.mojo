@@ -6,7 +6,7 @@ spec. It avoids external rays as geometric objects; addresses are rational
 pairs (num, den), and doubling is arithmetic modulo den.
 """
 
-from arithmetic.integer_gcd import gcd_int
+from finite_exact.integer_gcd import gcd_int
 
 
 def reduce_num(num0: Int, den0: Int) -> Int:

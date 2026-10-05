@@ -7,7 +7,7 @@
 # not representable by the checked Int64 transition backend.
 
 from arithmetic.checked_int64_backend import I64_MIN, checked_add_i64, checked_sub_i64, checked_mul_i64, checked_neg_i64, denominator_is_valid_i64
-from arithmetic.integer_gcd import gcd_i64_or_one
+from finite_exact.integer_gcd import gcd_i64_or_one
 
 
 struct CheckedQResult(ImplicitlyCopyable):

@@ -67,7 +67,7 @@ def test_compiler_checked_boundary_is_explicit():
         "kernel/mojo/polynomial/poly_z.mojo",
         "kernel/mojo/certificates/cert_types.mojo",
         "vendor/mojo/finite_exact/rat_q.mojo",
-        "kernel/mojo/arithmetic/integer_gcd.mojo",
+        "vendor/mojo/finite_exact/integer_gcd.mojo",
         "kernel/mojo/dynamics/ray_address.mojo",
         "kernel/mojo/arithmetic/rational_trig.mojo",
         "kernel/mojo/theorem_kernel/alignment_audit_status.mojo",

@@ -5,7 +5,7 @@
 # rejects the transition; accepted results are canonical reduced fractions.
 
 from arithmetic.checked_int64_backend import checked_mul_i64
-from arithmetic.integer_gcd import gcd_i64
+from finite_exact.integer_gcd import gcd_i64
 
 
 struct CheckedRayAddrResult(ImplicitlyCopyable):

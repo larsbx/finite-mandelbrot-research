@@ -52,10 +52,13 @@ def test_long_division_replaces_shift_and_subtract_and_keeps_the_reference(mojo_
 
 def test_an_exact_number_can_be_read_in_base_ten(mojo_smoke):
     """Limbs are base 10^9, so the decimal form is exact and needs no division;
-    it is how an exact rational leaves the repository readable. It sits outside
-    the vendored kernel, which stays byte-identical to its upstream."""
-    assert "def bigz_decimal(" in text("kernel/mojo/arithmetic/exact_decimal.mojo")
+    it is how an exact rational leaves the repository readable. First written
+    here, it now lives upstream in finite_exact as its own module, vendored
+    byte-identical to its upstream; no local copy remains."""
+    assert "def bigz_decimal(" in text("vendor/mojo/finite_exact/exact_decimal.mojo")
     assert "def bigz_decimal(" not in text("vendor/mojo/finite_exact/bigint_z.mojo")
+    assert not (ROOT / "kernel/mojo/arithmetic/exact_decimal.mojo").exists()
+    assert "from finite_exact.exact_decimal import" in text("kernel/mojo/entrypoints/atlas_dataset.mojo")
     assert mojo_smoke.case_passed("exact decimal")
 
 

@@ -33,7 +33,7 @@ from c1.residual.residual_directive_carrier import (
     internal_address,
 )
 from c1.separator.separated_density import separated_pair_density
-from arithmetic.exact_decimal import q_decimal
+from finite_exact.exact_decimal import q_decimal
 from certificates.misiurewicz_catalogue import (
     catalogue,
     catalogue_count,

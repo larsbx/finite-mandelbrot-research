@@ -39,7 +39,7 @@
 # fibres of the corresponding parameters is the imported theorem tag
 # `KnownTrivialFiberClass`, not a property computed here.
 
-from arithmetic.integer_gcd import gcd_int
+from finite_exact.integer_gcd import gcd_int
 
 comptime MAX_TYPE_INDEX = 20
 comptime MAX_CATALOGUE_DENOMINATOR = 1048576

@@ -1,7 +1,7 @@
 # Canonical finite rational-ray address value types.
 # Neither type represents a measured angle.
 
-from arithmetic.integer_gcd import gcd_int
+from finite_exact.integer_gcd import gcd_int
 
 
 struct RayAddr(ImplicitlyCopyable):

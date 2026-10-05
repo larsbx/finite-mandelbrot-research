@@ -4,10 +4,9 @@
 #
 # Specification: docs/rational-interval-arithmetic-spec.md (binding 6.2).
 #
-# This lives here rather than in `finite_exact/` because that package is
-# vendored byte for byte from `larsbx/finite-math-kernels` and the digest is
-# checked; a renderer is a consumer of the kernel's public accessors, not part
-# of it. BigZ exposes its sign and its limbs, which is all base ten needs.
+# A renderer is a consumer of the kernel's public accessors: BigZ exposes its
+# sign and its limbs, which is all base ten needs. First written in
+# `larsbx/finite-mandelbrot-research`, beside a vendored copy of this package.
 #
 # Rendering is exact and total: it introduces no division, no rounding, and no
 # floating point, so an exact rational can leave the repository readable
