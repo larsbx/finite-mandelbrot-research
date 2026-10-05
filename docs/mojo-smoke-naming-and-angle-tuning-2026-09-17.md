@@ -17,7 +17,8 @@ branches, so a failure printed a single bare `FAIL`. Which contract broke, and
 whether anything after it also broke, were both invisible; the first failure
 masked the rest.
 
-`kernel/mojo/smoke/smoke_report.mojo` replaces the chain with a named case. `SmokeReport`
+`kernel/mojo/smoke/smoke_report.mojo` (since moved upstream and vendored back as
+`vendor/mojo/mojo_smoke/report.mojo`) replaces the chain with a named case. `SmokeReport`
 records a name and a verdict, prints `[PASS] name` or `[FAIL] name` as it
 goes, and keeps counting after a failure, so one run names every broken
 contract. The suite now reports 58 cases, up from the roughly fifty the chain

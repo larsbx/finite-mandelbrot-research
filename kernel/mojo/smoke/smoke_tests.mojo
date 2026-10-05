@@ -11,7 +11,7 @@
 # governed term is used in the sense that term carries in
 # docs/terminology-registry.md; naming a case asserts nothing beyond the
 # verdict the case returned. Cases are independent and all of them run, so one
-# failure does not hide the next: see kernel/mojo/smoke/smoke_report.mojo.
+# failure does not hide the next: see vendor/mojo/mojo_smoke/report.mojo.
 
 from polynomial.poly_z import smoke_poly_identities
 from certificates.cert_types import MisCertHeader, JointBoxWitness, TheoremTags
@@ -58,7 +58,7 @@ from finite_exact.exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from arithmetic.bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
 from arithmetic.rat_backend_plan import q_backend_migration_smoke
-from smoke.smoke_report import SmokeReport, smoke_report_smoke
+from mojo_smoke.report import SmokeReport, smoke_report_smoke
 from dynamics.angle_tuning import angle_tuning_smoke
 from dynamics.projective_multiset import projective_multiset_smoke
 from dynamics.critical_relation_bridge import critical_relation_bridge_smoke

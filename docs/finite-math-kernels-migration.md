@@ -25,6 +25,11 @@ directive-prefix, and column-coincidence modules under
 (`docs/C1_residual_directive_carrier.md`); the balanced-pair and automaton
 modules are not vendored.
 
+The smoke suite's named reporter is the vendored `mojo_smoke` package
+(`vendor/mojo/mojo_smoke/report.mojo`); it replaced
+`kernel/mojo/smoke/smoke_report.mojo`, which differed from it only in its
+header comment.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;

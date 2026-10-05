@@ -40,7 +40,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo`.
 - `vendor/mojo/finite_exact/bigint_z.mojo`.
 - `kernel/mojo/arithmetic/bigint_adapter.mojo`.
-- `kernel/mojo/smoke/smoke_report.mojo`.
+- `vendor/mojo/mojo_smoke/report.mojo`.
 - `kernel/mojo/dynamics/angle_tuning.mojo`.
 - `kernel/mojo/dynamics/bigq_ray_address.mojo`.
 - `kernel/mojo/certificates/c_minus_2/bigq_landing_target_adapter.mojo`.

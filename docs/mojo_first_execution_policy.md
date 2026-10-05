@@ -57,7 +57,7 @@ the absence of floating-point literals or the presence of a regime-
 correspondence marker.
 
 Every case of the Mojo smoke suite is named and reported through
-`kernel/mojo/smoke/smoke_report.mojo`, and every case runs even after one fails, so a single
+`vendor/mojo/mojo_smoke/report.mojo` (vendored from `larsbx/finite-math-kernels`), and every case runs even after one fails, so a single
 run names every broken contract. A case name that is a governed term is used
 in the sense the terminology registry gives it.
 
