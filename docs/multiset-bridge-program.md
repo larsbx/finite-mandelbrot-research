@@ -149,15 +149,15 @@ near `0.021`. The table is therefore evidence that every Gleason polynomial
 of period at most 8, and every Misiurewicz polynomial with `ell + k <= 8`, is
 irreducible over `Q`. On its own it is not a proof, since the reading assumes
 Chebotarev convergence at this prime bound. The certificates below supply
-the proof for the same range.
+the proof for this range and for `ell + k <= 10`.
 
-#### Irreducibility certificates for `ell + k <= 8`
+#### Irreducibility certificates for `ell + k <= 10`
 
 `kernel/mojo/dynamics/exact_type_irreducibility.mojo` certifies that every
-exact-type polynomial `E_{ell,k}` with `ell + k <= 8` is irreducible over `Q`:
+exact-type polynomial `E_{ell,k}` with `ell + k <= 10` is irreducible over `Q`:
 
 - 3 linear types: `C`, `C + 1`, `C + 2`;
-- 26 types of degree 2 through 120, the largest being the period-8 Gleason
+- 43 types of degree 2 through 495, the largest being the period-10 Gleason
   polynomial.
 
 Over `Z`,
@@ -173,7 +173,7 @@ its factor degrees from distinct-degree factorization. Any factorization
 `E = GH` over `Q` has monic integral factors (Gauss), so `deg G` would be a
 subset sum of the factor degrees at every listed prime. The certificate
 holds when the common subset sums are only `0` and `deg E`. Every type needs
-at most three primes, all drawn from `{3, 5, 7, 11}`.
+at most five primes, all drawn from `{3, 5, 7, 11, 13, 17, 19}`.
 
 The multiplicities `m` are read off by exact division. They are the true
 multiplicities only once the lower `E` are irreducible, so the types are
@@ -193,7 +193,7 @@ The smoke checks three further things:
 - that a product of two exact-type polynomials never certifies;
 - the replay itself.
 
-The certificate says nothing past `ell + k = 8` and names no Galois group.
+The certificate says nothing past `ell + k = 10` and names no Galois group.
 
 ### B2 — Good-reduction and lifting certificate
 

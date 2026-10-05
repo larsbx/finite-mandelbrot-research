@@ -20,11 +20,13 @@
 # once the lower E are irreducible, so the types are certified in increasing
 # order and a type is accepted only after every lower one.
 #
+# Each replayed pattern's linear factors are also checked against a root count.
+#
 # reference/python/polynomial/exact_type_irreducibility.py recomputes E over Z,
 # the multiplicities by exact division, and every certificate with its own
 # factorization; tests/test_exact_type_irreducibility.py binds the two.
 
-comptime CERTIFIED_HORIZON = 8
+comptime CERTIFIED_HORIZON = 10
 
 
 @fieldwise_init
@@ -177,6 +179,166 @@ def multiplicities() -> List[Multiplicity]:
         Multiplicity(0, 8, 0, 1, 1),
         Multiplicity(0, 8, 0, 2, 1),
         Multiplicity(0, 8, 0, 4, 1),
+        Multiplicity(8, 1, 0, 1, 9),
+        Multiplicity(8, 1, 2, 1, 1),
+        Multiplicity(8, 1, 3, 1, 1),
+        Multiplicity(8, 1, 4, 1, 1),
+        Multiplicity(8, 1, 5, 1, 1),
+        Multiplicity(8, 1, 6, 1, 1),
+        Multiplicity(8, 1, 7, 1, 1),
+        Multiplicity(7, 2, 0, 1, 8),
+        Multiplicity(7, 2, 0, 2, 5),
+        Multiplicity(7, 2, 2, 1, 1),
+        Multiplicity(7, 2, 3, 1, 1),
+        Multiplicity(7, 2, 2, 2, 1),
+        Multiplicity(7, 2, 4, 1, 1),
+        Multiplicity(7, 2, 3, 2, 1),
+        Multiplicity(7, 2, 5, 1, 1),
+        Multiplicity(7, 2, 4, 2, 1),
+        Multiplicity(7, 2, 6, 1, 1),
+        Multiplicity(7, 2, 5, 2, 1),
+        Multiplicity(7, 2, 7, 1, 1),
+        Multiplicity(7, 2, 6, 2, 1),
+        Multiplicity(6, 3, 0, 1, 7),
+        Multiplicity(6, 3, 2, 1, 1),
+        Multiplicity(6, 3, 0, 3, 3),
+        Multiplicity(6, 3, 3, 1, 1),
+        Multiplicity(6, 3, 4, 1, 1),
+        Multiplicity(6, 3, 2, 3, 1),
+        Multiplicity(6, 3, 5, 1, 1),
+        Multiplicity(6, 3, 3, 3, 1),
+        Multiplicity(6, 3, 6, 1, 1),
+        Multiplicity(6, 3, 4, 3, 1),
+        Multiplicity(6, 3, 5, 3, 1),
+        Multiplicity(5, 4, 0, 1, 6),
+        Multiplicity(5, 4, 0, 2, 4),
+        Multiplicity(5, 4, 2, 1, 1),
+        Multiplicity(5, 4, 3, 1, 1),
+        Multiplicity(5, 4, 2, 2, 1),
+        Multiplicity(5, 4, 0, 4, 3),
+        Multiplicity(5, 4, 4, 1, 1),
+        Multiplicity(5, 4, 3, 2, 1),
+        Multiplicity(5, 4, 5, 1, 1),
+        Multiplicity(5, 4, 4, 2, 1),
+        Multiplicity(5, 4, 2, 4, 1),
+        Multiplicity(5, 4, 5, 2, 1),
+        Multiplicity(5, 4, 3, 4, 1),
+        Multiplicity(5, 4, 4, 4, 1),
+        Multiplicity(4, 5, 0, 1, 5),
+        Multiplicity(4, 5, 2, 1, 1),
+        Multiplicity(4, 5, 3, 1, 1),
+        Multiplicity(4, 5, 4, 1, 1),
+        Multiplicity(4, 5, 0, 5, 2),
+        Multiplicity(4, 5, 2, 5, 1),
+        Multiplicity(4, 5, 3, 5, 1),
+        Multiplicity(3, 6, 0, 1, 4),
+        Multiplicity(3, 6, 0, 2, 3),
+        Multiplicity(3, 6, 2, 1, 1),
+        Multiplicity(3, 6, 0, 3, 2),
+        Multiplicity(3, 6, 3, 1, 1),
+        Multiplicity(3, 6, 2, 2, 1),
+        Multiplicity(3, 6, 3, 2, 1),
+        Multiplicity(3, 6, 2, 3, 1),
+        Multiplicity(3, 6, 3, 3, 1),
+        Multiplicity(3, 6, 0, 6, 2),
+        Multiplicity(3, 6, 2, 6, 1),
+        Multiplicity(2, 7, 0, 1, 3),
+        Multiplicity(2, 7, 2, 1, 1),
+        Multiplicity(2, 7, 0, 7, 2),
+        Multiplicity(0, 9, 0, 1, 1),
+        Multiplicity(0, 9, 0, 3, 1),
+        Multiplicity(9, 1, 0, 1, 10),
+        Multiplicity(9, 1, 2, 1, 1),
+        Multiplicity(9, 1, 3, 1, 1),
+        Multiplicity(9, 1, 4, 1, 1),
+        Multiplicity(9, 1, 5, 1, 1),
+        Multiplicity(9, 1, 6, 1, 1),
+        Multiplicity(9, 1, 7, 1, 1),
+        Multiplicity(9, 1, 8, 1, 1),
+        Multiplicity(8, 2, 0, 1, 9),
+        Multiplicity(8, 2, 0, 2, 5),
+        Multiplicity(8, 2, 2, 1, 1),
+        Multiplicity(8, 2, 3, 1, 1),
+        Multiplicity(8, 2, 2, 2, 1),
+        Multiplicity(8, 2, 4, 1, 1),
+        Multiplicity(8, 2, 3, 2, 1),
+        Multiplicity(8, 2, 5, 1, 1),
+        Multiplicity(8, 2, 4, 2, 1),
+        Multiplicity(8, 2, 6, 1, 1),
+        Multiplicity(8, 2, 5, 2, 1),
+        Multiplicity(8, 2, 7, 1, 1),
+        Multiplicity(8, 2, 6, 2, 1),
+        Multiplicity(8, 2, 8, 1, 1),
+        Multiplicity(8, 2, 7, 2, 1),
+        Multiplicity(7, 3, 0, 1, 8),
+        Multiplicity(7, 3, 2, 1, 1),
+        Multiplicity(7, 3, 0, 3, 4),
+        Multiplicity(7, 3, 3, 1, 1),
+        Multiplicity(7, 3, 4, 1, 1),
+        Multiplicity(7, 3, 2, 3, 1),
+        Multiplicity(7, 3, 5, 1, 1),
+        Multiplicity(7, 3, 3, 3, 1),
+        Multiplicity(7, 3, 6, 1, 1),
+        Multiplicity(7, 3, 4, 3, 1),
+        Multiplicity(7, 3, 7, 1, 1),
+        Multiplicity(7, 3, 5, 3, 1),
+        Multiplicity(7, 3, 6, 3, 1),
+        Multiplicity(6, 4, 0, 1, 7),
+        Multiplicity(6, 4, 0, 2, 4),
+        Multiplicity(6, 4, 2, 1, 1),
+        Multiplicity(6, 4, 3, 1, 1),
+        Multiplicity(6, 4, 2, 2, 1),
+        Multiplicity(6, 4, 0, 4, 3),
+        Multiplicity(6, 4, 4, 1, 1),
+        Multiplicity(6, 4, 3, 2, 1),
+        Multiplicity(6, 4, 5, 1, 1),
+        Multiplicity(6, 4, 4, 2, 1),
+        Multiplicity(6, 4, 2, 4, 1),
+        Multiplicity(6, 4, 6, 1, 1),
+        Multiplicity(6, 4, 5, 2, 1),
+        Multiplicity(6, 4, 3, 4, 1),
+        Multiplicity(6, 4, 6, 2, 1),
+        Multiplicity(6, 4, 4, 4, 1),
+        Multiplicity(6, 4, 5, 4, 1),
+        Multiplicity(5, 5, 0, 1, 6),
+        Multiplicity(5, 5, 2, 1, 1),
+        Multiplicity(5, 5, 3, 1, 1),
+        Multiplicity(5, 5, 4, 1, 1),
+        Multiplicity(5, 5, 0, 5, 2),
+        Multiplicity(5, 5, 5, 1, 1),
+        Multiplicity(5, 5, 2, 5, 1),
+        Multiplicity(5, 5, 3, 5, 1),
+        Multiplicity(5, 5, 4, 5, 1),
+        Multiplicity(4, 6, 0, 1, 5),
+        Multiplicity(4, 6, 0, 2, 3),
+        Multiplicity(4, 6, 2, 1, 1),
+        Multiplicity(4, 6, 0, 3, 3),
+        Multiplicity(4, 6, 3, 1, 1),
+        Multiplicity(4, 6, 2, 2, 1),
+        Multiplicity(4, 6, 4, 1, 1),
+        Multiplicity(4, 6, 3, 2, 1),
+        Multiplicity(4, 6, 2, 3, 1),
+        Multiplicity(4, 6, 4, 2, 1),
+        Multiplicity(4, 6, 3, 3, 1),
+        Multiplicity(4, 6, 0, 6, 2),
+        Multiplicity(4, 6, 4, 3, 1),
+        Multiplicity(4, 6, 2, 6, 1),
+        Multiplicity(4, 6, 3, 6, 1),
+        Multiplicity(3, 7, 0, 1, 4),
+        Multiplicity(3, 7, 2, 1, 1),
+        Multiplicity(3, 7, 3, 1, 1),
+        Multiplicity(3, 7, 0, 7, 2),
+        Multiplicity(3, 7, 2, 7, 1),
+        Multiplicity(2, 8, 0, 1, 3),
+        Multiplicity(2, 8, 0, 2, 2),
+        Multiplicity(2, 8, 2, 1, 1),
+        Multiplicity(2, 8, 2, 2, 1),
+        Multiplicity(2, 8, 0, 4, 2),
+        Multiplicity(2, 8, 2, 4, 1),
+        Multiplicity(2, 8, 0, 8, 2),
+        Multiplicity(0, 10, 0, 1, 1),
+        Multiplicity(0, 10, 0, 2, 1),
+        Multiplicity(0, 10, 0, 5, 1),
     ]
 
 
@@ -229,6 +391,51 @@ def certificates() -> List[FactorPattern]:
         FactorPattern(2, 6, 3, "54"),
         FactorPattern(0, 8, 3, "22 48 50"),
         FactorPattern(0, 8, 5, "29 91"),
+        FactorPattern(8, 1, 3, "9 11 21 86"),
+        FactorPattern(8, 1, 5, "3 5 7 9 103"),
+        FactorPattern(8, 1, 7, "2 23 41 61"),
+        FactorPattern(7, 2, 3, "6 7 21 29"),
+        FactorPattern(7, 2, 5, "3 28 32"),
+        FactorPattern(7, 2, 11, "4 18 41"),
+        FactorPattern(6, 3, 3, "16 18 62"),
+        FactorPattern(6, 3, 5, "5 91"),
+        FactorPattern(5, 4, 3, "4 8 12 14 52"),
+        FactorPattern(5, 4, 5, "2 3 3 6 76"),
+        FactorPattern(5, 4, 7, "3 5 11 13 58"),
+        FactorPattern(5, 4, 11, "2 3 12 17 23 33"),
+        FactorPattern(5, 4, 13, "2 39 49"),
+        FactorPattern(4, 5, 3, "5 29 86"),
+        FactorPattern(4, 5, 7, "4 5 17 18 20 23 33"),
+        FactorPattern(4, 5, 13, "2 5 51 62"),
+        FactorPattern(4, 5, 17, "1 6 8 105"),
+        FactorPattern(3, 6, 3, "18 19 71"),
+        FactorPattern(3, 6, 5, "20 20 68"),
+        FactorPattern(2, 7, 3, "3 32 40 51"),
+        FactorPattern(2, 7, 5, "4 15 107"),
+        FactorPattern(0, 9, 3, "6 8 34 204"),
+        FactorPattern(0, 9, 5, "13 86 153"),
+        FactorPattern(9, 1, 3, "5 12 21 30 187"),
+        FactorPattern(9, 1, 5, "11 17 227"),
+        FactorPattern(9, 1, 19, "3 3 7 15 81 146"),
+        FactorPattern(8, 2, 3, "4 11 13 42 58"),
+        FactorPattern(8, 2, 5, "6 8 17 34 63"),
+        FactorPattern(8, 2, 7, "2 3 10 38 75"),
+        FactorPattern(7, 3, 3, "24 53 112"),
+        FactorPattern(7, 3, 5, "53 65 71"),
+        FactorPattern(7, 3, 7, "10 23 45 111"),
+        FactorPattern(6, 4, 3, "7 28 65 92"),
+        FactorPattern(6, 4, 5, "4 5 7 176"),
+        FactorPattern(6, 4, 13, "4 6 23 24 26 109"),
+        FactorPattern(5, 5, 3, "4 236"),
+        FactorPattern(5, 5, 7, "3 3 6 38 46 144"),
+        FactorPattern(4, 6, 3, "4 12 200"),
+        FactorPattern(4, 6, 5, "7 209"),
+        FactorPattern(3, 7, 3, "9 59 184"),
+        FactorPattern(3, 7, 5, "3 3 4 10 33 199"),
+        FactorPattern(2, 8, 3, "5 30 205"),
+        FactorPattern(2, 8, 5, "1 2 7 8 222"),
+        FactorPattern(0, 10, 3, "16 479"),
+        FactorPattern(0, 10, 5, "8 18 68 170 231"),
     ]
 
 
@@ -299,42 +506,66 @@ def gcd(a: List[Int], b: List[Int], p: Int) -> List[Int]:
     return x^
 
 
-def relation_mod_p(ell: Int, k: Int, p: Int) -> List[Int]:
-    var c = List[Int]()
-    c.append(0)
-    c.append(1)
+def critical_polys_mod_p(horizon: Int, p: Int) -> List[List[Int]]:
+    """Q_0, ..., Q_horizon mod p."""
+    var out = List[List[Int]]()
     var q = List[Int]()
     q.append(0)
-    var q_ell = q.copy()
-    for n in range(ell + k):
-        if n == ell:
-            q_ell = q.copy()
+    out.append(q.copy())
+    for _ in range(horizon):
         var s = mul(q, q, p)
-        s = trim(s^)
         while len(s) < 2:
             s.append(0)
         s[1] = (s[1] + 1) % p
         q = trim(s^)
-    var out = List[Int](length=max(len(q), len(q_ell)), fill=0)
-    for i in range(len(q)):
-        out[i] = q[i]
-    for i in range(len(q_ell)):
-        out[i] = (out[i] - q_ell[i] + p) % p
-    return trim(out^)
+        out.append(q.copy())
+    return out^
+
+
+struct ExactTypes(Movable):
+    """Every E_{ell,k} mod p with ell + k <= horizon, each the exact quotient of
+    R_{ell,k} by the lower types already in the table."""
+
+    var prime: Int
+    var horizon: Int
+    var polys: List[List[Int]]
+
+    def __init__(out self, prime: Int, horizon: Int) raises:
+        self.prime = prime
+        self.horizon = horizon
+        self.polys = List[List[Int]](length=(horizon + 1) * (horizon + 1), fill=List[Int]())
+        var q = critical_polys_mod_p(horizon, prime)
+        var rows = multiplicities()
+        for h in range(1, horizon + 1):
+            for k in range(1, h + 1):
+                var ell = h - k
+                if ell == 1:
+                    continue
+                var rest = List[Int](length=max(len(q[h]), len(q[ell])), fill=0)
+                for i in range(len(q[h])):
+                    rest[i] = q[h][i]
+                for i in range(len(q[ell])):
+                    rest[i] = (rest[i] - q[ell][i] + prime) % prime
+                rest = trim(rest^)
+                for row in rows:
+                    if row.ell == ell and row.k == k:
+                        for _ in range(row.m):
+                            var qr = divide(rest, self.polys[self.slot(row.mu, row.lam)], prime)
+                            if not (len(qr[1]) == 1 and qr[1][0] == 0):
+                                raise Error("inexact division of R_" + String(ell) + "," + String(k))
+                            rest = qr[0].copy()
+                self.polys[self.slot(ell, k)] = rest^
+
+    def slot(self, ell: Int, k: Int) -> Int:
+        return ell * (self.horizon + 1) + k
+
+    def at(self, ell: Int, k: Int) -> List[Int]:
+        return self.polys[self.slot(ell, k)].copy()
 
 
 def exact_type_mod_p(ell: Int, k: Int, p: Int) raises -> List[Int]:
     """E_{ell,k} mod p as the exact quotient of R_{ell,k}; raises if a division is not exact."""
-    var rest = relation_mod_p(ell, k, p)
-    for row in multiplicities():
-        if row.ell == ell and row.k == k:
-            var lower = exact_type_mod_p(row.mu, row.lam, p)
-            for _ in range(row.m):
-                var qr = divide(rest, lower, p)
-                if not (len(qr[1]) == 1 and qr[1][0] == 0):
-                    raise Error("inexact division of R_" + String(ell) + "," + String(k))
-                rest = qr[0].copy()
-    return rest^
+    return ExactTypes(p, ell + k).at(ell, k)
 
 
 def factor_degrees(f: List[Int], p: Int) raises -> List[Int]:
@@ -419,33 +650,70 @@ def forces_irreducible(degree: Int, patterns: List[List[Int]]) -> Bool:
     return True
 
 
-def certified_irreducible(ell: Int, k: Int, patterns: List[FactorPattern]) raises -> Bool:
+def linear_factors(degrees: List[Int]) -> Int:
+    var n = 0
+    for d in degrees:
+        if d == 1:
+            n += 1
+    return n
+
+
+def roots_mod_p(f: List[Int], p: Int) -> Int:
+    var n = 0
+    for c in range(p):
+        var acc = 0
+        for i in range(len(f) - 1, -1, -1):
+            acc = (acc * c + f[i]) % p
+        if acc == 0:
+            n += 1
+    return n
+
+
+def certified_irreducible(
+    ell: Int, k: Int, patterns: List[FactorPattern], tables: List[ExactTypes]
+) raises -> Bool:
     """Replays the listed factor patterns of E_{ell,k}; True iff they force irreducibility."""
-    var degree = len(exact_type_mod_p(ell, k, 3)) - 1
+    var degree = len(tables[0].at(ell, k)) - 1
     var replayed = List[List[Int]]()
     for row in patterns:
         if row.ell != ell or row.k != k:
             continue
-        var f = exact_type_mod_p(ell, k, row.prime)
-        if len(f) - 1 != degree:
+        var found = False
+        for t in range(len(tables)):
+            if tables[t].prime == row.prime:
+                found = True
+                var f = tables[t].at(ell, k)
+                if len(f) - 1 != degree:
+                    return False
+                var degrees = factor_degrees(f, row.prime)
+                var claimed = parse_degrees(row.degrees)
+                if len(degrees) != len(claimed):
+                    return False
+                for i in range(len(degrees)):
+                    if degrees[i] != claimed[i]:
+                        return False
+                if linear_factors(degrees) != roots_mod_p(f, row.prime):
+                    return False
+                replayed.append(degrees^)
+        if not found:
             return False
-        var degrees = factor_degrees(f, row.prime)
-        var claimed = parse_degrees(row.degrees)
-        if len(degrees) != len(claimed):
-            return False
-        for t in range(len(degrees)):
-            if degrees[t] != claimed[t]:
-                return False
-        replayed.append(degrees^)
     return forces_irreducible(degree, replayed)
 
 
 def all_types_certified(patterns: List[FactorPattern]) raises -> Bool:
     """Every exact type with ell + k <= CERTIFIED_HORIZON, in increasing order."""
+    var tables = List[ExactTypes]()
+    tables.append(ExactTypes(3, CERTIFIED_HORIZON))
+    for row in patterns:
+        var seen = False
+        for t in range(len(tables)):
+            seen = seen or tables[t].prime == row.prime
+        if not seen:
+            tables.append(ExactTypes(row.prime, CERTIFIED_HORIZON))
     for horizon in range(1, CERTIFIED_HORIZON + 1):
         for k in range(1, horizon + 1):
             var ell = horizon - k
-            if ell != 1 and not certified_irreducible(ell, k, patterns):
+            if ell != 1 and not certified_irreducible(ell, k, patterns, tables):
                 return False
     return True
 
@@ -464,23 +732,6 @@ def exact_type_irreducibility_smoke() -> Bool:
                 pass
         if len(product_patterns) < 3 or forces_irreducible(6, product_patterns):
             return False
-        # Every factor pattern sums to its degree and counts the roots mod p.
-        for row in certificates():
-            var f = exact_type_mod_p(row.ell, row.k, row.prime)
-            var degrees = factor_degrees(f, row.prime)
-            var linear = 0
-            for d in degrees:
-                if d == 1:
-                    linear += 1
-            var roots = 0
-            for c in range(row.prime):
-                var acc = 0
-                for i in range(len(f) - 1, -1, -1):
-                    acc = (acc * c + f[i]) % row.prime
-                if acc == 0:
-                    roots += 1
-            if roots != linear:
-                return False
         return True
     except:
         return False
