@@ -114,6 +114,43 @@ This is an algebraic factor and collision certificate. It does not choose or
 localize any embedding, so it supplies no B3 root handle and makes no density,
 equidistribution, or C1 claim.
 
+#### Exact-type counts over `F_p` (research-only)
+
+`kernel/mojo/dynamics/critical_type_sieve.mojo` counts, for each prime `p`,
+
+```text
+N_p(ell,k) = #{ c in F_p : the critical orbit of c has exact type (ell,k) mod p }.
+```
+
+Its coefficient semantics is a root count of the exact-type divisor reduced
+modulo `p`. The smoke checks three exact laws on every residue of the primes
+through `1009` and horizon `8`:
+
+- `#roots of R_{ell,k} in F_p = sum_{mu <= ell, lambda | k} N_p(mu,lambda)`;
+- the counts and the unresolved residues partition `F_p`;
+- `N_p(1,k) = 0` for odd `p`.
+
+`tests/test_critical_type_sieve.py` recomputes its golden counts from the
+exact integer polynomials, by root counting and inversion over that order.
+
+Where `p` divides no relevant discriminant, `N_p(ell,k)` is the number of
+`F_p`-roots of the exact-type polynomial (for `(4,1)`, the `F_7` above). By
+Chebotarev density, the mean over primes is therefore the number of its
+`Q`-irreducible factors. `pixi run type-sieve` prints the totals over the 2261
+odd primes `p <= 20000` for every `(ell,k)` with `ell + k <= 8`, `ell != 1`:
+
+- the linear types `(0,1)`, `(0,2)`, `(2,1)` total exactly 2261;
+- every other total lies in `[2166, 2301]`, a mean in `[0.958, 1.018]`;
+- `(4,1)` totals 2219.
+
+Two irreducible factors would put a mean near 2. If the Galois action is the
+full symmetric group, the count has variance 1 and a mean has standard error
+near `0.021`. The table is therefore evidence that every Gleason polynomial
+of period at most 8, and every Misiurewicz polynomial with `ell + k <= 8`, is
+irreducible over `Q`. It is not a proof: the reading assumes Chebotarev
+convergence at this prime bound, and no irreducibility certificate is
+produced.
+
 ### B2 — Good-reduction and lifting certificate
 
 A residue-class root may be used in the bridge only with a certificate that

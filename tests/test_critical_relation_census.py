@@ -11,32 +11,17 @@ shares neither the mod-p recurrence nor the census with the Mojo code.
 from __future__ import annotations
 
 import re
-from functools import cache
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from reference.python.polynomial.poly_reference import q_polys, return_poly  # noqa: E402
+
 SRC = ROOT / "kernel/mojo/dynamics/critical_type_census.mojo"
 BRIDGE = ROOT / "kernel/mojo/dynamics/critical_relation_bridge.mojo"
 GOLDEN = re.compile(r"Golden\((-?\d+), (\d+), (\d+), (\d+), (True|False), (True|False), (True|False)\)")
-
-
-@cache
-def q(n: int) -> tuple[int, ...]:
-    """Coefficients of Q_n, constant term first: Q_0 = 0, Q_{n+1} = Q_n^2 + C."""
-    if n == 0:
-        return (0,)
-    prev = q(n - 1)
-    out = [0] * max(2, 2 * len(prev) - 1)
-    for i, a in enumerate(prev):
-        for j, b in enumerate(prev):
-            out[i + j] += a * b
-    out[1] += 1
-    return tuple(out)
-
-
-def minus(a: tuple[int, ...], b: tuple[int, ...]) -> list[int]:
-    width = max(len(a), len(b))
-    return [(a[i] if i < len(a) else 0) - (b[i] if i < len(b) else 0) for i in range(width)]
 
 
 def evaluate(coeffs: list[int], c: int, p: int) -> int:
@@ -44,8 +29,8 @@ def evaluate(coeffs: list[int], c: int, p: int) -> int:
 
 
 def certificate(c: int, ell: int, k: int, p: int) -> tuple[bool, bool, bool]:
-    relation = minus(q(ell + k), q(ell))
-    derivative = [i * a for i, a in enumerate(relation)][1:]
+    relation = list(return_poly(ell, k).coeffs)
+    derivative = list(return_poly(ell, k).derivative().coeffs)
     orbit = [0]
     for _ in range(ell + k):
         orbit.append(orbit[-1] ** 2 + c)
@@ -82,7 +67,8 @@ def test_the_golden_vectors_lie_past_both_polynomial_bounds():
 
 
 def test_the_polynomial_horizon_is_where_int_coefficients_end():
-    bits = {n: max(abs(a) for a in q(n)).bit_length() for n in (7, 8)}
-    derivative_bits = max(abs(i * a) for i, a in enumerate(q(7))).bit_length()
+    qs = q_polys(8)
+    bits = {n: max(abs(a) for a in qs[n].coeffs).bit_length() for n in (7, 8)}
+    derivative_bits = max(abs(a) for a in qs[7].derivative().coeffs).bit_length()
     assert bits[7] <= 62 and derivative_bits <= 62 and bits[8] > 63
     assert "comptime MAX_BRIDGE_HORIZON = 7" in BRIDGE.read_text(encoding="utf-8")
