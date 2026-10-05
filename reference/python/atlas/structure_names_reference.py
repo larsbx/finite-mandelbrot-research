@@ -161,12 +161,19 @@ def doubling(theta: Fraction, n: int = 1) -> Fraction:
     return (theta * 2**n) % 1
 
 
-def exact_type(theta: Fraction) -> tuple[int, int]:
+#: The bound the Mojo catalogue holds addresses to.
+MAX_ANGLE_DENOMINATOR = 1 << 20
+
+
+def exact_type(theta: Fraction) -> tuple[int, int] | None:
     """`(preperiod, period)` of `theta` under doubling, read off the orbit's first
     repeat -- iteration, not the 2-adic valuation and multiplicative order the
-    Mojo catalogue computes."""
+    Mojo catalogue computes. None for an angle outside `[0, 1)` or with
+    denominator past the bound: malformed data, never reduced into range."""
+    if not 0 <= theta < 1 or theta.denominator > MAX_ANGLE_DENOMINATOR:
+        return None
     seen: dict[Fraction, int] = {}
-    point, step = theta % 1, 0
+    point, step = theta, 0
     while point not in seen:
         seen[point] = step
         point, step = doubling(point), step + 1

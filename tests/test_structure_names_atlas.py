@@ -96,6 +96,15 @@ def test_checks_reject_corrupted_data(field: str, wrong: object) -> None:
     assert sn.check_entry(corrupted, BY_ID) != []
 
 
+def test_exact_type_refuses_angles_outside_the_circle_and_past_the_bound() -> None:
+    """An angle outside [0, 1) or with denominator past 2^20 is malformed data,
+    reported by the checks rather than reduced into a valid-looking type."""
+    for theta in (Fraction(1), Fraction(-1, 3), Fraction(4, 3), Fraction(1, (1 << 20) + 1)):
+        assert sn.exact_type(theta) is None, theta
+    assert sn.exact_type(Fraction(1, 1 << 20)) == (20, 1)
+    assert sn.exact_type(Fraction(1, 6)) == (1, 2)
+
+
 def test_reference_main_passes() -> None:
     result = subprocess.run(
         [sys.executable, "reference/python/atlas/structure_names_reference.py"],
