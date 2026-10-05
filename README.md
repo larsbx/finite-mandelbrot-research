@@ -207,7 +207,7 @@ kernel/mojo/                 # canonical Mojo; include roots -I kernel/mojo -I v
   theorem_kernel/ smoke/
   entrypoints/               # atlas_dataset.mojo (pixi run atlas-dataset), run_examples.mojo
 vendor/                      # pinned in vendored.toml; never edited here
-  mojo/                      # finite_exact/, substitution_dynamics/ from larsbx/finite-math-kernels
+  mojo/                      # finite_exact/, substitution_dynamics/, finite_field_orbit/ from larsbx/finite-math-kernels
   python/                    # claim_governance/, proof_records/, oracle_refinement/, same upstream
 proof/
   c1/
