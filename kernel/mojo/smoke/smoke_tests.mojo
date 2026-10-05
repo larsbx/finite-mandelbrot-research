@@ -64,6 +64,7 @@ from dynamics.projective_multiset import projective_multiset_smoke
 from dynamics.critical_relation_bridge import critical_relation_bridge_smoke
 from dynamics.critical_type_census import critical_type_census_smoke
 from dynamics.critical_type_sieve import critical_type_sieve_smoke
+from dynamics.exact_type_irreducibility import exact_type_irreducibility_smoke
 from dynamics.multiset_b3_localization import multiset_b3_localization_smoke
 from dynamics.critical_relation_multiset import critical_relation_multiset_smoke
 from dynamics.critical_relation_residual_multiset import critical_relation_residual_multiset_smoke
@@ -353,6 +354,7 @@ def run_smoke_tests() -> Bool:
     _ = report.record("critical-relation bridge", critical_relation_bridge_smoke())
     _ = report.record("critical type census", critical_type_census_smoke())
     _ = report.record("critical type sieve", critical_type_sieve_smoke())
+    _ = report.record("exact-type irreducibility", exact_type_irreducibility_smoke())
     _ = report.record("multiset B3 localization", multiset_b3_localization_smoke())
     _ = report.record("critical-relation divisor multiset", critical_relation_multiset_smoke())
     _ = report.record("R41 residual divisor multiset", critical_relation_residual_multiset_smoke())
