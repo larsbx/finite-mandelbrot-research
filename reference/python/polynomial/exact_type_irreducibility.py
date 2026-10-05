@@ -27,6 +27,7 @@ if __package__ in (None, ""):
 from reference.python.polynomial.poly_reference import return_poly  # noqa: E402
 
 Poly = list[int]  # ascending powers of C
+HORIZON = 10  # the kernel's CERTIFIED_HORIZON
 
 
 def trim(a: Poly) -> Poly:
@@ -170,14 +171,14 @@ def find_certificate(f: Poly, bound: int = 1000) -> list[tuple[int, list[int]]] 
 
 
 def main() -> int:
-    for ell, k in types(8):
+    for ell, k in types(HORIZON):
         f, _ = exact_type(ell, k)
         certificate = find_certificate(list(f))
         if certificate is None:
             print(f"({ell},{k}) degree {len(f) - 1}: no certificate below the bound")
             return 1
         print(f"({ell},{k}) degree {len(f) - 1}: primes {[p for p, _ in certificate]}")
-    print("OK: every exact-type polynomial with ell + k <= 8 is certified irreducible over Q")
+    print(f"OK: every exact-type polynomial with ell + k <= {HORIZON} is certified irreducible over Q")
     return 0
 
 
