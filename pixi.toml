@@ -17,6 +17,8 @@ regime-audit = "python tools/audit_regime_correspondences.py"
 vendored = "python vendor/python/vendoring/check_vendored_sync.py"
 ledgers = "python tools/make_ledger.py"
 ledgers-check = "python tools/make_ledger.py --check"
+crosswalk = "python tools/make_structure_crosswalk.py"
+crosswalk-check = "python tools/make_structure_crosswalk.py --check"
 
 [dependencies]
 # Mojo 1.0.0 release: every Modular package pinned (tests check against pixi.lock).

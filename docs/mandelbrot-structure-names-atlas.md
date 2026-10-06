@@ -196,6 +196,10 @@ consecutive pair Farey neighbours (checked).
 - **Attribution is best effort.** Where the origin of a folk name could not be
   confirmed, the source says so rather than guessing.
 
+Where the estate's code and data hold an atlas datum, from kernel smoke
+cases to certificate files in sibling repositories, is recorded and checked
+in `docs/structure-crosswalk.md`.
+
 ## 9. Adding a name
 
 Add an entry to `schemas/structure_names.toml` with a `source`, add its row and
