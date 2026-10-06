@@ -27,7 +27,7 @@ from audit_exact_arithmetic import (  # noqa: E402
     audit,
 )
 from exact_arithmetic_audit import allowlisted, arithmetic_consumers, binding_rows  # noqa: E402
-from interval_exclusion_reference import I  # noqa: E402
+from closed_interval import IQ  # noqa: E402
 
 
 def text(rel: str) -> str:
@@ -159,8 +159,8 @@ def test_mojo_law_tests_are_wired_into_the_smoke_target(mojo_smoke):
 # --- sections 1 to 3: executable laws against the Fraction oracle -----------
 
 
-def iv(lo, hi) -> I:
-    return I(Fraction(lo), Fraction(hi))
+def iv(lo, hi) -> IQ:
+    return IQ.of(Fraction(lo), Fraction(hi))
 
 
 def test_rational_equality_is_decidable_and_cancellation_lossless():
@@ -194,8 +194,9 @@ def test_dependency_problem_and_subdistributivity():
 
 
 def test_reversed_endpoints_fail_closed():
-    try:
-        iv(2, 1)
-    except ValueError:
-        return
-    raise AssertionError("J1 not enforced")
+    # J1: reversed endpoints are a rejected interval that poisons every
+    # operation it enters and is never read as evidence, as in closed_q.
+    bad = iv(2, 1)
+    assert not bad.accepted()
+    assert not bad.add(iv(0, 1)).accepted()
+    assert not bad.contains_zero() and not bad.excludes_zero()

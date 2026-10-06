@@ -10,64 +10,34 @@ using rational interval arithmetic. It is not the final Mojo certificate engine.
 Core invariant preserved here:
   squarefree-localize on R_{ell,k}, then prove exact type by pointwise exclusion
   of every forbidden collision on the same box beta.
+
+Interval arithmetic is the vendored `closed_interval` package
+(vendor/python/closed_interval, pinned in vendored.toml): the Python twin of
+the vendored Mojo `closed_q`, whose complex square is the sharp one of spec
+section 2.5. This file keeps only the exclusion check over it.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
 from fractions import Fraction
 from itertools import combinations
+from pathlib import Path
+
+_VENDOR = str(Path(__file__).resolve().parents[3] / "vendor" / "python")
+if _VENDOR not in sys.path:
+    sys.path.insert(0, _VENDOR)
+
+from closed_interval import IQ, ComplexIQ  # noqa: E402
 
 
-@dataclass(frozen=True)
-class I:
-    lo: Fraction
-    hi: Fraction
-
-    def __post_init__(self) -> None:
-        if self.lo > self.hi:
-            raise ValueError("empty interval")
-
-    def add(self, other: "I") -> "I":
-        return I(self.lo + other.lo, self.hi + other.hi)
-
-    def sub(self, other: "I") -> "I":
-        return I(self.lo - other.hi, self.hi - other.lo)
-
-    def mul(self, other: "I") -> "I":
-        vals = [self.lo * other.lo, self.lo * other.hi, self.hi * other.lo, self.hi * other.hi]
-        return I(min(vals), max(vals))
-
-    def contains_zero(self) -> bool:
-        return self.lo <= 0 <= self.hi
+def excludes_zero(box: ComplexIQ) -> bool:
+    """``0 + 0i`` is outside ``box``; a rejected box excludes nothing."""
+    return box.accepted() and not box.contains_zero()
 
 
-@dataclass(frozen=True)
-class CI:
-    re: I
-    im: I
-
-    def add(self, other: "CI") -> "CI":
-        return CI(self.re.add(other.re), self.im.add(other.im))
-
-    def sub(self, other: "CI") -> "CI":
-        return CI(self.re.sub(other.re), self.im.sub(other.im))
-
-    def mul(self, other: "CI") -> "CI":
-        # (a+bi)(c+di) = (ac-bd) + (ad+bc)i, all interval operations.
-        real = self.re.mul(other.re).sub(self.im.mul(other.im))
-        imag = self.re.mul(other.im).add(self.im.mul(other.re))
-        return CI(real, imag)
-
-    def square(self) -> "CI":
-        return self.mul(self)
-
-    def excludes_zero(self) -> bool:
-        return (not self.re.contains_zero()) or (not self.im.contains_zero())
-
-
-def q_orbit_box(c: CI, horizon: int) -> list[CI]:
-    zero = CI(I(Fraction(0), Fraction(0)), I(Fraction(0), Fraction(0)))
+def q_orbit_box(c: ComplexIQ, horizon: int) -> list[ComplexIQ]:
+    zero = ComplexIQ.singleton(0, 0)
     out = [zero]
     z = zero
     for _ in range(horizon):
@@ -89,30 +59,30 @@ def forbidden_pairs(ell: int, period: int, horizon: int) -> set[tuple[int, int]]
     return all_pairs - intended_pairs(ell, period, horizon)
 
 
-def excluded_count(cbox: CI, ell: int, period: int, horizon: int) -> tuple[int, int, list[tuple[int, int]]]:
+def excluded_count(cbox: ComplexIQ, ell: int, period: int, horizon: int) -> tuple[int, int, list[tuple[int, int]]]:
     q = q_orbit_box(cbox, horizon)
     failures: list[tuple[int, int]] = []
     pairs = sorted(forbidden_pairs(ell, period, horizon))
     for i, j in pairs:
         hij = q[j].sub(q[i])
-        if not hij.excludes_zero():
+        if not excludes_zero(hij):
             failures.append((i, j))
     return (len(pairs) - len(failures), len(pairs), failures)
 
 
-def dyadic_box(center_re_num: int, center_im_num: int, center_exp: int, half_exp: int) -> CI:
+def dyadic_box(center_re_num: int, center_im_num: int, center_exp: int, half_exp: int) -> ComplexIQ:
     den = 2 ** center_exp
     h = Fraction(1, 2 ** half_exp)
     re = Fraction(center_re_num, den)
     im = Fraction(center_im_num, den)
-    return CI(I(re - h, re + h), I(im - h, im + h))
+    return ComplexIQ(IQ.of(re - h, re + h), IQ.of(im - h, im + h))
 
 
-def c_minus_2_box() -> CI:
-    return CI(I(Fraction(-33, 16), Fraction(-31, 16)), I(Fraction(-1, 16), Fraction(1, 16)))
+def c_minus_2_box() -> ComplexIQ:
+    return ComplexIQ.of(Fraction(-33, 16), Fraction(-31, 16), Fraction(-1, 16), Fraction(1, 16))
 
 
-def m41_box() -> CI:
+def m41_box() -> ComplexIQ:
     # Center from the project notes, half-width 2^-25.
     return dyadic_box(-56912193317957, 538341446717435, 49, 25)
 
