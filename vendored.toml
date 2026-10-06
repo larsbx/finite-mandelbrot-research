@@ -4,7 +4,7 @@
 [[package]]
 name = "finite_exact"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -24,7 +24,7 @@ root = "vendor/mojo"
 [[package]]
 name = "claim_governance"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -46,7 +46,7 @@ root = "vendor/python"
 [[package]]
 name = "substitution_dynamics"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -59,7 +59,7 @@ root = "vendor/mojo"
 [[package]]
 name = "proof_records"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -73,7 +73,7 @@ root = "vendor/python"
 [[package]]
 name = "oracle_refinement"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -82,7 +82,7 @@ root = "vendor/python"
 [[package]]
 name = "finite_field_orbit"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -92,7 +92,7 @@ root = "vendor/mojo"
 [[package]]
 name = "mojo_smoke"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -103,7 +103,7 @@ root = "vendor/mojo"
 [[package]]
 name = "vendoring"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -113,7 +113,7 @@ root = "vendor/python"
 [[package]]
 name = "quadratic_orbit"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -128,7 +128,7 @@ root = "vendor/mojo"
 [[package]]
 name = "rational_dynamics"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -145,7 +145,7 @@ root = "vendor/mojo"
 [[package]]
 name = "angle_doubling"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -155,7 +155,7 @@ root = "vendor/mojo"
 [[package]]
 name = "exact_arithmetic_audit"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -165,7 +165,7 @@ root = "vendor/python"
 [[package]]
 name = "closed_interval"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -176,7 +176,7 @@ root = "vendor/python"
 [[package]]
 name = "finite_polynomial"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
@@ -190,7 +190,7 @@ root = "vendor/mojo"
 "finite_polynomial/hensel_lifting.mojo" = "fa9731a69a32a670d480008e875b0812ead4c8255f19829d78f5f74cdab96891"
 "finite_polynomial/miller_rabin.mojo" = "ff2a73c97a818824daacebb413f8dba994d77278f50e6a2d9f31674339df37b6"
 "finite_polynomial/moebius_function.mojo" = "6d1dbfecc53cfe9a3a80fb5cd1cec05548646da7f6d078f6165ff83a9346a5f6"
-"finite_polynomial/polynomial_fp.mojo" = "90052e8d79be73a34b3d2864bbc19c7cae2ddf5b392c6e359332f40562084b1d"
+"finite_polynomial/polynomial_fp.mojo" = "72d557b99c7425e2569fe050a6edfac601f5cf66e8a73e270d8ecbc0a6e751a6"
 "finite_polynomial/polynomial_z.mojo" = "fe173bd88f0ef3492cef05668bbf59e3b679c1adfc3ad59729958005770aab01"
 "finite_polynomial/quadratic_germ.mojo" = "ab9c5afebf73935f9f4a49d8029a49b4a977aa83eea41c7af24cf3b1ea05bfb4"
 "finite_polynomial/rabin_irreducibility.mojo" = "248696d1df8649518797b54eeab2ecf695ff02952e812465c973785d271698f4"
@@ -200,7 +200,7 @@ root = "vendor/mojo"
 [[package]]
 name = "lexical_audit"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -210,7 +210,7 @@ root = "vendor/python"
 [[package]]
 name = "polyglot_envelope"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/python"
 
 [package.files]
@@ -222,7 +222,7 @@ root = "vendor/python"
 [[package]]
 name = "root_isolation"
 repository = "larsbx/finite-math-kernels"
-commit = "562e408b0035c0be88d44ef420eedda5eec064b2"
+commit = "9d27bc4508844e72ffc61acb8ba172f7346707d8"
 root = "vendor/mojo"
 
 [package.files]
