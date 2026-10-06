@@ -39,6 +39,7 @@
 # fibres of the corresponding parameters is the imported theorem tag
 # `KnownTrivialFiberClass`, not a property computed here.
 
+from angle_doubling.angle import type_count
 from finite_exact.integer_gcd import gcd_int
 
 comptime MAX_TYPE_INDEX = 20
@@ -130,11 +131,14 @@ def catalogue_denominator(preperiod: Int, period: Int) -> Int:
     exceeds the catalogue bound."""
     if preperiod < 1 or period < 1 or preperiod > MAX_TYPE_INDEX or period > MAX_TYPE_INDEX:
         return -1
-    var odd_part = (1 << period) - 1
-    var scale = 1 << preperiod
-    if odd_part > MAX_CATALOGUE_DENOMINATOR // scale:
+    # The addresses with `2^(l+k) t = 2^l t` are exactly the multiples of
+    # `1 / (2^l (2^k - 1))`, so the vendored `type_count` is this denominator.
+    # Both indices are at most `MAX_TYPE_INDEX`, inside its range, so it never
+    # refuses here; a refusal would still fail closed below.
+    var den = Int(type_count(preperiod, period))
+    if den < 1 or den > MAX_CATALOGUE_DENOMINATOR:
         return -1
-    return scale * odd_part
+    return den
 
 
 def catalogueable_type(preperiod: Int, period: Int) -> Bool:

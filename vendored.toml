@@ -108,3 +108,35 @@ root = "vendor/python"
 [package.files]
 "vendoring/__init__.py" = "959cdf7a89536784da18659db7cfe4099c885f5370249eccc71ce73775f8a584"
 "vendoring/check_vendored_sync.py" = "b3ed66adbaba22f74f5d05b93319fdcd3d022c9dcb3595099a3e23a24e8064a7"
+
+[[package]]
+name = "quadratic_orbit"
+repository = "larsbx/finite-math-kernels"
+commit = "360bc90c27893900d30718e42d61d14ce255e530"
+root = "vendor/mojo"
+
+[package.files]
+"quadratic_orbit/__init__.mojo" = "4d8f371cf6378c9154f0f22e874b405c0c05a524904c6747ef385d48b9b4b49f"
+"quadratic_orbit/collision.mojo" = "9c2a89dc89a715fef35619d95bc8b1abe5ef788c37de8180e39cc7de72621142"
+"quadratic_orbit/orbit.mojo" = "ce37cada4a11ba57c0f6d3d6008a69846ca3136c07d021a25b082410c1f8392b"
+"quadratic_orbit/preperiodic.mojo" = "5d010196a8f15232e664d48629bbf330747e1380e78e3dbde2e4c58d96073e2e"
+
+[[package]]
+name = "rational_dynamics"
+repository = "larsbx/finite-math-kernels"
+commit = "360bc90c27893900d30718e42d61d14ce255e530"
+root = "vendor/mojo"
+
+[package.files]
+"rational_dynamics/__init__.mojo" = "8daf118ae953fe63a55dbcaf8070205fb0779b3fca3663f4108fb67ae04c81af"
+"rational_dynamics/rational.mojo" = "b2453171973e2e4460bdbb572886b1da8ea6b7aff935796087ede1a68e1abfc6"
+
+[[package]]
+name = "angle_doubling"
+repository = "larsbx/finite-math-kernels"
+commit = "360bc90c27893900d30718e42d61d14ce255e530"
+root = "vendor/mojo"
+
+[package.files]
+"angle_doubling/__init__.mojo" = "9166f13819f822a439beef317c127d5f726ee3ef25e4e6f73f7a9178573be97f"
+"angle_doubling/angle.mojo" = "46defc94d8dc3ff5e9079f1c2543479bd27316bae32054966e20cd107742c233"

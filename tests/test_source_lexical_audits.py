@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
-from source_tokens import mask_comments_and_strings
+from claim_governance.lexing import mask_comments_and_strings
 from audit_no_trig import TOKEN_RE
 
 
@@ -42,3 +42,24 @@ def test_no_trig_pattern_covers_general_transcendentals():
         assert TOKEN_RE.search(expression)
     assert TOKEN_RE.search("# sqrt(x)")
     assert not TOKEN_RE.search(mask_comments_and_strings("# sqrt(x)\nvar q = x * x\n"))
+
+
+def test_lexical_audits_use_the_vendored_masker():
+    # The masker is the vendored claim_governance one (pinned in vendored.toml);
+    # the former local copy, tools/source_tokens.py, is gone.
+    assert not (ROOT / "tools" / "source_tokens.py").exists()
+    for audit in ("audit_no_trig.py", "audit_no_points.py", "audit_exact_arithmetic.py"):
+        src = (ROOT / "tools" / audit).read_text(encoding="utf-8")
+        assert "from claim_governance.lexing import mask_comments_and_strings" in src
+        assert "source_tokens" not in src
+
+
+def test_vendored_masker_keeps_a_backslash_continued_string_open():
+    # Where the vendored masker differs from the former local copy: a
+    # backslash-newline continues a single-quoted string, and an escaped quote
+    # does not close a triple-quoted one. No governed source exercised either
+    # case, so every audit verdict is unchanged.
+    masked = mask_comments_and_strings('x = "a\\\nsin(y)"\ncos(z)\n')
+    assert "sin" not in masked and "cos(z)" in masked
+    masked = mask_comments_and_strings('"""a \\""" sin(y) """\ncos(z)\n')
+    assert "sin" not in masked and "cos(z)" in masked

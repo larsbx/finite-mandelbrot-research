@@ -6,7 +6,7 @@ SRC = ROOT / "kernel/mojo/c1/wake/wake_membership.mojo"
 DOC = ROOT / "docs" / "C1_wake_membership_soundness.md"
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "vendor" / "python"))
-from source_tokens import mask_comments_and_strings
+from claim_governance.lexing import mask_comments_and_strings
 
 
 def read(path: Path) -> str:

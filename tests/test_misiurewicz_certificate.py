@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "kernel/mojo/certificates/misiurewicz_certificate.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "vendor" / "python"))
-from source_tokens import mask_comments_and_strings
+from claim_governance.lexing import mask_comments_and_strings
 
 
 def text() -> str:

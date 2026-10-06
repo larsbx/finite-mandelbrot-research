@@ -30,6 +30,58 @@ The smoke suite's named reporter is the vendored `mojo_smoke` package
 `kernel/mojo/smoke/smoke_report.mojo`, which differed from it only in its
 header comment.
 
+The interval critical orbit's shared pieces are the vendored `quadratic_orbit`
+package (`vendor/mojo/quadratic_orbit/`). `kernel/mojo/dynamics/interval_orbit.mojo`
+imports the collision partition (`intended_pair`, `forbidden_count`) from
+`quadratic_orbit/collision.mojo` and the orbit step (`zero_box`,
+`quadratic_step` under the local name `next_orbit_value`), `collision_interval`
+and `complex_excludes_zero` from `quadratic_orbit/orbit.mojo`; its local copies,
+and the unused local `intended_count`, were removed. The two partitions agree
+on every input the consumer passes: both intend nothing when `ell < 1` or
+`period < 1` (so a purely periodic type, `ell = 0`, is rejected by
+`OrbitEvalConfig.valid()` before partitioning and partitions to nothing if
+reached anyway), and upstream additionally refuses negative indices, which no
+caller passes. `excludes_zero`, the two-valued reading of
+`complex_excludes_zero`, stays local. The legacy-syntax
+`kernel/mojo/certificates/collision_sets.mojo` (and the other uncompiled
+`fn`-era files) keeps its own partition: it is outside the compiled closure,
+and its `is_intended_tail_pair` intends tail pairs at `ell = 0`, which the
+upstream partition does not.
+
+The BigZ ray address of `kernel/mojo/dynamics/bigq_ray_address.mojo` is the
+vendored `rational_dynamics` `ReducedFraction`, and its doubling and equality
+are `double_mod_one` and `fraction_equal`
+(`vendor/mojo/rational_dynamics/rational.mojo`). `make_bigq_ray_addr` remains a
+thin adapter that keeps the local contract: the input is normalized as a `Q`
+first, so a negative denominator flips the sign as before, and an address
+outside `[0, 1)` is refused, where upstream `reduce_fraction` would accept any
+nonnegative fraction. The Int64 checked addresses of
+`kernel/mojo/dynamics/checked_ray_address.mojo` stay local: upstream has no
+fixed-width equivalent.
+
+The catalogue denominator `2^l (2^k - 1)` of
+`kernel/mojo/certificates/misiurewicz_catalogue.mojo` is the vendored
+`angle_doubling` `type_count` (`vendor/mojo/angle_doubling/angle.mojo`): the
+addresses with `2^(l+k) t = 2^l t` are exactly the multiples of that
+denominator's reciprocal, and the local index and denominator bounds still
+apply first. Three local readings stay, because upstream's differ:
+`exact_type` reads every period up to its denominator bound `2^20`, while
+upstream `period` refuses past 64 (the smoke's brute-force check reaches
+`1/107`, of period 106); `angle_period` in `kernel/mojo/dynamics/angle_tuning.mojo`
+reads periods of denominators up to `2^62 - 1`, while upstream `Angle` refuses
+denominators past `2^30`; and `catalogue_count` counts the addresses of
+*exact* type `(l, k)` by Moebius inversion, which `type_count`, counting every
+address with `2^(l+k) t = 2^l t`, is not.
+
+The lexical audits (`tools/audit_no_trig.py`, `tools/audit_no_points.py`,
+`tools/audit_exact_arithmetic.py`) and the source-reading tests mask comments
+and strings with the vendored `claim_governance.lexing.mask_comments_and_strings`;
+the local `tools/source_tokens.py` was removed. The two maskers produced
+byte-identical output on every `.py`, `.mojo`, `.md`, `.toml` and `.tex` file
+in the repository when the swap was made. They differ only where the local
+copy mis-lexed: upstream keeps a backslash-continued single-quoted string open
+and does not close a triple-quoted string at an escaped quote.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;
