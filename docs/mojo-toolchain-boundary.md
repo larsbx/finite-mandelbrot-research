@@ -26,9 +26,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo`.
 - `kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo`.
 - `kernel/mojo/c1/proof/final_proof_object_skeleton.mojo`.
-- `kernel/mojo/arithmetic/checked_int64_backend.mojo`.
 - `kernel/mojo/arithmetic/cert_backend.mojo`.
-- `kernel/mojo/dynamics/checked_ray_address.mojo`.
 - `kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo`.
 - `vendor/mojo/finite_exact/bigint_z.mojo`.
 - `kernel/mojo/arithmetic/bigint_adapter.mojo`.

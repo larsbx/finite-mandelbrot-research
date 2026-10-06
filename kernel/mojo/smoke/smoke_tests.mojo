@@ -43,9 +43,7 @@ from arithmetic.rational_trig import demo_spread_orthogonal_axes, demo_ray_addr_
 from theorem_kernel.alignment_audit_status import AlignmentPolicy, canonical_alignment_policy, alignment_policy_valid
 from theorem_kernel.mojo_optimization_contract import OptimizationPolicy, canonical_optimization_policy, optimization_policy_valid
 from c1.proof.final_proof_object_skeleton import C1FinalProofObject, FinalProofAcceptancePolicy, canonical_final_proof_acceptance_policy, final_proof_acceptance_policy_valid, accepts_c1_final_proof_object, rejects_missing_link_final_exit, skeleton_alone_proves_c1
-from arithmetic.checked_int64_backend import checked_i64_boundary_smoke
 from arithmetic.cert_backend import cert_backend_smoke
-from dynamics.checked_ray_address import checked_ray_address_smoke
 from c1.theorem_tags.theorem_tag_payload_instances import theorem_tag_payload_instances_smoke
 from finite_exact.exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
@@ -313,9 +311,7 @@ def run_smoke_tests() raises -> Bool:
     _ = report.record("alignment policy data", test_alignment_policy_data())
     _ = report.record("optimization policy data", test_optimization_policy_data())
     _ = report.record("final proof object policy data", test_final_proof_object_policy_data())
-    _ = report.record("checked i64 boundary", checked_i64_boundary_smoke())
     _ = report.record("certificate backend", cert_backend_smoke())
-    _ = report.record("checked ray address", checked_ray_address_smoke())
     _ = report.record("theorem tag payload instances", theorem_tag_payload_instances_smoke())
     _ = report.record("residual directive carrier", residual_directive_carrier_smoke())
     _ = report.record("exact angle tuning", angle_tuning_smoke())

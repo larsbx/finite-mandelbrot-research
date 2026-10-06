@@ -57,8 +57,9 @@ Every constructor and operation must normalize. Equality and order may use cross
    `R_{2,1}=C^3(C+2)`, lower-type exclusion of `C=0`, exact type-`(2,1)`
    verification at `C=-2`, and the canonical checked rational-ray theorem
    import record. `kernel/mojo/arithmetic/checked_int64_backend.mojo` and the
-   address primitives of `kernel/mojo/dynamics/checked_ray_address.mojo` remain
-   only for the kneading and tuning kernels that import them.
+   address primitives of `kernel/mojo/dynamics/checked_ray_address.mojo` are
+   deleted too: the kneading and tuning kernels that imported them now use the
+   vendored `rational_dynamics` doubling over BigZ.
 1. **Selected:** Mojo-native dynamic base-`10^9` limbs in `vendor/mojo/finite_exact/bigint_z.mojo`.
 2. **Complete:** the integer layer implements unbounded signed storage, exact
    add/sub/mul/order, quotient/remainder, rejected non-divisions, Euclidean gcd,

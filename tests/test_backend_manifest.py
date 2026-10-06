@@ -40,18 +40,9 @@ def test_manifest_blocks_proof_grade_requirements_on_demo_backend():
     assert reqs["canonical_hash_encoding"] is False
 
 
-def test_checked_int64_transition_layer_is_compiler_wired(mojo_smoke):
-    src = (ROOT / "kernel/mojo/arithmetic/checked_int64_backend.mojo").read_text(encoding="utf-8")
-    smoke = (ROOT / "kernel/mojo/smoke/smoke_tests.mojo").read_text(encoding="utf-8")
-    for operation in ["checked_add_i64", "checked_sub_i64", "checked_mul_i64", "checked_neg_i64"]:
-        assert f"def {operation}" in src
-    assert "denominator_is_valid_i64" in src
-    assert "q8_growth_must_overflow_i64" in src
-    assert "from arithmetic.checked_int64_backend import checked_i64_boundary_smoke" in smoke
-    assert mojo_smoke.case_passed("checked i64 boundary")
-
-
 RETIRED_CHECKED_STACK = [
+    "kernel/mojo/arithmetic/checked_int64_backend.mojo",
+    "kernel/mojo/dynamics/checked_ray_address.mojo",
     "kernel/mojo/arithmetic/checked_q.mojo",
     "kernel/mojo/arithmetic/checked_interval_q.mojo",
     "kernel/mojo/arithmetic/checked_complex_interval.mojo",
@@ -100,16 +91,9 @@ def test_bigq_replays_carry_the_c_minus_2_certificates(mojo_smoke):
         assert mojo_smoke.case_passed(case)
     for retired in ["checked Q", "checked interval Q", "checked complex Horner", "checked Krawczyk",
                     "checked interval exclusion", "certificate arithmetic migration",
-                    "checked finite certificate gate", "checked landing target adapter"]:
+                    "checked finite certificate gate", "checked landing target adapter",
+                    "checked i64 boundary", "checked ray address"]:
         assert f'report.record("{retired}"' not in smoke
-
-
-def test_checked_ray_address_primitives_are_compiler_wired(mojo_smoke):
-    ray = (ROOT / "kernel/mojo/dynamics/checked_ray_address.mojo").read_text(encoding="utf-8")
-    assert "checked_mul_i64(address.num, 2)" in ray
-    assert "if doubled.overflowed:" in ray
-    assert "verify_checked_one_half_orbit" not in ray
-    assert mojo_smoke.case_passed("checked ray address")
 
 
 def test_backend_manifest_audit_exists_and_checks_all_requirements():

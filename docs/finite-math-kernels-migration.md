@@ -75,8 +75,9 @@ thin adapter that keeps the local contract: the input is normalized as a `Q`
 first, so a negative denominator flips the sign as before, and an address
 outside `[0, 1)` is refused, where upstream `reduce_fraction` would accept any
 nonnegative fraction. The Int64 checked addresses of
-`kernel/mojo/dynamics/checked_ray_address.mojo` stay local: upstream has no
-fixed-width equivalent.
+`kernel/mojo/dynamics/checked_ray_address.mojo` and the checked Int64 backend
+they ran on are retired: the kneading and tuning kernels that imported them now
+use the vendored `rational_dynamics` doubling over BigZ.
 
 The catalogue denominator `2^l (2^k - 1)` of
 `kernel/mojo/certificates/misiurewicz_catalogue.mojo` is the vendored
