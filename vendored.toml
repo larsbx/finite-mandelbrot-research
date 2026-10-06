@@ -4,7 +4,7 @@
 [[package]]
 name = "finite_exact"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -24,7 +24,7 @@ root = "vendor/mojo"
 [[package]]
 name = "claim_governance"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
@@ -46,7 +46,7 @@ root = "vendor/python"
 [[package]]
 name = "substitution_dynamics"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -58,7 +58,7 @@ root = "vendor/mojo"
 [[package]]
 name = "proof_records"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
@@ -72,7 +72,7 @@ root = "vendor/python"
 [[package]]
 name = "oracle_refinement"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
@@ -81,7 +81,7 @@ root = "vendor/python"
 [[package]]
 name = "finite_field_orbit"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -91,7 +91,7 @@ root = "vendor/mojo"
 [[package]]
 name = "mojo_smoke"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -102,7 +102,7 @@ root = "vendor/mojo"
 [[package]]
 name = "vendoring"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
@@ -112,7 +112,7 @@ root = "vendor/python"
 [[package]]
 name = "quadratic_orbit"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -124,7 +124,7 @@ root = "vendor/mojo"
 [[package]]
 name = "rational_dynamics"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -134,7 +134,7 @@ root = "vendor/mojo"
 [[package]]
 name = "angle_doubling"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/mojo"
 
 [package.files]
@@ -144,7 +144,7 @@ root = "vendor/mojo"
 [[package]]
 name = "exact_arithmetic_audit"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
@@ -154,10 +154,22 @@ root = "vendor/python"
 [[package]]
 name = "closed_interval"
 repository = "larsbx/finite-math-kernels"
-commit = "65038cf1b6e8b038f1efc85e802d08b8c22fe4e1"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
 root = "vendor/python"
 
 [package.files]
 "closed_interval/__init__.py" = "25f2f2555bc5ce24bb9df5d7e20389ba3213d99f432751fb19288381ff6c2a83"
 "closed_interval/dyadic.py" = "c1be682fa4551a3c66122d090fb62005ef8c53300a73f0ba7a451d09f110d97c"
 "closed_interval/interval.py" = "3fae9c63bc9d66f5a4c25b164012a208c45705ee756512daa1694edbfbda7e51"
+
+[[package]]
+name = "polyglot_envelope"
+repository = "larsbx/finite-math-kernels"
+commit = "2bc69d4581bd84acc0cd0c5eca5f424340e12cbe"
+root = "vendor/python"
+
+[package.files]
+"polyglot_envelope/__init__.py" = "557be587e92e18466f1ea9d08ddcab8a0a4da9b2787c32f6679a73e9bc9548f3"
+"polyglot_envelope/boundary-envelope-v1.schema.json" = "bc336f2cf14ccd33df10ecaaddcacd92cf950cd456b626ead7004d6c5c921d77"
+"polyglot_envelope/conformance-v1.json" = "cbb004de07ef44eb9e07b23900e3ebbcdfa41bd69e977a542cac533d6e530ecb"
+"polyglot_envelope/render.py" = "d218beaa4c7c231bc66d24f489e9b9fad4d481a28e9339de692e17b77b03a4b7"
