@@ -99,6 +99,11 @@ def test_compiler_checked_boundary_is_explicit():
         "vendor/mojo/quadratic_orbit/collision.mojo",
         "vendor/mojo/quadratic_orbit/orbit.mojo",
         "vendor/mojo/rational_dynamics/rational.mojo",
+        "vendor/mojo/rational_dynamics/doubling.mojo",
+        "vendor/mojo/rational_dynamics/moebius.mojo",
+        "vendor/mojo/rational_dynamics/multiplicative_order.mojo",
+        "vendor/mojo/rational_dynamics/carmichael.mojo",
+        "vendor/mojo/rational_dynamics/integers.mojo",
         "vendor/mojo/angle_doubling/angle.mojo",
     ]:
         assert path in boundary

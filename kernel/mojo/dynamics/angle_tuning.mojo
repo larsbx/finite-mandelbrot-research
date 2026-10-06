@@ -15,28 +15,36 @@
 # agreement of the two was asserted rather than derived. `tuned_angle` closes
 # that: the smoke now tunes the angle and compares.
 #
-# All arithmetic is checked fixed-width integer arithmetic. A digit of a
-# reduced address `p/q` is read by doubling `p` and comparing with `q`, which
-# cannot exceed `2q`, and the tuned denominator `2^(n q) - 1` is refused
-# before it is formed unless `n q` stays inside `TUNING_PERIOD_LIMIT`. There
-# is no floating point and no measured angle here; these are finite symbolic
-# addresses.
+# Addresses are the vendored `rational_dynamics` `ReducedFraction` (upstream
+# finite-math-kernels, exact over BigZ): `address` admits `Int64` input in
+# `[0, 1)`, doubling is `double_mod_one`, equality `fraction_equal`, and the
+# digits of an address are `rational_dynamics.doubling.binary_digits`. The
+# tuned denominator `2^(n q) - 1` is refused unless `n q` stays inside
+# `TUNING_PERIOD_LIMIT`; that bound is this module's contract, because callers
+# read tuned addresses back as `Int64`. The period search is bounded by the
+# same limit: refusing a period past it costs at most `TUNING_PERIOD_LIMIT`
+# doublings, where the vendored uncapped order would have to finish its
+# search first. There is no floating point and no measured angle here; these
+# are finite symbolic addresses.
 #
 # Scope: tuning is an operation on addresses. It locates no parameter in the
 # plane, and the landing of the tuned ray is the imported theorem tag, not a
 # property computed here.
 
-from arithmetic.checked_int64_backend import CheckedI64Result, checked_add_i64, checked_mul_i64, checked_sub_i64
-from dynamics.checked_ray_address import (
-    CheckedRayAddrResult,
-    checked_double_ray_addr,
-    checked_ray_addr_equal,
-    make_checked_ray_addr,
-    rejected_ray_addr,
+from finite_exact.bigint_z import BigZ, bigz_add, bigz_from_i64, bigz_lt, bigz_mul, bigz_sub
+from rational_dynamics.doubling import binary_digits
+from rational_dynamics.integers import bigz_is_even
+from rational_dynamics.rational import (
+    ReducedFraction,
+    double_mod_one,
+    fraction_equal,
+    fraction_from_i64,
+    reduce_fraction,
+    rejected_fraction,
 )
 
-# `2^62 - 1` is the largest tuned denominator that fits, so a period product
-# beyond 62 is refused rather than wrapped.
+# `2^62 - 1` is the largest tuned denominator that fits `Int64`, so a period
+# product beyond 62 is refused.
 comptime TUNING_PERIOD_LIMIT = 62
 
 
@@ -61,91 +69,70 @@ def rejected_block() -> BinaryBlock:
     return BinaryBlock(List[Int](), True)
 
 
-def angle_period(num: Int64, den: Int64) -> Int:
-    """Exact period of `num/den` under doubling modulo one, or `-1`.
+def address(num: Int64, den: Int64) -> ReducedFraction:
+    """The reduced address `num/den`, refused outside `[0, 1)` or for a
+    non-positive denominator."""
+    if den <= 0 or num < 0 or num >= den:
+        return rejected_fraction()
+    return fraction_from_i64(num, den)
 
-    Refuses an address outside `(0, 1)`, an address whose reduced denominator
-    is even (those are strictly preperiodic, not periodic), any overflow, and
-    a period beyond `TUNING_PERIOD_LIMIT`."""
-    var start = make_checked_ray_addr(num, den)
-    if start.rejected or start.num == 0 or start.den % 2 == 0:
+
+def address_period(start: ReducedFraction) -> Int:
+    """Exact period of a periodic address under doubling modulo one, or `-1`.
+
+    Refuses a rejected address, zero, an address whose reduced denominator is
+    even (those are strictly preperiodic, not periodic), and a period beyond
+    `TUNING_PERIOD_LIMIT`, after at most that many doublings."""
+    if start.rejected or start.num.is_zero() or bigz_is_even(start.den):
         return -1
-    var current = checked_double_ray_addr(start)
+    var current = double_mod_one(start)
     for period in range(1, TUNING_PERIOD_LIMIT + 1):
-        if current.rejected:
-            return -1
-        if checked_ray_addr_equal(current, start):
+        if fraction_equal(current, start):
             return period
-        current = checked_double_ray_addr(current)
+        current = double_mod_one(current)
     return -1
 
 
+def angle_period(num: Int64, den: Int64) -> Int:
+    """`address_period` of `num/den`; refuses an address outside `(0, 1)`."""
+    return address_period(address(num, den))
+
+
+def address_block(t: ReducedFraction, length: Int) -> BinaryBlock:
+    """The first `length` binary digits of an address: the vendored `binary_digits`."""
+    var block = binary_digits(t, length)
+    if block.rejected:
+        return rejected_block()
+    return BinaryBlock(block.digits, False)
+
+
 def binary_block(num: Int64, den: Int64, length: Int) -> BinaryBlock:
-    """The first `length` binary digits of `num/den`.
-
-    Digit `k` is the integer part of `2^(k+1) num / den` modulo two, read by
-    doubling the numerator and subtracting the denominator when it fits."""
-    if length < 0:
-        return rejected_block()
-    var address = make_checked_ray_addr(num, den)
-    if address.rejected:
-        return rejected_block()
-    var digits = List[Int]()
-    var numerator = address.num
-    for _ in range(length):
-        var doubled = checked_mul_i64(numerator, 2)
-        if doubled.overflowed:
-            return rejected_block()
-        if doubled.value >= address.den:
-            var reduced = checked_sub_i64(doubled.value, address.den)
-            if reduced.overflowed:
-                return rejected_block()
-            digits.append(1)
-            numerator = reduced.value
-        else:
-            digits.append(0)
-            numerator = doubled.value
-    return BinaryBlock(digits^, False)
+    """The first `length` binary digits of `num/den`. Refuses a malformed
+    address and a negative length."""
+    return address_block(address(num, den), length)
 
 
-def _digits_to_numerator(digits: List[Int]) -> CheckedI64Result:
+def _digits_to_numerator(digits: List[Int]) -> BigZ:
     """Read a binary word as an integer, most significant digit first."""
-    var value = CheckedI64Result(0, False)
+    var value = bigz_from_i64(0)
     for i in range(len(digits)):
-        var shifted = checked_mul_i64(value.value, 2)
-        if shifted.overflowed:
-            return shifted^
-        value = checked_add_i64(shifted.value, Int64(digits[i]))
-        if value.overflowed:
-            return value^
+        value = bigz_add(bigz_add(value, value), bigz_from_i64(Int64(digits[i])))
     return value^
 
 
-def _period_denominator(period: Int) -> CheckedI64Result:
+def _period_denominator(period: Int) -> BigZ:
     """`2^period - 1`, the denominator of an address of that exact period."""
-    if period < 1 or period > TUNING_PERIOD_LIMIT:
-        return CheckedI64Result(0, True)
-    var power = CheckedI64Result(1, False)
+    var power = bigz_from_i64(1)
     for _ in range(period):
-        power = checked_mul_i64(power.value, 2)
-        if power.overflowed:
-            return power^
-    return checked_sub_i64(power.value, 1)
+        power = bigz_add(power, power)
+    return bigz_sub(power, bigz_from_i64(1))
 
 
-def _strictly_before(a: CheckedRayAddrResult, b: CheckedRayAddrResult) -> Bool:
-    """`a < b` for two accepted reduced addresses, by cross multiplication.
-
-    Denominators are positive, so the comparison keeps its direction. An
-    overflow in either cross product refuses the comparison rather than
-    guessing, which makes the caller reject the pair."""
+def _strictly_before(a: ReducedFraction, b: ReducedFraction) -> Bool:
+    """`a < b` for two accepted reduced addresses, by exact cross multiplication."""
     if a.rejected or b.rejected:
         return False
-    var left = checked_mul_i64(a.num, b.den)
-    var right = checked_mul_i64(b.num, a.den)
-    if left.overflowed or right.overflowed:
-        return False
-    return left.value < right.value
+    return bigz_lt(bigz_mul(a.num, b.den), bigz_mul(b.num, a.den))
 
 
 def tuned_angle(
@@ -155,49 +142,44 @@ def tuned_angle(
     root_plus_den: Int64,
     num: Int64,
     den: Int64,
-) -> CheckedRayAddrResult:
+) -> ReducedFraction:
     """`theta` tuned by the component with root rays `theta_- < theta_+`.
 
     Refuses a root pair whose two periods disagree, a root pair that is not
-    strictly ordered, a non-periodic argument, a period product beyond
-    `TUNING_PERIOD_LIMIT`, and any overflow. The result is a reduced address.
+    strictly ordered, a non-periodic argument, and a period product beyond
+    `TUNING_PERIOD_LIMIT`. The result is a reduced address.
 
     The ordering is part of what a component is, and the substitution is not
     symmetric in the two rays: the lower ray supplies the block for a zero
     digit and the upper ray the block for a one. So an equal or swapped pair
     is malformed input, not a component read the other way round, and it is
     refused rather than silently tuned to a different address."""
-    var root_period = angle_period(root_minus_num, root_minus_den)
-    if root_period < 1 or angle_period(root_plus_num, root_plus_den) != root_period:
-        return rejected_ray_addr()
-    if not _strictly_before(
-        make_checked_ray_addr(root_minus_num, root_minus_den),
-        make_checked_ray_addr(root_plus_num, root_plus_den),
-    ):
-        return rejected_ray_addr()
-    var angle_length = angle_period(num, den)
+    var lower_ray = address(root_minus_num, root_minus_den)
+    var upper_ray = address(root_plus_num, root_plus_den)
+    var root_period = address_period(lower_ray)
+    if root_period < 1 or address_period(upper_ray) != root_period:
+        return rejected_fraction()
+    if not _strictly_before(lower_ray, upper_ray):
+        return rejected_fraction()
+    var theta = address(num, den)
+    var angle_length = address_period(theta)
     if angle_length < 1:
-        return rejected_ray_addr()
+        return rejected_fraction()
     if angle_length > TUNING_PERIOD_LIMIT // root_period:
-        return rejected_ray_addr()
+        return rejected_fraction()
 
-    var lower = binary_block(root_minus_num, root_minus_den, root_period)
-    var upper = binary_block(root_plus_num, root_plus_den, root_period)
-    var angle = binary_block(num, den, angle_length)
+    var lower = address_block(lower_ray, root_period)
+    var upper = address_block(upper_ray, root_period)
+    var angle = address_block(theta, angle_length)
     if lower.rejected or upper.rejected or angle.rejected:
-        return rejected_ray_addr()
+        return rejected_fraction()
 
     var word = List[Int]()
     for i in range(angle.length()):
         ref block = upper.digits if angle.digits[i] == 1 else lower.digits
         for j in range(len(block)):
             word.append(block[j])
-
-    var numerator = _digits_to_numerator(word)
-    var denominator = _period_denominator(root_period * angle_length)
-    if numerator.overflowed or denominator.overflowed or denominator.value <= 0:
-        return rejected_ray_addr()
-    return make_checked_ray_addr(numerator.value, denominator.value)
+    return reduce_fraction(_digits_to_numerator(word), _period_denominator(root_period * angle_length))
 
 
 def tunes_to(
@@ -211,9 +193,9 @@ def tunes_to(
     expected_den: Int64,
 ) -> Bool:
     """Whether tuning `num/den` by the given component yields `expected`."""
-    return checked_ray_addr_equal(
+    return fraction_equal(
         tuned_angle(root_minus_num, root_minus_den, root_plus_num, root_plus_den, num, den),
-        make_checked_ray_addr(expected_num, expected_den),
+        address(expected_num, expected_den),
     )
 
 

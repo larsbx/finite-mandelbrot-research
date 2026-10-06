@@ -6,16 +6,21 @@
 # renormalization centre) together with the tuning pattern it determines: the
 # 0/1 kneading prefix of the address and the twist fixed by the internal-address
 # continuation rule. The kneading prefix of the whole carrier is the vendored
-# `substitution_dynamics.tuning.kneading_prefix` of its patterns. Nothing here
-# decides fibre membership; see the non-claims at the end of the file.
+# `substitution_dynamics.tuning.kneading_prefix` of its patterns; the twist is
+# the vendored `continuation_twist` and the internal address the vendored
+# `internal_address`. Nothing here decides fibre membership; see the
+# non-claims at the end of the file.
 #
 # Identifying the pattern's substitution with Douady-Hubbard tuning on kneading
 # sequences is the theorem tag `TuningKneadingSubstitution` in
 # kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo, scaffolded, not checked.
 
-from dynamics.angle_tuning import tuned_angle
-from arithmetic.checked_int64_backend import CheckedI64Result, checked_add_i64, checked_mul_i64
-from dynamics.checked_ray_address import checked_double_ray_addr, make_checked_ray_addr
+from dynamics.angle_tuning import address, tuned_angle
+from finite_exact.bigint_z import bigz_add, bigz_eq, bigz_lt, bigz_mul
+from finite_exact.checked_int import checked_mul
+from rational_dynamics.integers import bigz_is_even, bigz_to_int
+from rational_dynamics.rational import ReducedFraction, double_mod_one
+from substitution_dynamics.internal_address import internal_address
 from substitution_dynamics.tuning import TuningPattern, continuation_twist, kneading_prefix
 
 comptime MAX_CARRIER_PERIOD = 62
@@ -43,71 +48,51 @@ def rejected_kneading_prefix() -> KneadingPrefixResult:
     return KneadingPrefixResult(List[Int](), 0, True)
 
 
-def _cross(a: Int64, b: Int64) -> CheckedI64Result:
-    return checked_mul_i64(a, b)
+# Regime correspondence: angle-kneading-prefix
+def kneading_prefix_of(theta: ReducedFraction) -> KneadingPrefixResult:
+    """0/1 kneading sequence of a periodic address: letter `k` is 1 when
+    `2^k theta` lies strictly between `theta/2` and `(theta+1)/2` modulo one, 0
+    when it lies strictly outside, and the sequence stops at the first
+    boundary hit, which is position `period - 1`. Rejects a rejected address,
+    zero, an even reduced denominator (not periodic), and periods beyond
+    `MAX_CARRIER_PERIOD`. Exact: the comparisons are BigZ cross products and
+    the doubling is the vendored `double_mod_one`."""
+    if theta.rejected or theta.num.is_zero() or bigz_is_even(theta.den):
+        return rejected_kneading_prefix()
+    var two_den = bigz_add(theta.den, theta.den)
+    var upper_num = bigz_add(theta.num, theta.den)
+    var prefix = List[Int]()
+    var current = theta.copy()
+    for k in range(MAX_CARRIER_PERIOD):
+        # Compare current = a/b with theta/2 = num/(2 den) and (theta+1)/2 = (num+den)/(2 den).
+        var lhs = bigz_mul(current.num, two_den)
+        var low = bigz_mul(theta.num, current.den)
+        var high = bigz_mul(upper_num, current.den)
+        if bigz_eq(lhs, low) or bigz_eq(lhs, high):
+            return KneadingPrefixResult(prefix, k + 1, False)
+        prefix.append(1 if (bigz_lt(low, lhs) and bigz_lt(lhs, high)) else 0)
+        current = double_mod_one(current)
+    return rejected_kneading_prefix()
 
 
 # Regime correspondence: angle-kneading-prefix
 def checked_kneading_prefix(num: Int64, den: Int64) -> KneadingPrefixResult:
-    """0/1 kneading sequence of the periodic address `num/den`: letter `k` is 1
-    when `2^k theta` lies strictly between `theta/2` and `(theta+1)/2` modulo
-    one, 0 when it lies strictly outside, and the sequence stops at the first
-    boundary hit, which is position `period - 1`. Rejects addresses outside
-    `(0, 1)`, addresses with an even reduced denominator (not periodic), any
-    fixed-width overflow, and periods beyond `MAX_CARRIER_PERIOD`."""
-    var theta = make_checked_ray_addr(num, den)
-    if theta.rejected or theta.num == 0 or theta.den % 2 == 0:
-        return rejected_kneading_prefix()
-    var two_den = checked_mul_i64(theta.den, 2)
-    var upper_num = checked_add_i64(theta.num, theta.den)
-    if two_den.overflowed or upper_num.overflowed:
-        return rejected_kneading_prefix()
-    var prefix = List[Int]()
-    var current = theta
-    for k in range(MAX_CARRIER_PERIOD):
-        # Compare current = a/b with theta/2 = num/(2 den) and (theta+1)/2 = (num+den)/(2 den).
-        var lhs = _cross(current.num, two_den.value)
-        var low = _cross(theta.num, current.den)
-        var high = _cross(upper_num.value, current.den)
-        if lhs.overflowed or low.overflowed or high.overflowed:
-            return rejected_kneading_prefix()
-        if lhs.value == low.value or lhs.value == high.value:
-            return KneadingPrefixResult(prefix, k + 1, False)
-        prefix.append(1 if (lhs.value > low.value and lhs.value < high.value) else 0)
-        current = checked_double_ray_addr(current)
-        if current.rejected:
-            return rejected_kneading_prefix()
-    return rejected_kneading_prefix()
+    """`kneading_prefix_of` the address `num/den`; rejects addresses outside `(0, 1)`."""
+    return kneading_prefix_of(address(num, den))
 
 
-def _rho(nu: List[Int], m: Int) -> Int:
-    """`min {k > m : nu_k != nu_(k-m)}` over the periodic extension of `nu`
-    (1-indexed), or 0 when no such `k` exists within one full comparison cycle."""
-    var n = len(nu)
-    for k in range(m + 1, m + 4 * n + 2):
-        if nu[(k - 1) % n] != nu[(k - m - 1) % n]:
-            return k
-    return 0
-
-
-def internal_address(nu: List[Int]) -> List[Int]:
-    """The internal address `1 -> rho(1) -> rho(rho(1)) -> ...` of the periodic
-    sequence `nu`, up to its own length. The list is the address itself, which
-    the membership test below reads rather than recomputing."""
-    var out: List[Int] = [1]
-    var m = 1
-    while True:
-        var r = _rho(nu, m)
-        if r == 0 or r > len(nu):
-            return out^
-        out.append(r)
-        m = r
+def _address(nu: List[Int]) -> List[Int]:
+    """The vendored internal address of `nu`, or empty for a word it refuses."""
+    try:
+        return internal_address(nu)
+    except:
+        return List[Int]()
 
 
 def _internal_address_contains(nu: List[Int], target: Int) -> Bool:
-    """Whether `target` occurs in the internal address of `nu`. The smoke reads
-    it as the brute-force characterization the closed form below must meet."""
-    var address = internal_address(nu)
+    """Whether `target` occurs in the vendored internal address of `nu`. The
+    smoke reads it as the characterization the closed form below must meet."""
+    var address = _address(nu)
     for i in range(len(address)):
         if address[i] == target:
             return True
@@ -133,12 +118,8 @@ def continuation_last_letter(prefix: List[Int]) -> ContinuationResult:
     a letter (upstream docs/tuning-substitutions-spec.md section 1.3): of the
     two continuations of a non-empty 0/1 prefix exactly one has `n` in its
     internal address, and this is its last letter. Fails closed on an empty
-    prefix and on any letter outside `{0, 1}`."""
-    if len(prefix) == 0:
-        return ContinuationResult(0, True)
-    for i in range(len(prefix)):
-        if prefix[i] != 0 and prefix[i] != 1:
-            return ContinuationResult(0, True)
+    prefix and on any letter outside `{0, 1}`, which the vendored kernel
+    refuses."""
     try:
         # twist on means tau(1) = prefix . 0, so the continuation ends in 0.
         return ContinuationResult(0 if continuation_twist(prefix) else 1, False)
@@ -181,18 +162,16 @@ def checked_directive_level(num: Int64, den: Int64) -> DirectiveLevelResult:
     """The tuning pattern of a periodic address: prefix its kneading prefix,
     twist chosen so that the image of `1` is `A(nu)` (the continuation whose
     internal address contains the period). Fails closed on any rejection."""
-    var kneading = checked_kneading_prefix(num, den)
+    var theta = address(num, den)
+    var kneading = kneading_prefix_of(theta)
     if kneading.rejected or len(kneading.prefix) == 0:
         return DirectiveLevelResult(_placeholder_level(), True)
-    var continuation = continuation_last_letter(kneading.prefix)
-    if continuation.rejected:
-        return DirectiveLevelResult(_placeholder_level(), True)
-    var theta = make_checked_ray_addr(num, den)
-    # tau(1) = prefix . (1 xor twist) must equal A(nu) = prefix . last_letter.
-    var twist = continuation.last_letter == 0
     try:
-        var pattern = TuningPattern.checked(kneading.prefix, twist)
-        return DirectiveLevelResult(DirectiveLevel(theta.num, theta.den, pattern), False)
+        # The vendored continuation pattern: tau(1) = prefix . (1 xor twist) is A(nu).
+        var pattern = TuningPattern.continuation(kneading.prefix)
+        # The reduced address is no larger than the input, so it fits `Int64`.
+        var level = DirectiveLevel(Int64(bigz_to_int(theta.num)), Int64(bigz_to_int(theta.den)), pattern)
+        return DirectiveLevelResult(level, False)
     except:
         return DirectiveLevelResult(_placeholder_level(), True)
 
@@ -232,22 +211,25 @@ struct ResidualDirectiveCarrier(Copyable, Movable):
         letters shared by every tuning of these levels (vendored kernel). Fails
         closed before expanding when the period overflows or exceeds
         `MAX_KNEADING_WORD` letters."""
-        var period = self.checked_period()
-        if period.overflowed or period.value > MAX_KNEADING_WORD:
+        var period: Int
+        try:
+            period = self.checked_period()
+        except:
+            raise Error("carrier period exceeds the kneading word bound")
+        if period > MAX_KNEADING_WORD:
             raise Error("carrier period exceeds the kneading word bound")
         var patterns = List[TuningPattern]()
         for i in range(len(self.levels)):
             patterns.append(self.levels[i].pattern.copy())
         return kneading_prefix(patterns)
 
-    def checked_period(self) -> CheckedI64Result:
-        """`p_1 ... p_n`, or an overflowed result: sixty-three period-2 levels
-        already exceed `Int64`, so the product is never trusted unchecked."""
-        var p = CheckedI64Result(1, False)
+    def checked_period(self) raises -> Int:
+        """`p_1 ... p_n`, raising on overflow (`finite_exact.checked_int`):
+        sixty-three period-2 levels already exceed `Int64`, so the product is
+        never trusted unchecked."""
+        var p = 1
         for i in range(len(self.levels)):
-            p = checked_mul_i64(p.value, Int64(self.levels[i].pattern.period()))
-            if p.overflowed:
-                return p
+            p = checked_mul(p, self.levels[i].pattern.period())
         return p
 
 
@@ -281,14 +263,14 @@ def _carrier(nums: List[Int64], dens: List[Int64]) -> ResidualDirectiveCarrier:
     return carrier^
 
 
-def _tuned_matches(nums: List[Int64], dens: List[Int64], tuned_num: Int64, tuned_den: Int64) -> Bool:
+def _tuned_matches(nums: List[Int64], dens: List[Int64], tuned: ReducedFraction) -> Bool:
     """The carrier's kneading prefix equals the kneading prefix of the address
     obtained by exact angle tuning (`angle_tuning.tuned_angle`, cross-checked by
     the independent oracle reference/python/c1/kneading_reference.py)."""
     var carrier = _carrier(nums, dens)
     if carrier.depth() != len(nums):
         return False
-    var expected = checked_kneading_prefix(tuned_num, tuned_den)
+    var expected = kneading_prefix_of(tuned)
     try:
         return expected.accepted() and carrier.kneading_word() == expected.prefix
     except:
@@ -325,11 +307,11 @@ def residual_directive_carrier_smoke() -> Bool:
     var rabbit_address: List[Int] = [1, 3]
     var airplane_address: List[Int] = [1, 2, 3]
     var doubling_address: List[Int] = [1, 2]
-    if internal_address(rabbit_nu) != rabbit_address:
+    if _address(rabbit_nu) != rabbit_address:
         return False
-    if internal_address(airplane_nu) != airplane_address:
+    if _address(airplane_nu) != airplane_address:
         return False
-    if internal_address(doubling_nu) != doubling_address:
+    if _address(doubling_nu) != doubling_address:
         return False
     if not _internal_address_contains(rabbit_nu, 3) or _internal_address_contains(rabbit_nu, 2):
         return False
@@ -385,7 +367,14 @@ def residual_directive_carrier_smoke() -> Bool:
     # period-four component is (7/15, 8/15); a repeated level is a repeated
     # tuning, so three doubling levels tune 1/3 twice.
     var doubling_once = tuned_angle(1, 3, 2, 3, 1, 3)
-    var doubling_twice = tuned_angle(1, 3, 2, 3, doubling_once.num, doubling_once.den)
+    var once_num: Int64
+    var once_den: Int64
+    try:
+        once_num = Int64(bigz_to_int(doubling_once.num))
+        once_den = Int64(bigz_to_int(doubling_once.den))
+    except:
+        return False
+    var doubling_twice = tuned_angle(1, 3, 2, 3, once_num, once_den)
     var primitive_four = tuned_angle(7, 15, 8, 15, 1, 3)
     var rabbit_third = tuned_angle(1, 7, 2, 7, 1, 3)
     var rabbit_airplane = tuned_angle(1, 7, 2, 7, 3, 7)
@@ -393,28 +382,37 @@ def residual_directive_carrier_smoke() -> Bool:
         return False
     if rabbit_third.rejected or rabbit_airplane.rejected:
         return False
-    if not _tuned_matches(n1, d1, doubling_once.num, doubling_once.den):
+    if not _tuned_matches(n1, d1, doubling_once):
         return False
-    if not _tuned_matches(n2, d2, doubling_twice.num, doubling_twice.den):
+    if not _tuned_matches(n2, d2, doubling_twice):
         return False
-    if not _tuned_matches(n3, d3, primitive_four.num, primitive_four.den):
+    if not _tuned_matches(n3, d3, primitive_four):
         return False
-    if not _tuned_matches(n4, d4, rabbit_third.num, rabbit_third.den):
+    if not _tuned_matches(n4, d4, rabbit_third):
         return False
-    if not _tuned_matches(n5, d5, rabbit_airplane.num, rabbit_airplane.den):
+    if not _tuned_matches(n5, d5, rabbit_airplane):
         return False
     # Refinement is strict and agreement is prefix-wise.
     var base = _carrier(n1, d1)
     var deeper = _carrier(n2, d2)
-    var deeper_period = deeper.checked_period()
-    if not (base.depth() == 2 and deeper.depth() == 3 and deeper_period.accepted() and deeper_period.value == 8):
+    var deeper_period: Int
+    try:
+        deeper_period = deeper.checked_period()
+    except:
+        return False
+    if not (base.depth() == 2 and deeper.depth() == 3 and deeper_period == 8):
         return False
     # Sixty-three period-2 levels form a valid carrier whose period 2^63 does not fit.
     var doubling_level = checked_directive_level(1, 3)
     var wide = ResidualDirectiveCarrier.empty()
     for _ in range(63):
         wide = wide.refined(doubling_level.level)
-    if not (wide.depth() == 63 and wide.checked_period().overflowed):
+    var overflowed = False
+    try:
+        _ = wide.checked_period()
+    except:
+        overflowed = True
+    if not (wide.depth() == 63 and overflowed):
         return False
     var refused = False
     try:
