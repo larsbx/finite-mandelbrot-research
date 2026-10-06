@@ -185,3 +185,13 @@ root = "vendor/python"
 "closed_interval/__init__.py" = "25f2f2555bc5ce24bb9df5d7e20389ba3213d99f432751fb19288381ff6c2a83"
 "closed_interval/dyadic.py" = "c1be682fa4551a3c66122d090fb62005ef8c53300a73f0ba7a451d09f110d97c"
 "closed_interval/interval.py" = "3fae9c63bc9d66f5a4c25b164012a208c45705ee756512daa1694edbfbda7e51"
+
+[[package]]
+name = "lexical_audit"
+repository = "larsbx/finite-math-kernels"
+commit = "9019c641521f903f5076223b921abbee6703c2e9"
+root = "vendor/python"
+
+[package.files]
+"lexical_audit/__init__.py" = "ad206b6b719a55abad97f933fed25d603de26845c537509e6af9a18faefd7fc2"
+"lexical_audit/audit.py" = "475195c469cf2851fa34b93b658a55dd7bbe667400082eb1fdc7e81a1f3af3f0"

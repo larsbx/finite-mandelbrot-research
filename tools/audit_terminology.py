@@ -8,6 +8,10 @@ This is not a theorem checker. It enforces repository hygiene:
 - rank-2 files must not introduce circle/locus primitives;
 - a project terminology registry and use manifest must exist;
 - deprecated C1 bridge terminology must not be used for new non-migration claims.
+
+The engine is the vendored `lexical_audit` package; this file is the policy.
+Every occurrence of a phrase is read, in comments and prose alike, and passes
+only with a marker of the named context within 140 characters of its start.
 """
 
 from __future__ import annotations
@@ -17,20 +21,35 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCAN_ROOTS = [ROOT / "docs", ROOT / "kernel", ROOT / "vendor" / "mojo"]
-REGISTRY = ROOT / "docs" / "terminology-registry.md"
-USE_MANIFEST = ROOT / "docs" / "terminology-use-manifest.md"
+sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
-DECLARATION_RE = re.compile(r"Terminology declaration:\s*(?P<term>.+)")
-REQUIRED_DECLARATION_FIELDS = [
+from lexical_audit import (  # noqa: E402
+    ContextRule,
+    Declaration,
+    DeclarationRule,
+    Document,
+    Policy,
+    Requirement,
+    Scope,
+    all_of,
+    contains,
+    run,
+)
+
+SCAN_ROOTS = ("docs", "kernel", "vendor/mojo")
+REGISTRY = "docs/terminology-registry.md"
+USE_MANIFEST = "docs/terminology-use-manifest.md"
+
+REQUIRED_DECLARATION_FIELDS = (
     "Terminology declaration:",
     "Genealogy:",
     "Bridge claim:",
     "Known leaks:",
     "Use discipline:",
-]
+)
+DECLARATION = Declaration("Terminology declaration:", REQUIRED_DECLARATION_FIELDS)
 
-RISKY_PHRASES = [
+RISKY_PHRASES = (
     "obvious isomorphism",
     "canonical analogy",
     "essentially the same",
@@ -41,9 +60,9 @@ RISKY_PHRASES = [
     "equivalent to",
     "corresponds exactly",
     "proof by analogy",
-]
+)
 
-NEGATING_CONTEXT = [
+NEGATING_CONTEXT = (
     "not ",
     "no ",
     "without ",
@@ -56,23 +75,21 @@ NEGATING_CONTEXT = [
     "cannot",
     "does not",
     "is not",
-]
+)
 
-MIGRATION_CONTEXT = [
+MIGRATION_CONTEXT = (
     "deprecated",
     "legacy",
     "replaces",
     "rather than",
     "migration",
     "old term",
-]
+)
 
-RANK2_FILES = [
-    ROOT / "docs" / "rank2-coordinate-substrate.md",
-    ROOT / "kernel/mojo/arithmetic/rank2_operator.mojo",
-]
+RANK2_DOCUMENT = "docs/rank2-coordinate-substrate.md"
+RANK2_OPERATOR = "kernel/mojo/arithmetic/rank2_operator.mojo"
 
-RANK2_BANNED_LOCI = [
+RANK2_BANNED_LOCI = (
     "unit circle",
     "circle object",
     "circle primitive",
@@ -80,9 +97,9 @@ RANK2_BANNED_LOCI = [
     "arc object",
     "circumference",
     "analytic locus",
-]
+)
 
-REGISTRY_REQUIRED_TERMS = [
+REGISTRY_REQUIRED_TERMS = (
     "PointVertex",
     "rank-2 coordinate record",
     "finite rational-ray nest",
@@ -92,9 +109,9 @@ REGISTRY_REQUIRED_TERMS = [
     "Mojo theorem kernel",
     "exact-type catalogue",
     "prefix obstruction",
-]
+)
 
-C1_SCOPED_TERMS = [
+C1_SCOPED_TERMS = (
     "finite rational-ray nest",
     "persistent non-separation",
     "persistent wake ambiguity",
@@ -106,11 +123,11 @@ C1_SCOPED_TERMS = [
     "separator code",
     "exact-type catalogue",
     "prefix obstruction",
-]
+)
 
-DEPRECATED_TERMS = [
+DEPRECATED_TERMS = (
     "catalogue extensionality",
-]
+)
 
 C1_SCOPED_PREFIXES = (
     "docs/C1_",
@@ -118,196 +135,82 @@ C1_SCOPED_PREFIXES = (
     "tests/test_C1_",
 )
 
-LEGACY_C1_MIGRATION_FILES = {
+LEGACY_C1_MIGRATION_FILES = (
     "docs/C1_catalogue_extensionality.md",
     "docs/C1_catalogue_extensionality_proof_consolidation.md",
     "docs/alignment_audit_deep_research_findings.md",
     "docs/linter_skill_paper_language.md",
-}
+)
 
-ALLOWLIST = {
+ALLOWLIST = (
     "docs/terminology-governance.md",
     "docs/terminology-registry.md",
     "docs/terminology-use-manifest.md",
     "tests/test_terminology_governance.py",
     "tests/test_terminology_registry.py",
     "tests/test_terminology_use_manifest.py",
-}
+)
+
+USE_MANIFEST_SECTIONS = (
+    "## Registered project terms currently allowed",
+    "## Terms requiring local declaration outside C1 files",
+    "## Terms requiring theorem-tag status",
+    "## High-risk bridge phrases",
+    "## Circle/rank-2 ban",
+)
 
 
-def iter_files():
-    for root in SCAN_ROOTS:
-        if not root.exists():
-            continue
-        for path in root.rglob("*"):
-            if path.is_file() and path.suffix in {".md", ".mojo", ".py"}:
-                yield path
+def scan(exclude: tuple[str, ...] = ()) -> Scope:
+    """Every `.md`, `.mojo` and `.py` under the scan roots, vendored Mojo included."""
+    return Scope(tuple(f"{base}/**/*{suffix}" for base in SCAN_ROOTS for suffix in (".md", ".mojo", ".py")), exclude)
 
 
-def rel(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
-
-
-def has_full_declaration(text: str) -> bool:
-    if not DECLARATION_RE.search(text):
-        return False
-    return all(field in text for field in REQUIRED_DECLARATION_FIELDS)
-
-
-def has_context(text: str, index: int, markers: list[str]) -> bool:
-    window = text[max(0, index - 140): index + 140].lower()
-    return any(marker in window for marker in markers)
-
-
-def is_negated_context(text: str, index: int) -> bool:
-    return has_context(text, index, NEGATING_CONTEXT)
-
-
-def is_migration_context(text: str, index: int) -> bool:
-    return has_context(text, index, MIGRATION_CONTEXT)
-
-
-def audit_registry(errors: list[str]) -> None:
-    if not REGISTRY.exists():
-        errors.append("docs/terminology-registry.md: required terminology registry is missing")
-        return
-    text = REGISTRY.read_text(encoding="utf-8")
-    if "## Established field terms" not in text:
-        errors.append("docs/terminology-registry.md: missing established field terms section")
-    if "## Project terms with declarations" not in text:
-        errors.append("docs/terminology-registry.md: missing project declaration section")
-    if "## Deprecated project terms" not in text:
-        errors.append("docs/terminology-registry.md: missing deprecated project terms section")
-    for term in REGISTRY_REQUIRED_TERMS:
-        if term not in text:
-            errors.append(f"docs/terminology-registry.md: missing governed term {term!r}")
-    declarations = DECLARATION_RE.findall(text)
-    if len(declarations) < len(REGISTRY_REQUIRED_TERMS):
-        errors.append("docs/terminology-registry.md: too few terminology declarations")
-    if not has_full_declaration(text):
-        errors.append("docs/terminology-registry.md: declaration blocks must include genealogy, bridge claim, known leaks, and use discipline")
-
-
-def audit_use_manifest(errors: list[str]) -> None:
-    if not USE_MANIFEST.exists():
-        errors.append("docs/terminology-use-manifest.md: required terminology use manifest is missing")
-        return
-    text = USE_MANIFEST.read_text(encoding="utf-8")
-    required_sections = [
-        "## Registered project terms currently allowed",
-        "## Terms requiring local declaration outside C1 files",
-        "## Terms requiring theorem-tag status",
-        "## High-risk bridge phrases",
-        "## Circle/rank-2 ban",
-    ]
-    for section in required_sections:
-        if section not in text:
-            errors.append(f"docs/terminology-use-manifest.md: missing section {section!r}")
-    for term in C1_SCOPED_TERMS:
-        if term not in text:
-            errors.append(f"docs/terminology-use-manifest.md: missing scoped term {term!r}")
-    if "catalogue extensionality" in text and "deprecated" not in text.lower():
-        errors.append("docs/terminology-use-manifest.md: legacy catalogue extensionality must be marked deprecated")
-
-
-def audit_declarations(path: Path, text: str, errors: list[str]) -> None:
-    if "Terminology declaration:" not in text:
-        return
-    missing = [field for field in REQUIRED_DECLARATION_FIELDS if field not in text]
-    if missing:
-        errors.append(
-            f"{rel(path)}: terminology declaration missing fields: {', '.join(missing)}"
-        )
-
-
-def audit_risky_phrases(path: Path, text: str, errors: list[str]) -> None:
-    rp = rel(path)
-    if rp in ALLOWLIST:
-        return
-    lower = text.lower()
-    governed = has_full_declaration(text)
-    for phrase in RISKY_PHRASES:
-        start = 0
-        while True:
-            idx = lower.find(phrase, start)
-            if idx == -1:
-                break
-            if not governed and not is_negated_context(lower, idx):
-                errors.append(
-                    f"{rp}: risky phrase '{phrase}' requires terminology declaration with genealogy and leaks"
-                )
-            start = idx + len(phrase)
-
-
-def audit_deprecated_terms(path: Path, text: str, errors: list[str]) -> None:
-    rp = rel(path)
-    if rp in LEGACY_C1_MIGRATION_FILES:
-        return
-    lower = text.lower()
-    for term in DEPRECATED_TERMS:
-        start = 0
-        while True:
-            idx = lower.find(term, start)
-            if idx == -1:
-                break
-            if not is_migration_context(lower, idx):
-                errors.append(
-                    f"{rp}: deprecated term '{term}' requires migration/deprecation context; use SeparatorCatalogueAdequacy/Soundness/Completeness"
-                )
-            start = idx + len(term)
-
-
-def audit_c1_scoped_terms(path: Path, text: str, errors: list[str]) -> None:
-    rp = rel(path)
-    if rp in ALLOWLIST or rp.startswith(C1_SCOPED_PREFIXES):
-        return
-    lower = text.lower()
-    governed = has_full_declaration(text) or "docs/terminology-registry.md" in text
-    for term in C1_SCOPED_TERMS:
-        idx = lower.find(term.lower())
-        if idx == -1:
-            continue
-        if not governed and not is_negated_context(lower, idx):
-            errors.append(
-                f"{rp}: C1-scoped term '{term}' requires local declaration or registry pointer outside C1 files"
-            )
-
-
-def audit_rank2_loci(errors: list[str]) -> None:
-    for path in RANK2_FILES:
-        if not path.exists():
-            continue
-        text = path.read_text(encoding="utf-8").lower()
-        rp = rel(path)
-        for phrase in RANK2_BANNED_LOCI:
-            idx = text.find(phrase)
-            if idx == -1:
-                continue
-            if rp == "docs/rank2-coordinate-substrate.md" and is_negated_context(text, idx):
-                continue
-            errors.append(f"{rp}: rank-2 locus phrase '{phrase}' is not allowed")
-
-
-def main() -> int:
-    errors: list[str] = []
-    audit_registry(errors)
-    audit_use_manifest(errors)
-    for path in iter_files():
-        text = path.read_text(encoding="utf-8")
-        audit_declarations(path, text, errors)
-        audit_risky_phrases(path, text, errors)
-        audit_deprecated_terms(path, text, errors)
-        audit_c1_scoped_terms(path, text, errors)
-    audit_rank2_loci(errors)
-
-    if errors:
-        print("Terminology governance audit failed:")
-        for error in errors:
-            print(f"- {error}")
-        return 1
-    print("Terminology governance audit passed.")
-    return 0
+POLICY = Policy(
+    title="Terminology governance audit",
+    stop_on_documents=False,
+    documents=(
+        Document(REGISTRY, f"{REGISTRY}: required terminology registry is missing", (
+            contains("## Established field terms", f"{REGISTRY}: missing established field terms section"),
+            contains("## Project terms with declarations", f"{REGISTRY}: missing project declaration section"),
+            contains("## Deprecated project terms", f"{REGISTRY}: missing deprecated project terms section"),
+            *(contains(term, f"{REGISTRY}: missing governed term {term!r}") for term in REGISTRY_REQUIRED_TERMS),
+            Requirement(r"Terminology declaration:\s*.", f"{REGISTRY}: too few terminology declarations",
+                        minimum=len(REGISTRY_REQUIRED_TERMS)),
+            Requirement(all_of(r"Terminology declaration:\s*.", *map(re.escape, REQUIRED_DECLARATION_FIELDS)),
+                        f"{REGISTRY}: declaration blocks must include genealogy, bridge claim, known leaks, and use discipline"),
+        )),
+        Document(USE_MANIFEST, f"{USE_MANIFEST}: required terminology use manifest is missing", (
+            *(contains(section, f"{USE_MANIFEST}: missing section {section!r}") for section in USE_MANIFEST_SECTIONS),
+            *(contains(term, f"{USE_MANIFEST}: missing scoped term {term!r}") for term in C1_SCOPED_TERMS),
+            Requirement(r"\A(?![\s\S]*catalogue extensionality)|(?i:deprecated)",
+                        f"{USE_MANIFEST}: legacy catalogue extensionality must be marked deprecated"),
+        )),
+    ),
+    rules=(
+        DeclarationRule(scan(), DECLARATION, "{path}: terminology declaration missing fields: {missing}"),
+        ContextRule(
+            scan(ALLOWLIST), RISKY_PHRASES,
+            "{path}: risky phrase '{term}' requires terminology declaration with genealogy and leaks",
+            context=NEGATING_CONTEXT, exempt_declared=DECLARATION,
+        ),
+        ContextRule(
+            scan(LEGACY_C1_MIGRATION_FILES), DEPRECATED_TERMS,
+            "{path}: deprecated term '{term}' requires migration/deprecation context; "
+            "use SeparatorCatalogueAdequacy/Soundness/Completeness",
+            context=MIGRATION_CONTEXT,
+        ),
+        ContextRule(
+            scan(ALLOWLIST + tuple(f"{prefix}*" for prefix in C1_SCOPED_PREFIXES)), C1_SCOPED_TERMS,
+            "{path}: C1-scoped term '{term}' requires local declaration or registry pointer outside C1 files",
+            context=NEGATING_CONTEXT, exempt_declared=DECLARATION, exempt_if_contains=(REGISTRY,),
+        ),
+        # The rank-2 substrate may name a locus to deny it; the operator may not name one at all.
+        ContextRule(Scope((RANK2_DOCUMENT,)), RANK2_BANNED_LOCI, "{path}: rank-2 locus phrase '{term}' is not allowed",
+                    context=NEGATING_CONTEXT),
+        ContextRule(Scope((RANK2_OPERATOR,)), RANK2_BANNED_LOCI, "{path}: rank-2 locus phrase '{term}' is not allowed"),
+    ),
+)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run(ROOT, POLICY))

@@ -51,12 +51,15 @@ def test_manifest_registers_mojo_theorem_kernel_boundary():
 def test_linter_reads_manifest_and_scoped_terms():
     body = text(LINTER)
     assert "USE_MANIFEST" in body
-    assert "audit_use_manifest" in body
-    assert "audit_c1_scoped_terms" in body
-    assert "audit_deprecated_terms" in body
     assert "C1_SCOPED_TERMS" in body
     assert "DEPRECATED_TERMS" in body
     assert "C1_SCOPED_PREFIXES" in body
+    from audit_terminology import C1_SCOPED_TERMS, DEPRECATED_TERMS, POLICY, USE_MANIFEST as MANIFEST_PATH
+
+    assert MANIFEST_PATH in {document.path for document in POLICY.documents}
+    rule_terms = [set(getattr(rule, "terms", ())) for rule in POLICY.rules]
+    assert set(C1_SCOPED_TERMS) in rule_terms
+    assert set(DEPRECATED_TERMS) in rule_terms
 
 
 def test_manifest_preserves_rank2_circle_ban():
