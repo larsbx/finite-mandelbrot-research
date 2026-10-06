@@ -7,7 +7,9 @@
 # remains barred from certificate acceptance until its replay is complete.
 
 from finite_exact.closed_interval import ComplexIQ, IQ, IQBoolResult
-from finite_exact.rat_q import Q
+from quadratic_orbit.collision import forbidden_count, intended_pair
+from quadratic_orbit.orbit import collision_interval, complex_excludes_zero, zero_box
+from quadratic_orbit.orbit import quadratic_step as next_orbit_value
 from certificates.krawczyk_witness import c_minus_2_box
 
 
@@ -132,38 +134,12 @@ struct BigQExactTypeExclusionResult(Copyable):
         return not self.arithmetic_rejected and self.excluded_count < self.required_count
 
 
-def intended_pair(ell: Int, period: Int, i: Int, j: Int) -> Bool:
-    # Public verifiers reject invalid OrbitEvalConfig values before partitioning.
-    # Keep this primitive total as defense in depth for internal callers.
-    if ell < 1 or period < 1:
-        return False
-    return i >= ell and ((j - i) % period == 0)
-
-
-def forbidden_count(ell: Int, period: Int, horizon: Int) -> Int:
-    var total = 0
-    for i in range(horizon + 1):
-        for j in range(i + 1, horizon + 1):
-            if not intended_pair(ell, period, i, j):
-                total += 1
-    return total
-
-
-def intended_count(ell: Int, period: Int, horizon: Int) -> Int:
-    var total = 0
-    for i in range(horizon + 1):
-        for j in range(i + 1, horizon + 1):
-            if intended_pair(ell, period, i, j):
-                total += 1
-    return total
-
-
-def zero_box() -> ComplexIQ:
-    return ComplexIQ.singleton(Q.zero(), Q.zero())
-
-
-def next_orbit_value(z: ComplexIQ, c_box: ComplexIQ) -> ComplexIQ:
-    return z.square().add(c_box)
+# The collision partition (`intended_pair`, `forbidden_count`) and the orbit
+# step (`zero_box`, and `next_orbit_value`, which is the vendored
+# `quadratic_step`) are the vendored `quadratic_orbit` package.
+# Its `intended_pair` is total: `ell < 1 or period < 1` intends nothing, so an
+# invalid type is never silently partitioned. Public verifiers below still
+# reject invalid OrbitEvalConfig values before partitioning.
 
 
 def build_interval_orbit_h3(c_box: ComplexIQ) -> Orbit4:
@@ -185,18 +161,8 @@ def build_interval_orbit_h6(c_box: ComplexIQ) -> Orbit7:
     return Orbit7(q0, q1, q2, q3, q4, q5, q6)
 
 
-def collision_interval(a: ComplexIQ, b: ComplexIQ) -> ComplexIQ:
-    return b.sub(a)
-
-
-def complex_excludes_zero(z: ComplexIQ) -> IQBoolResult:
-    if not z.accepted():
-        return IQBoolResult(False, True)
-    var re_result = z.re.excludes_zero()
-    var im_result = z.im.excludes_zero()
-    if re_result.rejected or im_result.rejected:
-        return IQBoolResult(False, True)
-    return IQBoolResult(re_result.value or im_result.value, False)
+# `collision_interval` (`b - a`) and the three-valued, fail-closed
+# `complex_excludes_zero` are the vendored `quadratic_orbit.orbit` functions.
 
 
 def excludes_zero(z: ComplexIQ) -> Bool:

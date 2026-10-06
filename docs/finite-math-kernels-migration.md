@@ -30,6 +30,24 @@ The smoke suite's named reporter is the vendored `mojo_smoke` package
 `kernel/mojo/smoke/smoke_report.mojo`, which differed from it only in its
 header comment.
 
+The interval critical orbit's shared pieces are the vendored `quadratic_orbit`
+package (`vendor/mojo/quadratic_orbit/`). `kernel/mojo/dynamics/interval_orbit.mojo`
+imports the collision partition (`intended_pair`, `forbidden_count`) from
+`quadratic_orbit/collision.mojo` and the orbit step (`zero_box`,
+`quadratic_step` under the local name `next_orbit_value`), `collision_interval`
+and `complex_excludes_zero` from `quadratic_orbit/orbit.mojo`; its local copies,
+and the unused local `intended_count`, were removed. The two partitions agree
+on every input the consumer passes: both intend nothing when `ell < 1` or
+`period < 1` (so a purely periodic type, `ell = 0`, is rejected by
+`OrbitEvalConfig.valid()` before partitioning and partitions to nothing if
+reached anyway), and upstream additionally refuses negative indices, which no
+caller passes. `excludes_zero`, the two-valued reading of
+`complex_excludes_zero`, stays local. The legacy-syntax
+`kernel/mojo/certificates/collision_sets.mojo` (and the other uncompiled
+`fn`-era files) keeps its own partition: it is outside the compiled closure,
+and its `is_intended_tail_pair` intends tail pairs at `ell = 0`, which the
+upstream partition does not.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;
