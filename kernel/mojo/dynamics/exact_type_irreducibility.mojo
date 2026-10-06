@@ -22,9 +22,26 @@
 #
 # Each replayed pattern's linear factors are also checked against a root count.
 #
+# The arithmetic over F_p (exact division, gcd, distinct-degree factorization,
+# root counts) is the vendored finite_polynomial.polynomial_fp, whose residues
+# stay below 2^31 so no product can wrap.
+#
 # reference/python/polynomial/exact_type_irreducibility.py recomputes E over Z,
 # the multiplicities by exact division, and every certificate with its own
 # factorization; tests/test_exact_type_irreducibility.py binds the two.
+
+from finite_polynomial import poly_fp_factor_degrees
+from finite_polynomial.polynomial_fp import (
+    Modulus,
+    PolyFp,
+    poly_fp_add,
+    poly_fp_divmod,
+    poly_fp_mul,
+    poly_fp_root_count,
+    poly_fp_sub,
+    poly_fp_x,
+    prime_field,
+)
 
 comptime CERTIFIED_HORIZON = 10
 
@@ -439,86 +456,15 @@ def certificates() -> List[FactorPattern]:
     ]
 
 
-def trim(var a: List[Int]) -> List[Int]:
-    while len(a) > 1 and a[len(a) - 1] == 0:
-        _ = a.pop()
-    if len(a) == 0:
-        a.append(0)
-    return a^
 
 
-def inverse(a: Int, p: Int) -> Int:
-    var result = 1
-    var base = a % p
-    var e = p - 2
-    while e > 0:
-        if e % 2 == 1:
-            result = result * base % p
-        base = base * base % p
-        e //= 2
-    return result
-
-
-def mul(a: List[Int], b: List[Int], p: Int) -> List[Int]:
-    var out = List[Int](length=len(a) + len(b) - 1, fill=0)
-    for i in range(len(a)):
-        if a[i] != 0:
-            for j in range(len(b)):
-                out[i + j] = (out[i + j] + a[i] * b[j]) % p
-    return trim(out^)
-
-
-def divide(a: List[Int], b: List[Int], p: Int) -> Tuple[List[Int], List[Int]]:
-    """Quotient and remainder over F_p; b nonzero."""
-    var r = List[Int](capacity=len(a))
-    for x in a:
-        r.append(x % p)
-    var db = len(b) - 1
-    var lead = inverse(b[db], p)
-    var q = List[Int](length=max(len(a) - db, 1), fill=0)
-    for i in range(len(a) - 1 - db, -1, -1):
-        var c = r[i + db] * lead % p
-        q[i] = c
-        if c != 0:
-            for j in range(db + 1):
-                r[i + j] = (r[i + j] - c * b[j] % p + p) % p
-    var rem = List[Int](capacity=max(db, 1))
-    for i in range(db):
-        rem.append(r[i] if i < len(r) else 0)
-    return (trim(q^), trim(rem^))
-
-
-def quotient(a: List[Int], b: List[Int], p: Int) -> List[Int]:
-    return divide(a, b, p)[0].copy()
-
-
-def remainder(a: List[Int], b: List[Int], p: Int) -> List[Int]:
-    return divide(a, b, p)[1].copy()
-
-
-def gcd(a: List[Int], b: List[Int], p: Int) -> List[Int]:
-    var x = trim(a.copy())
-    var y = trim(b.copy())
-    while not (len(y) == 1 and y[0] == 0):
-        var r = remainder(x, y, p)
-        x = y^
-        y = r^
-    return x^
-
-
-def critical_polys_mod_p(horizon: Int, p: Int) -> List[List[Int]]:
+def critical_polys_mod_p(horizon: Int, field: Modulus) raises -> List[PolyFp]:
     """Q_0, ..., Q_horizon mod p."""
-    var out = List[List[Int]]()
-    var q = List[Int]()
-    q.append(0)
-    out.append(q.copy())
+    var x = poly_fp_x(field)
+    var out: List[PolyFp] = [PolyFp(field, [])]
     for _ in range(horizon):
-        var s = mul(q, q, p)
-        while len(s) < 2:
-            s.append(0)
-        s[1] = (s[1] + 1) % p
-        q = trim(s^)
-        out.append(q.copy())
+        var q = out[len(out) - 1].copy()
+        out.append(poly_fp_add(poly_fp_mul(q, q), x))
     return out^
 
 
@@ -528,97 +474,40 @@ struct ExactTypes(Movable):
 
     var prime: Int
     var horizon: Int
-    var polys: List[List[Int]]
+    var polys: List[PolyFp]
 
     def __init__(out self, prime: Int, horizon: Int) raises:
+        var field = prime_field(prime)
         self.prime = prime
         self.horizon = horizon
-        self.polys = List[List[Int]](length=(horizon + 1) * (horizon + 1), fill=List[Int]())
-        var q = critical_polys_mod_p(horizon, prime)
+        self.polys = List[PolyFp](length=(horizon + 1) * (horizon + 1), fill=PolyFp(field, []))
+        var q = critical_polys_mod_p(horizon, field)
         var rows = multiplicities()
         for h in range(1, horizon + 1):
             for k in range(1, h + 1):
                 var ell = h - k
                 if ell == 1:
                     continue
-                var rest = List[Int](length=max(len(q[h]), len(q[ell])), fill=0)
-                for i in range(len(q[h])):
-                    rest[i] = q[h][i]
-                for i in range(len(q[ell])):
-                    rest[i] = (rest[i] - q[ell][i] + prime) % prime
-                rest = trim(rest^)
+                var rest = poly_fp_sub(q[h], q[ell])
                 for row in rows:
                     if row.ell == ell and row.k == k:
                         for _ in range(row.m):
-                            var qr = divide(rest, self.polys[self.slot(row.mu, row.lam)], prime)
-                            if not (len(qr[1]) == 1 and qr[1][0] == 0):
+                            var qr = poly_fp_divmod(rest, self.polys[self.slot(row.mu, row.lam)])
+                            if not qr.remainder.is_zero():
                                 raise Error("inexact division of R_" + String(ell) + "," + String(k))
-                            rest = qr[0].copy()
+                            rest = qr.quotient.copy()
                 self.polys[self.slot(ell, k)] = rest^
 
     def slot(self, ell: Int, k: Int) -> Int:
         return ell * (self.horizon + 1) + k
 
-    def at(self, ell: Int, k: Int) -> List[Int]:
+    def at(self, ell: Int, k: Int) -> PolyFp:
         return self.polys[self.slot(ell, k)].copy()
 
 
-def exact_type_mod_p(ell: Int, k: Int, p: Int) raises -> List[Int]:
+def exact_type_mod_p(ell: Int, k: Int, p: Int) raises -> PolyFp:
     """E_{ell,k} mod p as the exact quotient of R_{ell,k}; raises if a division is not exact."""
     return ExactTypes(p, ell + k).at(ell, k)
-
-
-def factor_degrees(f: List[Int], p: Int) raises -> List[Int]:
-    """Sorted factor degrees of monic f mod p (p < 2^31); raises when f mod p is not squarefree."""
-    var d = len(f) - 1
-    var df = List[Int](capacity=d)
-    for i in range(1, d + 1):
-        df.append(i * f[i] % p)
-    if len(gcd(f, trim(df^), p)) != 1:
-        raise Error("not squarefree")
-    var x = List[Int]()
-    x.append(0)
-    x.append(1)
-    var xp = List[Int]()
-    xp.append(1)
-    var base = remainder(x, f, p)
-    var e = p
-    while e > 0:
-        if e % 2 == 1:
-            xp = remainder(mul(xp, base, p), f, p)
-        base = remainder(mul(base, base, p), f, p)
-        e //= 2
-    var frobenius = List[List[Int]]()
-    var one = List[Int]()
-    one.append(1)
-    frobenius.append(one^)
-    for j in range(1, d):
-        frobenius.append(remainder(mul(frobenius[j - 1], xp, p), f, p))
-    var degrees = List[Int]()
-    var g = f.copy()
-    var h = x.copy()
-    var i = 0
-    while len(g) - 1 >= 2 * (i + 1):
-        i += 1
-        var next = List[Int](length=d, fill=0)
-        for j in range(len(h)):
-            if h[j] != 0:
-                for t in range(len(frobenius[j])):
-                    next[t] = (next[t] + h[j] * frobenius[j][t]) % p
-        h = trim(next^)
-        var diff = h.copy()
-        while len(diff) < 2:
-            diff.append(0)
-        diff[1] = (diff[1] - 1 + p) % p
-        var common = gcd(g, trim(diff^), p)
-        if len(common) > 1:
-            for _ in range((len(common) - 1) // i):
-                degrees.append(i)
-            g = quotient(g, common, p)
-    if len(g) > 1:
-        degrees.append(len(g) - 1)
-    sort(degrees)
-    return degrees^
 
 
 def parse_degrees(s: String) raises -> List[Int]:
@@ -658,22 +547,11 @@ def linear_factors(degrees: List[Int]) -> Int:
     return n
 
 
-def roots_mod_p(f: List[Int], p: Int) -> Int:
-    var n = 0
-    for c in range(p):
-        var acc = 0
-        for i in range(len(f) - 1, -1, -1):
-            acc = (acc * c + f[i]) % p
-        if acc == 0:
-            n += 1
-    return n
-
-
 def certified_irreducible(
     ell: Int, k: Int, patterns: List[FactorPattern], tables: List[ExactTypes]
 ) raises -> Bool:
     """Replays the listed factor patterns of E_{ell,k}; True iff they force irreducibility."""
-    var degree = len(tables[0].at(ell, k)) - 1
+    var degree = tables[0].at(ell, k).degree()
     var replayed = List[List[Int]]()
     for row in patterns:
         if row.ell != ell or row.k != k:
@@ -683,16 +561,16 @@ def certified_irreducible(
             if tables[t].prime == row.prime:
                 found = True
                 var f = tables[t].at(ell, k)
-                if len(f) - 1 != degree:
+                if f.degree() != degree:
                     return False
-                var degrees = factor_degrees(f, row.prime)
+                var degrees = poly_fp_factor_degrees(f)
                 var claimed = parse_degrees(row.degrees)
                 if len(degrees) != len(claimed):
                     return False
                 for i in range(len(degrees)):
                     if degrees[i] != claimed[i]:
                         return False
-                if linear_factors(degrees) != roots_mod_p(f, row.prime):
+                if linear_factors(degrees) != poly_fp_root_count(f):
                     return False
                 replayed.append(degrees^)
         if not found:
@@ -725,9 +603,9 @@ def exact_type_irreducibility_smoke() -> Bool:
         # A product of two exact-type polynomials must never certify.
         var product_patterns = List[List[Int]]()
         for p in [3, 5, 7, 11, 13, 17, 19, 23]:
-            var product = mul(exact_type_mod_p(0, 3, p), exact_type_mod_p(3, 1, p), p)
+            var product = poly_fp_mul(exact_type_mod_p(0, 3, p), exact_type_mod_p(3, 1, p))
             try:
-                product_patterns.append(factor_degrees(product, p))
+                product_patterns.append(poly_fp_factor_degrees(product))
             except:
                 pass
         if len(product_patterns) < 3 or forces_irreducible(6, product_patterns):

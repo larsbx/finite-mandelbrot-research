@@ -22,6 +22,24 @@ root = "vendor/mojo"
 "finite_exact/rational.mojo" = "6d84b8f4c3b1699648eee2512f49c7736dd5d4c8f7236809585b09cf1b5631c0"
 
 [[package]]
+name = "finite_polynomial"
+repository = "larsbx/finite-math-kernels"
+commit = "efb34b747c6befd0ca53f65dad781d278bc602e0"
+root = "vendor/mojo"
+
+[package.files]
+"finite_polynomial/__init__.mojo" = "989652780628eb1f4570a20f71cd48a9d8871537e4765e35135c318bcecb5e9d"
+"finite_polynomial/cyclotomic_field.mojo" = "1ef981ab0161a88e87bbb750f40498673547e0f69551d9cfb72a8e2ef2b63286"
+"finite_polynomial/cyclotomic_q.mojo" = "fb421b0b3befb6667b55d319ce7146b28b4df4009ce3b9792148c886ba913c5b"
+"finite_polynomial/distinct_degree.mojo" = "15e1acf03bd4b30e419eb9607808d9708c823a78b1c0ccfdcbbaefbb6fd96df5"
+"finite_polynomial/hensel_lifting.mojo" = "fa9731a69a32a670d480008e875b0812ead4c8255f19829d78f5f74cdab96891"
+"finite_polynomial/miller_rabin.mojo" = "ff2a73c97a818824daacebb413f8dba994d77278f50e6a2d9f31674339df37b6"
+"finite_polynomial/polynomial_fp.mojo" = "90052e8d79be73a34b3d2864bbc19c7cae2ddf5b392c6e359332f40562084b1d"
+"finite_polynomial/polynomial_z.mojo" = "98a9b9aa9748af3887ffada79c464b30f4522ae1c8d0dee5bb473d562d3aa9de"
+"finite_polynomial/quadratic_germ.mojo" = "68aa7b0201345ca40b9345e606776bc59234a572abe67fdc76e881e9887b763c"
+"finite_polynomial/rabin_irreducibility.mojo" = "248696d1df8649518797b54eeab2ecf695ff02952e812465c973785d271698f4"
+
+[[package]]
 name = "claim_governance"
 repository = "larsbx/finite-math-kernels"
 commit = "47bcf3ce40a9fac2c3279451f9e4687602f59bb0"
