@@ -15,16 +15,18 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "vendor" / "python"))
 
+from dataclasses import replace  # noqa: E402
+
 from audit_exact_arithmetic import (  # noqa: E402
     ALLOWLIST,
+    BINDING_HEADING,
+    POLICY,
     REQUIRED_SECTIONS,
     SPEC,
     SPEC_REL,
-    allowlisted,
-    arithmetic_consumers,
     audit,
-    binding_rows,
 )
+from exact_arithmetic_audit import allowlisted, arithmetic_consumers, binding_rows  # noqa: E402
 from interval_exclusion_reference import I  # noqa: E402
 
 
@@ -57,61 +59,78 @@ def test_audit_script_is_executable_and_green():
 
 
 def test_binding_table_covers_the_kernels_and_quarantines_floats():
-    rows = binding_rows()
+    rows = binding_rows(ROOT, POLICY)
     by_class = {}
     for cls, paths in rows:
         by_class.setdefault(cls, set()).update(paths)
     assert "kernel/mojo/polynomial/poly_interval_eval.mojo" in by_class["DEMO"]
     assert {"vendor/mojo/finite_exact/rat_q.mojo", "vendor/mojo/finite_exact/closed_q.mojo"} <= by_class["CONFORMS"]
     assert "kernel/mojo/dynamics/complex_box.mojo" in by_class["QUARANTINED"]
-    assert by_class["QUARANTINED"] == allowlisted()
+    assert by_class["QUARANTINED"] == allowlisted(ROOT, POLICY)
     assert ALLOWLIST.exists()
-    assert arithmetic_consumers() <= set().union(*by_class.values())
+    assert arithmetic_consumers(ROOT, POLICY) <= set().union(*by_class.values())
 
 
-def test_audit_rejects_a_float_outside_the_allowlist(tmp_path, monkeypatch):
-    import audit_exact_arithmetic as mod
+def scratch_consumer(tmp_path, name: str = "leak.mojo", source: str = ""):
+    """A minimal consumer under ``tmp_path``: the spec's required headings, a
+    binding table with one bound module that cites the spec, an empty
+    allowlist, and ``source`` as the unbound kernel file ``src/<name>``."""
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "tools").mkdir()
+    (tmp_path / "src").mkdir()
+    table = (
+        "\n\n| Spec item | Module | Class | Notes |\n| --- | --- | --- | --- |\n"
+        "| 1.1 | `src/bound.mojo` | CONFORMS | bound |\n"
+    )
+    spec = "\n\n".join(REQUIRED_SECTIONS).replace(BINDING_HEADING, BINDING_HEADING + table)
+    (tmp_path / SPEC_REL).write_text(f"{POLICY.repository}\n\n{spec}\n", encoding="utf-8")
+    (tmp_path / "src" / "bound.mojo").write_text(f"# {SPEC_REL}\n", encoding="utf-8")
+    (tmp_path / POLICY.allowlist).write_text("# Allowlist\n", encoding="utf-8")
+    if source:
+        (tmp_path / "src" / name).write_text(source, encoding="utf-8")
+    return replace(POLICY, scan_roots=("src",))
 
-    kernel = tmp_path / "src"
-    kernel.mkdir()
-    (kernel / "leak.mojo").write_text("var x: Float64 = 1.5\n", encoding="utf-8")
-    monkeypatch.setattr(mod, "SCAN_ROOTS", [kernel])
-    monkeypatch.setattr(mod, "ROOT", tmp_path)
-    monkeypatch.setattr(mod, "binding_rows", lambda text=None: [])
-    monkeypatch.setattr(mod, "allowlisted", lambda: set())
-    errors = mod.audit()
+
+def test_scratch_consumer_is_clean(tmp_path):
+    policy = scratch_consumer(tmp_path)
+    assert audit(tmp_path, policy) == []
+
+
+def test_audit_rejects_a_float_outside_the_allowlist(tmp_path):
+    policy = scratch_consumer(tmp_path, "leak.mojo", "var x: Float64 = 1.5\n")
+    errors = audit(tmp_path, policy)
     assert any("leak.mojo:1" in e and "C1" in e for e in errors)
 
 
-def test_audit_rejects_every_mojo_decimal_float_form(tmp_path, monkeypatch):
-    import audit_exact_arithmetic as mod
-
-    kernel = tmp_path / "src"
-    kernel.mkdir()
+def test_audit_rejects_every_mojo_decimal_float_form(tmp_path):
     forms = ["1e-3", "2.", ".5", "1.25", "1_000.5_0", "2E+4"]
-    (kernel / "leak.mojo").write_text(
-        "\n".join(f"var x{i} = {literal}" for i, literal in enumerate(forms)),
-        encoding="utf-8",
+    policy = scratch_consumer(
+        tmp_path, "leak.mojo", "\n".join(f"var x{i} = {literal}" for i, literal in enumerate(forms))
     )
-    monkeypatch.setattr(mod, "SCAN_ROOTS", [kernel])
-    monkeypatch.setattr(mod, "ROOT", tmp_path)
-    monkeypatch.setattr(mod, "binding_rows", lambda text=None: [])
-    monkeypatch.setattr(mod, "allowlisted", lambda: set())
-    errors = mod.audit()
+    errors = audit(tmp_path, policy)
     assert len([e for e in errors if "floating point in kernel scope" in e]) == len(forms)
 
 
-def test_audit_rejects_unbound_arithmetic_consumer(tmp_path, monkeypatch):
-    import audit_exact_arithmetic as mod
+def test_audit_rejects_unbound_arithmetic_consumer(tmp_path):
+    policy = scratch_consumer(tmp_path, "consumer.mojo", "from finite_exact.rat_q import Q\n")
+    assert "arithmetic consumer lacks binding row: src/consumer.mojo" in audit(tmp_path, policy)
 
-    kernel = tmp_path / "src"
-    kernel.mkdir()
-    (kernel / "consumer.mojo").write_text("from finite_exact.rat_q import Q\n", encoding="utf-8")
-    monkeypatch.setattr(mod, "SCAN_ROOTS", [kernel])
-    monkeypatch.setattr(mod, "ROOT", tmp_path)
-    monkeypatch.setattr(mod, "binding_rows", lambda text=None: [])
-    monkeypatch.setattr(mod, "allowlisted", lambda: set())
-    assert "arithmetic consumer lacks binding row: src/consumer.mojo" in mod.audit()
+
+def test_audit_reads_consumers_of_the_q_and_iq_layers_only(tmp_path):
+    # A BigZ- or gcd-only import is not a Q/IQ consumer under this policy.
+    policy = scratch_consumer(tmp_path, "consumer.mojo", "from finite_exact.integer_gcd import gcd_int\n")
+    assert audit(tmp_path, policy) == []
+
+
+def test_audit_rejects_a_simd_float_dtype(tmp_path):
+    policy = scratch_consumer(tmp_path, "leak.mojo", "comptime d = DType.float32\n")
+    assert any("leak.mojo:1" in e and "C1" in e for e in audit(tmp_path, policy))
+
+
+def test_allowlist_prose_grants_nothing(tmp_path):
+    policy = scratch_consumer(tmp_path, "leak.mojo", "var x: Float64 = 1.5\n")
+    (tmp_path / POLICY.allowlist).write_text("Prose naming `src/leak.mojo` grants nothing.\n", encoding="utf-8")
+    assert any("leak.mojo:1" in e and "C1" in e for e in audit(tmp_path, policy))
 
 
 def test_policy_surfaces_point_at_the_spec():
