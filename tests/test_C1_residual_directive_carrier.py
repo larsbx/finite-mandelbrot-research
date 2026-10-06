@@ -53,7 +53,7 @@ def test_non_claims_return_false_in_mojo():
         block = src[src.index(f"def {name}() -> Bool:"):]
         assert "return False" in block.split("\n\n")[0]
     assert "TuningPattern.dgp" not in src.replace("`TuningPattern.dgp`", "")
-    assert "from substitution_dynamics.tuning import TuningPattern, kneading_prefix" in src
+    assert "from substitution_dynamics.tuning import TuningPattern, continuation_twist, kneading_prefix" in src
 
 
 def test_regime_correspondence_binds_the_carrier_symbols():
@@ -103,6 +103,15 @@ def test_every_periodic_angle_has_a_kneading_prefix_of_length_period_minus_one()
 def test_continuation_rule_is_well_defined_for_every_periodic_angle_up_to_period_12():
     for theta in periodic_angles(12):
         assert kr.tuning_pattern(theta) is not None, theta
+
+
+def test_mojo_continuation_letter_is_the_vendored_closed_form():
+    src = text(SRC)
+    body = src[src.index("def continuation_last_letter("):src.index("struct DirectiveLevel(")]
+    assert "continuation_twist(prefix)" in body and "_internal_address_contains" not in body
+    assert "if len(prefix) == 0:" in body and "prefix[i] != 0 and prefix[i] != 1" in body
+    smoke = src[src.index("def residual_directive_carrier_smoke("):]
+    assert "for length in range(1, 11):" in smoke and "_internal_address_contains(other, length + 1)" in smoke
 
 
 def test_twists_of_named_centres():
