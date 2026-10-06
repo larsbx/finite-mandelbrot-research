@@ -172,21 +172,23 @@ def excludes_zero(z: ComplexIQ) -> Bool:
 
 def bigq_p21_exact_type_exclusions(half_width_den_power: Int) -> BigQExactTypeExclusionResult:
     var box_name = "beta_c_minus_2"
+    # Type (ell, period) = (2, 1) at horizon 3: the five pairs other than the
+    # intended (2, 3), in index order, from the vendored partition.
+    var required = forbidden_count(2, 1, 3)
     var orbit = build_interval_orbit_h3(c_minus_2_box(half_width_den_power))
     if not orbit.accepted():
-        return BigQExactTypeExclusionResult(box_name, half_width_den_power, 0, 5, True)
-    var pairs_i = List[Int]([0, 0, 0, 1, 1])
-    var pairs_j = List[Int]([1, 2, 3, 2, 3])
+        return BigQExactTypeExclusionResult(box_name, half_width_den_power, 0, required, True)
     var excluded = 0
-    for pair_idx in range(5):
-        var exclusion = complex_excludes_zero(
-            collision_interval(orbit.at(pairs_i[pair_idx]), orbit.at(pairs_j[pair_idx]))
-        )
-        if exclusion.rejected:
-            return BigQExactTypeExclusionResult(box_name, half_width_den_power, excluded, 5, True)
-        if exclusion.value:
-            excluded += 1
-    return BigQExactTypeExclusionResult(box_name, half_width_den_power, excluded, 5, False)
+    for i in range(4):
+        for j in range(i + 1, 4):
+            if intended_pair(2, 1, i, j):
+                continue
+            var exclusion = complex_excludes_zero(collision_interval(orbit.at(i), orbit.at(j)))
+            if exclusion.rejected:
+                return BigQExactTypeExclusionResult(box_name, half_width_den_power, excluded, required, True)
+            if exclusion.value:
+                excluded += 1
+    return BigQExactTypeExclusionResult(box_name, half_width_den_power, excluded, required, False)
 
 
 def verify_exact_type_exclusions_h3(c_box: ComplexIQ, ell: Int, period: Int) -> IntervalOrbitStatus:

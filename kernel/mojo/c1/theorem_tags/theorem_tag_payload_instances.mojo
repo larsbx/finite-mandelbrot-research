@@ -1,12 +1,14 @@
-# Source-specific theorem-tag payload instances for the checked c=-2 path.
+# Source-specific theorem-tag payload instances for the c=-2 path.
 #
-# The finite checks below verify source scope and instance data. Final import
-# remains fail-closed when parameter association or proof-grade classification
-# is absent. No analytic theorem is reproved here.
+# The finite checks below verify source scope and instance data against the
+# BigZ/Q replay (`bigq_landing_target_adapter`: Krawczyk localization, the five
+# forbidden-collision exclusions on the same box, and the 1/2 ray-address
+# orbit). Final import remains fail-closed when parameter association or
+# proof-grade classification is absent. No analytic theorem is reproved here.
 
-from certificates.certificate_arithmetic_migration_gate import CheckedLocalizationEnvelope, c_minus_2_checked_localization
-from dynamics.checked_ray_address import CheckedRayOrbitStatus, verify_checked_one_half_orbit
-from certificates.c_minus_2.checked_landing_target_adapter import LandingTargetAssociation, verify_c_minus_2_landing_target_association
+from finite_exact.bigint_z import bigz_add, bigz_from_i64, bigz_mul
+from dynamics.bigq_ray_address import BigQRayOrbitStatus, verify_bigq_one_half_orbit
+from certificates.c_minus_2.bigq_landing_target_adapter import BigQLandingTargetAssociation, verify_bigq_c_minus_2_landing_target_association
 from certificates.c_minus_2.proof_grade_landing_target_association import ProofGradeLandingTargetAssociation, verify_proof_grade_c_minus_2_landing_target_association
 from certificates.c_minus_2.proof_grade_misiurewicz_trivial_fiber_classification import ProofGradeMisiurewiczTrivialFiberClassification, verify_c_minus_2_misiurewicz_trivial_fiber_classification
 
@@ -25,23 +27,23 @@ struct TheoremSourceRef(ImplicitlyCopyable):
         return self.citation_key.byte_length() > 0 and self.source_title.byte_length() > 0 and self.covered_class.byte_length() > 0
 
 
-struct RationalRayLandingInstance(ImplicitlyCopyable):
+struct RationalRayLandingInstance(Copyable):
     var source: TheoremSourceRef
-    var rays: CheckedRayOrbitStatus
+    var rays: BigQRayOrbitStatus
     var address_num: Int64
     var address_den: Int64
     var landing_box_name: String
-    var landing_target_association: LandingTargetAssociation
+    var landing_target_association: BigQLandingTargetAssociation
     var proof_grade_landing_target_association: ProofGradeLandingTargetAssociation
     var excludes_generic_boundary_use: Bool
 
-    def __init__(out self, source: TheoremSourceRef, rays: CheckedRayOrbitStatus, address_num: Int64, address_den: Int64, landing_box_name: String, landing_target_association: LandingTargetAssociation, proof_grade_landing_target_association: ProofGradeLandingTargetAssociation, excludes_generic_boundary_use: Bool):
+    def __init__(out self, source: TheoremSourceRef, rays: BigQRayOrbitStatus, address_num: Int64, address_den: Int64, landing_box_name: String, landing_target_association: BigQLandingTargetAssociation, proof_grade_landing_target_association: ProofGradeLandingTargetAssociation, excludes_generic_boundary_use: Bool):
         self.source = source
-        self.rays = rays
+        self.rays = rays.copy()
         self.address_num = address_num
         self.address_den = address_den
         self.landing_box_name = landing_box_name
-        self.landing_target_association = landing_target_association
+        self.landing_target_association = landing_target_association.copy()
         self.proof_grade_landing_target_association = proof_grade_landing_target_association
         self.excludes_generic_boundary_use = excludes_generic_boundary_use
 
@@ -56,8 +58,8 @@ struct RationalRayLandingInstance(ImplicitlyCopyable):
     def source_scope_checked(self) -> Bool:
         return (
             self.source_metadata_checked() and
-            self.rays.accepted() and self.rays.preperiod == 1 and self.rays.period == 1 and
-            self.landing_target_association.checked_width_associated()
+            self.rays.arithmetic_replay_accepted() and self.rays.preperiod == 1 and self.rays.period == 1 and
+            self.landing_target_association.finite_replay_associated()
         )
 
     def final_import_admissible(self) -> Bool:
@@ -67,28 +69,28 @@ struct RationalRayLandingInstance(ImplicitlyCopyable):
         )
 
 
-struct MisiurewiczTrivialFiberInstance(ImplicitlyCopyable):
+struct MisiurewiczTrivialFiberInstance(Copyable):
     var source: TheoremSourceRef
-    var localization: CheckedLocalizationEnvelope
+    var association: BigQLandingTargetAssociation
     var ell: Int
     var period: Int
     var proof_grade_classification: ProofGradeMisiurewiczTrivialFiberClassification
     var excludes_generic_boundary_use: Bool
 
-    def __init__(out self, source: TheoremSourceRef, localization: CheckedLocalizationEnvelope, ell: Int, period: Int, proof_grade_classification: ProofGradeMisiurewiczTrivialFiberClassification, excludes_generic_boundary_use: Bool):
+    def __init__(out self, source: TheoremSourceRef, association: BigQLandingTargetAssociation, ell: Int, period: Int, proof_grade_classification: ProofGradeMisiurewiczTrivialFiberClassification, excludes_generic_boundary_use: Bool):
         self.source = source
-        self.localization = localization
+        self.association = association.copy()
         self.ell = ell
         self.period = period
         self.proof_grade_classification = proof_grade_classification
         self.excludes_generic_boundary_use = excludes_generic_boundary_use
 
-    def source_scope_checked_width(self) -> Bool:
+    def source_scope_checked(self) -> Bool:
         return (
             self.source.complete() and self.source.citation_key == "SchleicherFibersLC" and
             self.source.covered_class == "Misiurewicz parameters" and
-            self.localization.checked_width_accepted() and
-            self.localization.box_name == "beta_c_minus_2" and
+            self.association.finite_replay_associated() and
+            self.association.box_name == "beta_c_minus_2" and
             self.ell == 2 and self.period == 1 and self.excludes_generic_boundary_use
         )
 
@@ -119,14 +121,22 @@ def schleicher_misiurewicz_fiber_source() -> TheoremSourceRef:
     )
 
 
+# The replayed box is `beta_c_minus_2` at half-width `2^-8`, the radius the
+# retired checked-Int64 localization used; the BigZ replay reproduces its
+# Krawczyk image and exclusion verdicts there exactly.
+comptime C_MINUS_2_HALF_WIDTH_DEN_POWER = 8
+
+
 def c_minus_2_landing_instance() -> RationalRayLandingInstance:
+    # 1/2 with an unreduced numerator beyond Int64, as in the BigZ replays.
+    var beyond_i64 = bigz_add(bigz_from_i64(9223372036854775807), bigz_from_i64(1))
     return RationalRayLandingInstance(
         schleicher_rational_parameter_ray_source(),
-        verify_checked_one_half_orbit(),
+        verify_bigq_one_half_orbit(beyond_i64, bigz_mul(beyond_i64, bigz_from_i64(2))),
         1,
         2,
         "beta_c_minus_2",
-        verify_c_minus_2_landing_target_association(),
+        verify_bigq_c_minus_2_landing_target_association(C_MINUS_2_HALF_WIDTH_DEN_POWER),
         verify_proof_grade_c_minus_2_landing_target_association(),
         True,
     )
@@ -135,7 +145,7 @@ def c_minus_2_landing_instance() -> RationalRayLandingInstance:
 def c_minus_2_trivial_fiber_instance() -> MisiurewiczTrivialFiberInstance:
     return MisiurewiczTrivialFiberInstance(
         schleicher_misiurewicz_fiber_source(),
-        c_minus_2_checked_localization(),
+        verify_bigq_c_minus_2_landing_target_association(C_MINUS_2_HALF_WIDTH_DEN_POWER),
         2,
         1,
         verify_c_minus_2_misiurewicz_trivial_fiber_classification(),
@@ -155,7 +165,7 @@ def rational_landing_payload_proof_grade_association_ready() -> Bool:
 
 def misiurewicz_trivial_fiber_payload_source_checks_ready() -> Bool:
     var fiber = c_minus_2_trivial_fiber_instance()
-    return fiber.source_scope_checked_width() and fiber.final_import_admissible()
+    return fiber.source_scope_checked() and fiber.final_import_admissible()
 
 
 def theorem_tag_payload_instances_smoke() -> Bool:

@@ -3,13 +3,14 @@
 #
 # Rational geometry substrate for the finite-regime Mandelbrot project.
 #
-# Core arithmetic uses quadrance, spread, dot/cross determinants, algebraic
-# rotor coordinates, and symbolic Q/Z ray-address doubling.
+# Core arithmetic uses quadrance, spread, dot/cross determinants, and algebraic
+# rotor coordinates. Symbolic Q/Z ray-address doubling is the vendored
+# `rational_dynamics.double_mod_one`.
 #
 # The rational coordinates use the selected dynamic-limb BigZ backend.
 
-from dynamics.ray_address import RayAddr64
 from finite_exact.rat_q import Q
+from rational_dynamics.rational import ReducedFraction, double_mod_one, fraction_from_i64
 
 
 struct Vec2Q(Copyable):
@@ -67,15 +68,11 @@ def rotate_by_rotor(v: Vec2Q, r: RotorQ) -> Vec2Q:
     return Vec2Q(v.x.mul(r.u).sub(v.y.mul(r.v)), v.x.mul(r.v).add(v.y.mul(r.u)))
 
 
-def double_ray_addr(address: RayAddr64) -> RayAddr64:
-    return address.doubled()
-
-
 def demo_spread_orthogonal_axes() -> Q:
     var e1 = Vec2Q(Q.one(), Q.zero())
     var e2 = Vec2Q(Q.zero(), Q.one())
     return spread(e1, e2)
 
 
-def demo_ray_addr_doubling_half() -> RayAddr64:
-    return double_ray_addr(RayAddr64(1, 2))
+def demo_ray_addr_doubling_half() -> ReducedFraction:
+    return double_mod_one(fraction_from_i64(1, 2))

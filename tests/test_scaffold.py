@@ -44,7 +44,7 @@ def test_interval_demo_entrypoints_exist() -> None:
 
 def test_ray_address_not_angle_api() -> None:
     text = read("kernel/mojo/arithmetic/rational_trig.mojo") + read("kernel/mojo/dynamics/ray_address.mojo")
-    assert "struct RayAddr64" in text
-    assert "double_ray_addr" in text
+    assert "struct RayAddr64" not in text
+    assert "double_mod_one" in text
     assert "RatAngle" not in text
     assert "double_angle" not in text

@@ -4,6 +4,8 @@ Status: PR #19 baseline; source-scope slice completed before the proof-grade suc
 
 This document records the narrow purpose of branch `c1/rational-landing-payload-source-checks` in the canonical repository `larsbx/finite-mandelbrot-research`.
 
+> Since retired: the checked Int64 localization, ray-address orbit and landing adapter named below were deleted; the source-scope checks now consume the BigZ/Q replay (`certificates/c_minus_2/bigq_landing_target_adapter.mojo`), which reproduces their verdicts exactly. See `docs/rational-interval-arithmetic-spec.md` 6.2.
+
 ## Purpose
 
 The repository already has theorem-tag payload instances for the checked `c=-2` path:
