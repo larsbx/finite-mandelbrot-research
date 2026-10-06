@@ -123,6 +123,20 @@ for seven modules that use only `integer_gcd`, `bigint_z` or `exact_decimal`
 `vendor/mojo/rational_dynamics/rational.mojo`), none of which consumes the
 `Q` or `IQ` layer the binding table governs.
 
+`tools/audit_terminology.py` is a policy over the vendored `lexical_audit`
+engine (`vendor/python/lexical_audit/`), unified upstream from this
+repository's terminology audit, finite-julia-set-research's and the bulbs
+repository's no-limits audit. Its constants are unchanged; the registry and
+the use manifest are governing documents whose requirements are the former
+checks, and the risky-phrase, deprecated-term, C1-scoped-term and rank-2
+locus checks are context rules (a marker within 140 characters of the
+occurrence's start). One check is stricter: every occurrence of a C1-scoped
+term or a rank-2 locus phrase is read, where the former audit read only the
+first, so a negated first mention no longer hides a later one. A finding is
+named once, and the report lists findings in rule order rather than file
+order. On this tree it reports nothing, as the former audit did;
+`tests/test_terminology_audit.py` plants one violation per rule.
+
 The interval exclusion oracle
 `reference/python/interval/interval_exclusion_reference.py` computes over the
 vendored `closed_interval` package (`vendor/python/closed_interval/`), the
