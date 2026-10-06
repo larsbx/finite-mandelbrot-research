@@ -16,14 +16,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from reference.python.polynomial.exact_type_irreducibility import (  # noqa: E402
-    certifies, exact_type, factor_degrees, types,
+    HORIZON, certifies, exact_type, factor_degrees, types,
 )
 from reference.python.polynomial.poly_reference import return_poly  # noqa: E402
 
 SRC = ROOT / "kernel/mojo/dynamics/exact_type_irreducibility.mojo"
 MULTIPLICITY = re.compile(r"Multiplicity\((\d+), (\d+), (\d+), (\d+), (\d+)\)")
 PATTERN = re.compile(r'FactorPattern\((\d+), (\d+), (\d+), "([\d ]+)"\)')
-HORIZON = 8
 
 
 def source() -> str:
@@ -65,6 +64,10 @@ def test_every_pattern_is_the_factorization_mod_p_and_every_type_is_certified():
     for ell, k in types(HORIZON):
         degree = len(exact_type(ell, k)[0]) - 1
         assert degree == 1 or certifies(degree, patterns[(ell, k)]), (ell, k)
+
+
+def test_the_reference_horizon_is_the_kernels():
+    assert f"comptime CERTIFIED_HORIZON = {HORIZON}" in source()
 
 
 def test_a_product_of_exact_types_never_certifies():

@@ -79,7 +79,11 @@ def exact_type(num: Int, den: Int) -> MisiurewiczType:
     of that type, which is `catalogueable_type`."""
     if den <= 0 or num < 0 or num >= den or den > MAX_CATALOGUE_DENOMINATOR:
         return rejected_type()
-    var divisor = gcd_int(num, den)
+    var divisor: Int
+    try:
+        divisor = gcd_int(num, den)
+    except:
+        return rejected_type()
     if divisor <= 0:
         return rejected_type()
     var reduced = den // divisor
@@ -194,6 +198,27 @@ def catalogue_proves_fibre_triviality() -> Bool:
 # --- smoke ------------------------------------------------------------------------
 
 
+def type_agrees_with_doubling(max_den: Int) -> Bool:
+    """`exact_type` against the orbit itself: doubling on Z/den, where the first
+    repeated state gives the preperiod and the period directly. Every reduced
+    and unreduced address with denominator below `max_den`."""
+    for den in range(1, max_den):
+        var seen = List[Int](length=den, fill=-1)
+        for num in range(den):
+            for i in range(den):
+                seen[i] = -1
+            var point = num
+            var step = 0
+            while seen[point] < 0:
+                seen[point] = step
+                point = (2 * point) % den
+                step += 1
+            var found = exact_type(num, den)
+            if not (found.accepted() and found.preperiod == seen[point] and found.period == step - seen[point]):
+                return False
+    return True
+
+
 def misiurewicz_catalogue_smoke() -> Bool:
     # 1/2 -> 0 -> 0: preperiod one, period one, and Misiurewicz.
     var half = exact_type(1, 2)
@@ -225,6 +250,13 @@ def misiurewicz_catalogue_smoke() -> Bool:
     if catalogue(1, 2) != one_two or catalogue_denominator(1, 2) != 6:
         return False
     if catalogue(1, 3) != one_three or catalogue_denominator(1, 3) != 14:
+        return False
+    # The type against brute-force iteration of the doubling map.
+    if not type_agrees_with_doubling(120):
+        return False
+    var zero = exact_type(0, 1)
+    var quarter = exact_type(1, 4)
+    if not (zero.preperiod == 0 and zero.period == 1 and quarter.preperiod == 2 and quarter.period == 1):
         return False
     # The counting identity against the enumeration.
     for l in range(1, 5):

@@ -253,6 +253,58 @@ def _levels(nums: List[Int64], dens: List[Int64]) -> CarrierDensityProfile:
     )
 
 
+def sweep_picks() -> List[Tuple[Int, Int]]:
+    """The sweep corpus: separators (a/12, b/12) spread over the circle, declared
+    and audited in tests/test_generator_refinement.py."""
+    return [(0, 1), (1, 3), (2, 7), (3, 4), (4, 10), (5, 9), (6, 11), (7, 8), (2, 5)]
+
+
+def _twelfth(n: Int) -> Tuple[Int64, Int64]:
+    """n/12 in lowest terms, with 0 as 0/1."""
+    var g = 12
+    while n % g != 0 or 12 % g != 0:
+        g -= 1
+    return (Int64(n // g), Int64(12 // g))
+
+
+def sweep_profiles_accepted() -> Bool:
+    """Every prefix of one to three sweep separators yields an accepted profile.
+    carrier_density_profile refuses a profile whose residue rises or whose
+    increments do not sum to its density, so acceptance is both identities."""
+    var picks = sweep_picks()
+    var subsets = List[List[Int]]()
+    for a in range(len(picks)):
+        subsets.append([a])
+        for b in range(a + 1, len(picks)):
+            subsets.append([a, b])
+            for c in range(b + 1, len(picks)):
+                subsets.append([a, b, c])
+    for chosen in subsets:
+        var level_n = List[Int64]()
+        var level_d = List[Int64]()
+        var ln = List[Int64]()
+        var ld = List[Int64]()
+        var rn = List[Int64]()
+        var rd = List[Int64]()
+        var tags = List[Int64]()
+        var co = List[Bool]()
+        for i in chosen:
+            var lo = _twelfth(picks[i][0])
+            var hi = _twelfth(picks[i][1])
+            level_n.append(1)
+            level_d.append(3)
+            ln.append(lo[0])
+            ld.append(lo[1])
+            rn.append(hi[0])
+            rd.append(hi[1])
+            tags.append(LANDING_RATIONAL_RAY)
+            co.append(True)
+        var profile = carrier_density_profile(level_n, level_d, ln, ld, rn, rd, tags, co)
+        if not (profile.accepted() and profile.depth() == len(chosen)):
+            return False
+    return True
+
+
 def _is(value: Q, num: Int64, den: Int64) -> Bool:
     return value.eq(Q(num, den))
 
@@ -270,8 +322,7 @@ def carrier_density_profile_smoke() -> Bool:
         return False
 
     # Basilica then rabbit: the second level decides 22/147 more, and the
-    # residue falls from 5/9 to 179/441. Both are asserted identically by
-    # reference/python/c1/carrier_density_profile_reference.py.
+    # residue falls from 5/9 to 179/441.
     var two_n: List[Int64] = [1, 1]
     var two_d: List[Int64] = [3, 7]
     var refined = _levels(two_n, two_d)
@@ -367,6 +418,9 @@ def carrier_density_profile_smoke() -> Bool:
     if not admissible_separator(LANDING_HYPERBOLIC_BOUNDARY, True, 1, 3, 2, 3):
         return False
     if admissible_separator(LANDING_RATIONAL_RAY, True, 1, 3, 1, 3):
+        return False
+    # Both identities on every prefix of every small catalogue the sweep draws.
+    if not sweep_profiles_accepted():
         return False
 
     return (
