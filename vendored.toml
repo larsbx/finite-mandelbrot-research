@@ -135,10 +135,11 @@ commit = "47bcf3ce40a9fac2c3279451f9e4687602f59bb0"
 root = "vendor/mojo"
 
 [package.files]
-"quadratic_orbit/__init__.mojo" = "4d8f371cf6378c9154f0f22e874b405c0c05a524904c6747ef385d48b9b4b49f"
+"quadratic_orbit/__init__.mojo" = "2b09ec0b7831dede81d2e9f7dbeee80630bcc5d010e70dedef2d833f63419ae6"
 "quadratic_orbit/collision.mojo" = "9c2a89dc89a715fef35619d95bc8b1abe5ef788c37de8180e39cc7de72621142"
+"quadratic_orbit/krawczyk_operator.mojo" = "28a6c3ea4177a9f014db43df025897ef47907cb9f754be19a4954a33befdf091"
 "quadratic_orbit/orbit.mojo" = "ce37cada4a11ba57c0f6d3d6008a69846ca3136c07d021a25b082410c1f8392b"
-"quadratic_orbit/preperiodic.mojo" = "5d010196a8f15232e664d48629bbf330747e1380e78e3dbde2e4c58d96073e2e"
+"quadratic_orbit/preperiodic.mojo" = "f55d6f89571fb20c402677ed7ece1053f946b5014b83a10dace9d056b8362322"
 
 [[package]]
 name = "rational_dynamics"
