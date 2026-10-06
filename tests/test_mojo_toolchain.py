@@ -99,6 +99,7 @@ def test_compiler_checked_boundary_is_explicit():
         "vendor/mojo/quadratic_orbit/collision.mojo",
         "vendor/mojo/quadratic_orbit/orbit.mojo",
         "vendor/mojo/rational_dynamics/rational.mojo",
+        "vendor/mojo/angle_doubling/angle.mojo",
     ]:
         assert path in boundary
     assert "Passing it does not imply that" in boundary

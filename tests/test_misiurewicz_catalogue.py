@@ -64,6 +64,20 @@ def test_the_smoke_checks_the_type_against_iterating_the_doubling_map():
     assert "if not type_agrees_with_doubling(120):" in src[src.index("def misiurewicz_catalogue_smoke"):]
 
 
+def test_the_catalogue_denominator_is_the_vendored_type_count():
+    """`2^l (2^k - 1)` is the vendored angle_doubling `type_count`; the type
+    itself stays local, because angle_doubling refuses periods past 64 while
+    `exact_type` reads every period up to its denominator bound (the smoke's
+    `1/107`, of period 106, among them)."""
+    src = text(SRC)
+    assert "from angle_doubling.angle import type_count" in src
+    assert "var den = Int(type_count(preperiod, period))" in src
+    angle = text(ROOT / "vendor/mojo/angle_doubling/angle.mojo")
+    assert "def type_count(l: Int, k: Int) -> Int64:" in angle
+    assert "return (Int64(1) << Int64(l)) * ((Int64(1) << Int64(k)) - 1)" in angle
+    assert "return 64" in angle[angle.index("def order_limit"):]
+
+
 def test_the_mojo_catalogue_case_passes(mojo_smoke):
     """The Mojo catalogue is checked by running it, not by reading its source.
 

@@ -59,6 +59,20 @@ nonnegative fraction. The Int64 checked addresses of
 `kernel/mojo/dynamics/checked_ray_address.mojo` stay local: upstream has no
 fixed-width equivalent.
 
+The catalogue denominator `2^l (2^k - 1)` of
+`kernel/mojo/certificates/misiurewicz_catalogue.mojo` is the vendored
+`angle_doubling` `type_count` (`vendor/mojo/angle_doubling/angle.mojo`): the
+addresses with `2^(l+k) t = 2^l t` are exactly the multiples of that
+denominator's reciprocal, and the local index and denominator bounds still
+apply first. Three local readings stay, because upstream's differ:
+`exact_type` reads every period up to its denominator bound `2^20`, while
+upstream `period` refuses past 64 (the smoke's brute-force check reaches
+`1/107`, of period 106); `angle_period` in `kernel/mojo/dynamics/angle_tuning.mojo`
+reads periods of denominators up to `2^62 - 1`, while upstream `Angle` refuses
+denominators past `2^30`; and `catalogue_count` counts the addresses of
+*exact* type `(l, k)` by Moebius inversion, which `type_count`, counting every
+address with `2^(l+k) t = 2^l t`, is not.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;

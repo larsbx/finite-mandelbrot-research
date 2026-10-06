@@ -58,6 +58,7 @@ The compiler-checked dependency closure currently consists of:
 - `vendor/mojo/quadratic_orbit/collision.mojo`.
 - `vendor/mojo/quadratic_orbit/orbit.mojo`.
 - `vendor/mojo/rational_dynamics/rational.mojo`.
+- `vendor/mojo/angle_doubling/angle.mojo`.
 
 A second compile target, `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`, imports
 `bigint_z`, `rat_q`, and `interval_q` and is executed by `pixi run property`,
