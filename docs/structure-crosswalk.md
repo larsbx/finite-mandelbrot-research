@@ -50,7 +50,7 @@ checked against the centre of `bulb-1/2`.
 - **Surface.** `docs/structure_crosswalk.json` is regenerated and compared in
   CI, and carries no float.
 
-All 81 occurrences pass against the `main` branch of every repository named.
+All 89 occurrences pass against the `main` branch of every repository named.
 
 ## 3. The surface for vizops
 
@@ -60,9 +60,10 @@ draws:
 
 - `classes`: one per atlas kind (`atlas/hyperbolic-component`, …) and one per
   plane (`kernel`, `reference`, `oracle`, `data`, `test`, `doc`, `view`, …);
-- `relations`: the six occurrence relations above and six atlas relations read
-  off the atlas's own fields (`satellite-of`, `generated-by`, `julia-set-of`,
-  `region-at`, `in-limb-of`, `boundary-of`);
+- `relations`: the six occurrence relations above and eight atlas relations
+  read off the atlas's own fields (`satellite-of`, `generated-by`,
+  `julia-set-of`, `region-at`, `in-limb-of`, `boundary-of`, `conjugate-of`,
+  `tuning-image-of`);
 - `nodes`: every atlas entry with its exact `key`, and every occurrence with
   its repository, path, locator, exactness and, for the emitter, the
   `atlas-dataset` section it `emits`;
@@ -74,19 +75,18 @@ identification is one this repository checks.
 
 ## 4. Coverage
 
-| Atlas id | Occurrences | Where |
-| --- | --- | --- |
-| `tip` | 10 | catalogue (1,1), Krawczyk and exclusion boxes, `R_{2,1}`, incidence package, kernels' orbit test, bulbs' certify test, vizops view |
-| `bulb-1/2` | 10 | emitter tunings and kneading, reference components, prefix-graph control, bulbs centre box and wake, cyclotomic and parabolic-index vectors |
-| `bulb-1/3` | 9 | emitter, reference, prefix-graph control, kernels' rabbit tuning pattern, bulbs centre box and wake, cyclotomic vector |
-| `bulb-1/4` | 9 | emitter kneading, bulbs centre box and wake, index vectors in three repositories, Julia corpus `parabolic_i`, jet order 5 |
-| `bulb-1/2.1/2` | 6 | emitter, reference, kernels' `sat4`, the bulbs antipode box at `c = −5/4` |
-| `principal-misiurewicz-1/3` | 6 | `M_{4,1}` throughout: Theta, separator, orbits, exclusion boxes, catalogue (3,3) |
-| `airplane-component` | 5 | emitter, reference, Julia kneading at the root `−7/4` |
-| `bulb-2/3`, `c-i`, `c-minus-i`, `main-cardioid` | 4 each | emitter, catalogues, bulbs, Julia corpus, index fixtures |
-| `basilica`, `douady-rabbit`, `feigenbaum-cascade` | 3 each | carrier addresses, density levels, tuning cascades |
-| `airplane`, `kokopelli-component`, `cauliflower`, `san-marco`, `dendrite`, `chebyshev-segment`, `golden-mean-siegel` | 1–2 | corpus rows, emitter kneading, convergent certificates |
-| `co-rabbit`, `kokopelli`, `siegel-disk`, the six valleys | 0 | named only in the atlas and in literature prose |
+Every one of the 30 named structures that is not a class name meets the code;
+`tests/test_structure_crosswalk.py` requires it.
+
+| Atlas id | Where |
+| --- | --- |
+| `tip` | catalogue (1,1), Krawczyk and exclusion boxes, `R_{2,1}`, incidence package, kernels' orbit test, bulbs' certify test, vizops view |
+| `bulb-1/2`, `bulb-1/3`, `bulb-1/4`, `bulb-2/3` | emitter tunings and kneading, reference components, prefix-graph controls, `limb_streams`, bulbs centre boxes and wakes, cyclotomic and parabolic-index vectors, the Julia corpus |
+| `bulb-1/2.1/2`, `airplane-component`, `kokopelli-component` | emitter, reference, kernels' tuning patterns, the bulbs antipode box at `c = −5/4`, Julia kneading at `−7/4` |
+| `principal-misiurewicz-1/3` | `M_{4,1}` throughout: Theta, separator, orbits, exclusion boxes, catalogue (3,3) |
+| `main-cardioid`, `c-i`, `c-minus-i`, `feigenbaum-cascade` | catalogues, corpus rows, index fixtures, tuning cascades |
+| the ten Julia-set names | corpus rows, carrier addresses, density levels, certificate rows of their parameters |
+| the six valleys, `golden-mean-siegel` | `pixi run structure-streams` (`docs/structure-streams.md`), and the bulbs certificates of the convergent limbs |
 
 ## 5. What the survey found that is not yet mapped
 
@@ -106,6 +106,9 @@ identification is one this repository checks.
     (`7/15, 8/15`, centre near `−1.9408`) are named in the emitter and in vizops.
   - The type-(2,1) angles `1/4, 3/4` and their cubic `C³ + 2C² + 2C + 2`.
   - `critical_orbit_type = [3, 1]` for `principal-misiurewicz-1/3`.
+- **The rest of the ten.** The valleys and the golden-mean parameter became
+  finite objects as limb sequences, and the co-rabbit a conjugate; see
+  `docs/structure-streams.md`.
 
 ## 6. Adding an occurrence
 

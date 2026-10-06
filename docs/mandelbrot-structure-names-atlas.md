@@ -34,6 +34,8 @@ The defining family is `f_c(z) = z^2 + c` with critical point `0`
 | `landing_cycle` | the ray cycle the angles fall into after `ℓ` doublings | forward images contained in it; it is closed under doubling |
 | `limb` | the main-cardioid limb that contains the angles | angles strictly inside the `p/q`-wake |
 | `accumulation` | limbs of `parent` whose rotation numbers tend to `rotation` along Farey sequences | root angles strictly monotone toward the target |
+| `conjugate_of` | the entry is the complex conjugate of another | angles negated (`θ ↦ −θ` mod 1), period, address and centre polynomial equal, rotations mirrored, Gaussian parameter conjugated; for a Julia set, its parameter's conjugate |
+| `tuning_of` | a region is the image of a main-cardioid region under tuning by a component | every tuned limb of the image has period `n q`, one kneading sequence on both rays, and internal address that of the component extended by `n q`, read off the kneading sequence |
 
 Conventions. Angles are in `Q/Z`, written in `[0, 1)`. Munafo's `R2` names
 (Mu-Ency) are given where the folk names come from there: `R2a` is the main
@@ -150,6 +152,16 @@ monotonically toward the target root (checked to six Farey steps).
 | <a id="quad-spiral-valley"></a>`quad-spiral-valley` | Quad Spiral Valley | `main-cardioid` and `bulb-1/4` (mirror: 3/4-bulb) | main-cardioid limbs → `1/4` | `R2.C(1/4)` | Munafo 1997 |
 | <a id="scepter-valley"></a>`scepter-valley` | Scepter Valley, Seahorse Valley West | `bulb-1/2` and `bulb-1/2.1/2` at `c = −5/4` | 1/2-bulb limbs → `1/2` | `R2.1/2.C(1/2)` | Munafo |
 
+Two valleys are tuning images of others, checked as `tuning_of`: Scepter
+Valley is Seahorse Valley tuned by the 1/2-bulb's rays `(1/3, 2/3)`, and
+Double Spiral Valley is Elephant Valley tuned the same way. The image is
+combinatorial: tuning by a satellite component sends the cusp of the main
+cardioid to a root that is not a cusp, so the limb sequences correspond while
+the pictures differ.
+
+Each valley's limb sequence is printed exactly by `pixi run
+structure-streams` and studied in `docs/structure-streams.md`.
+
 The motifs that give valleys their names — seahorses, peacock eyes,
 elephants, spirals — are features of pictures at particular zooms. They have
 no exact key and are not entries.
@@ -177,7 +189,11 @@ parameter (eponym). The main-cardioid boundary parameter of internal angle
 `(√5 − 1)/2`, a classical referent with no finite key of its own. Its finite
 shadow is the chain of limbs it is the limit of, with rotation numbers the
 continued-fraction convergents `1/1, 1/2, 2/3, 3/5, 5/8, 8/13, …`, each
-consecutive pair Farey neighbours (checked).
+consecutive pair Farey neighbours (checked). `pixi run structure-streams`
+prints these limbs exactly up to `q = 34`.
+
+The co-rabbit is the complex conjugate of the rabbit (`conjugate_of`), as the
+2/3-bulb is of the 1/3-bulb and `c = −i` of `c = i`.
 
 ## 8. What a name does not carry
 

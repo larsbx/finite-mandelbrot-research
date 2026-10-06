@@ -231,26 +231,114 @@ def farey_neighbours(r: Fraction) -> tuple[Fraction | None, Fraction | None]:
     return (below if r > 0 else None, above if r < 1 else None)
 
 
+def farey_stream(r: Fraction) -> list[tuple[str, Fraction]]:
+    """Rotation numbers tending to `r` along its Farey parents, `(side, s)` with side "below" or "above",
+    to ACCUMULATION_DEPTH terms within MAX_ROTATION_DENOMINATOR."""
+    below, above = farey_neighbours(r)
+    return [
+        (side, Fraction(n * r.numerator + nb.numerator, n * r.denominator + nb.denominator))
+        for side, nb in (("below", below), ("above", above)) if nb is not None
+        for n in range(1, ACCUMULATION_DEPTH + 1)
+        if n * r.denominator + nb.denominator <= MAX_ROTATION_DENOMINATOR
+    ]
+
+
 def accumulation_errors(parent: dict, r: Fraction) -> list[str]:
     """The limbs of `parent` whose rotation numbers tend to `r` along Farey sequences have root
     angles that move strictly monotonically toward the root angles of the `r`-limb."""
-    below, above = farey_neighbours(r)
     target = limb_angles(parent, r)
     errors = []
-    for side, neighbour, pick, bound_ok, step_ok in (
-        ("below", below, 0, lambda a: a < target[0], lambda a, b: a < b),
-        ("above", above, 1, lambda a: a > target[1], lambda a, b: a > b),
+    for side, pick, bound_ok, step_ok in (
+        ("below", 0, lambda a: a < target[0], lambda a, b: a < b),
+        ("above", 1, lambda a: a > target[1], lambda a, b: a > b),
     ):
-        if neighbour is None:
-            continue
-        seq = [
-            Fraction(n * r.numerator + neighbour.numerator, n * r.denominator + neighbour.denominator)
-            for n in range(1, ACCUMULATION_DEPTH + 1)
-            if n * r.denominator + neighbour.denominator <= MAX_ROTATION_DENOMINATOR
-        ]
-        ends = [limb_angles(parent, s)[pick] for s in seq]
+        ends = [limb_angles(parent, s)[pick] for d, s in farey_stream(r) if d == side]
         if not all(bound_ok(a) for a in ends) or not all(step_ok(a, b) for a, b in zip(ends, ends[1:])):
             errors.append(f"limbs accumulating on {r} from {side} are not monotone toward it")
+    return errors
+
+
+# --- relations between entries ----------------------------------------------
+
+def conjugate_angles(angles) -> list[Fraction]:
+    """Complex conjugation acts on external angles as theta -> -theta modulo one."""
+    return sorted((1 - Fraction(a)) % 1 for a in angles)
+
+
+def _same_if_both(e: dict, f: dict, key: str) -> bool:
+    return key not in e or key not in f or e[key] == f[key]
+
+
+def _mirrored_if_both(e: dict, f: dict, key: str) -> bool:
+    return key not in e or key not in f or (1 - Fraction(e[key])) % 1 == Fraction(f[key])
+
+
+def conjugate_errors(e: dict, f: dict, by_id: dict) -> list[str]:
+    """`f` is the complex conjugate of `e`: angles negated, the real data equal, rotations mirrored;
+    a named Julia set is the conjugate of another when their parameters are. An entry is its own
+    conjugate only when its angles are symmetric (a real structure)."""
+    if e["kind"] != f["kind"]:
+        return [f"conjugate of a {f['kind']} cannot be a {e['kind']}"]
+    if e["kind"] == "julia-set":
+        if e["at"] != f["at"]:
+            return ["conjugate Julia sets sit at different places of their components"]
+        return conjugate_errors(by_id[e["parameter_of"]], by_id[f["parameter_of"]], by_id)
+    field = {"hyperbolic-component": "root_angles", "misiurewicz-parameter": "angles"}.get(e["kind"])
+    if field is None:
+        return [f"conjugation is not checked for a {e['kind']}"]
+    errors = [] if conjugate_angles(e[field]) == sorted(angle(a) for a in f[field]) else [f"{field} are not negated"]
+    errors += [f"{k} differs" for k in ("period", "internal_address", "center_polynomial", "angle_type", "parent")
+               if not _same_if_both(e, f, k)]
+    errors += [f"{k} is not mirrored" for k in ("rotation", "limb") if not _mirrored_if_both(e, f, k)]
+    if "parameter" in e and "parameter" in f:
+        (x, y), (u, v) = (tuple(Fraction(t) for t in e["parameter"]), tuple(Fraction(t) for t in f["parameter"]))
+        errors += [] if (x, -y) == (u, v) else ["parameter is not conjugated"]
+    return errors
+
+
+def tuning_image_terms(image: dict, by: dict, by_id: dict) -> list[dict]:
+    """The terms of a main-cardioid accumulation stream tuned by the component `by`: rotation, the two
+    tuned root angles, their period, and the internal address read off the kneading sequence."""
+    r = Fraction(image["accumulation"]["rotation"])
+    lo, hi = root_pair(by)
+    terms = []
+    for _, s in farey_stream(r):
+        tuned = tuple(kr.tune_angle(lo, hi, t) for t in rotation_angles(s))
+        terms.append({"rotation": s, "angles": tuned, "periods": [kr.period(t) for t in tuned],
+                      "kneading_agrees": kr.kneading_prefix(tuned[0]) == kr.kneading_prefix(tuned[1]),
+                      "address": internal_address(tuned[0])})
+    return terms
+
+
+def tuning_of_errors(e: dict, by_id: dict) -> list[str]:
+    """A region declared the image of another under tuning by a component: the image accumulates on the
+    main cardioid, this region accumulates on the component at the same rotation, and every tuned term is
+    a satellite of the component (period n q, one kneading sequence, address extended by n q)."""
+    rel = e["tuning_of"]
+    image, by = by_id.get(rel["image_of"]), by_id.get(rel["by"])
+    if image is None or by is None or image["kind"] != "region" or by["kind"] != "hyperbolic-component":
+        return ["tuning_of names no region and component"]
+    if image["accumulation"]["parent"] != "main-cardioid":
+        return ["a tuning image is taken of a main-cardioid accumulation"]
+    if e["accumulation"] != {"parent": rel["by"], "rotation": image["accumulation"]["rotation"]}:
+        return ["accumulation is not the image's, moved onto the tuning component"]
+    n = by["period"]
+    return [
+        f"tuned term {t['rotation']} is not a satellite of {rel['by']}"
+        for t in tuning_image_terms(image, by, by_id)
+        if t["periods"] != [n * t["rotation"].denominator] * 2 or not t["kneading_agrees"]
+        or t["address"] != by["internal_address"] + [n * t["rotation"].denominator]
+        or t["angles"] != limb_angles(by, t["rotation"])
+    ]
+
+
+def relation_errors(e: dict, by_id: dict) -> list[str]:
+    errors = []
+    if "conjugate_of" in e:
+        f = by_id.get(e["conjugate_of"])
+        errors += ["unknown conjugate_of"] if f is None else conjugate_errors(e, f, by_id)
+    if "tuning_of" in e:
+        errors += tuning_of_errors(e, by_id)
     return errors
 
 
@@ -354,7 +442,7 @@ CHECKS = {
 def check_entry(entry: dict, by_id: dict) -> list[str]:
     if not entry.get("names"):
         return ["no names"]
-    return [f"{entry['id']}: {m}" for m in CHECKS[entry["kind"]](entry, by_id)]
+    return [f"{entry['id']}: {m}" for m in CHECKS[entry["kind"]](entry, by_id) + relation_errors(entry, by_id)]
 
 
 def load(path: Path = TABLE) -> list[dict]:

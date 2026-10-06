@@ -50,7 +50,7 @@ ANGLE_SETS = ("root_angles", "angles", "landing_cycle", "convergents")
 RATIONALS = ("root_parameter", "rotation", "limb")
 #: Fields compared for equality as written (integers, nested lists).
 LITERALS = ("period", "internal_address", "center_polynomial", "angle_type", "critical_orbit_type")
-DATUM_FIELDS = ANGLE_SETS + RATIONALS + LITERALS + ("parameter", "levels", "center")
+DATUM_FIELDS = ANGLE_SETS + RATIONALS + LITERALS + ("parameter", "levels", "center", "accumulation")
 
 #: Edges from an occurrence to the atlas, and what each one asserts.
 OCCURRENCE_RELATIONS = {
@@ -71,6 +71,8 @@ ATLAS_RELATIONS = {
     "region-at": "a valley lies at the seam of the components in `between`",
     "in-limb-of": "a Misiurewicz parameter lies in the `limb` of the main cardioid",
     "boundary-of": "a boundary parameter lies on its `parent`",
+    "conjugate-of": "the complex conjugate of `conjugate_of`: angles negated, real data equal",
+    "tuning-image-of": "a region is the image of `tuning_of.image_of` under tuning by `tuning_of.by`",
 }
 PLANES = {
     "kernel": "canonical executable code (Mojo)",
@@ -135,6 +137,8 @@ def field_errors(name: str, value, entry: dict) -> list[str]:
         ok = bool(value) and _rationals(value) <= _rationals(atlas)
     elif name in RATIONALS:
         ok = Fraction(value) == Fraction(atlas)
+    elif name == "accumulation":
+        ok = value["parent"] == atlas["parent"] and Fraction(value["rotation"]) == Fraction(atlas["rotation"])
     elif name == "parameter":
         ok = _gaussian(value) == _gaussian(atlas)
     elif name == "levels":
@@ -216,13 +220,15 @@ def atlas_edges(atlas: dict[str, dict]) -> list[dict]:
         pairs += [(e["id"], "generated-by", e["generator"])] if "generator" in e else []
         pairs += [(e["id"], "julia-set-of", e["parameter_of"])] if "parameter_of" in e else []
         pairs += [(e["id"], "region-at", t) for t in e.get("between", ())]
+        pairs += [(e["id"], "conjugate-of", e["conjugate_of"])] if "conjugate_of" in e else []
+        pairs += [(e["id"], "tuning-image-of", e["tuning_of"]["image_of"])] if "tuning_of" in e else []
         if "limb" in e and (t := _in_limb_target(e["limb"], atlas)):
             pairs.append((e["id"], "in-limb-of", t))
     return [{"source": s, "relation": r, "target": t} for s, r, t in pairs]
 
 
 def _atlas_node(e: dict) -> dict:
-    key = {k: e[k] for k in DATUM_FIELDS + ("center_interval",) if k in e}
+    key = {k: e[k] for k in DATUM_FIELDS + ("center_interval", "conjugate_of", "tuning_of") if k in e}
     return {"id": e["id"], "class": f"atlas/{e['kind']}", "label": e["names"][0], "names": e["names"],
             "name_status": e["name_status"], **({"key": key} if key else {})}
 

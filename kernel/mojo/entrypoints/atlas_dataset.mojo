@@ -20,6 +20,7 @@
 # Usage: pixi run atlas-dataset > dataset.json
 
 from dynamics.angle_tuning import angle_period, binary_block, tuned_angle
+from entrypoints.json_text import arr, field, flag, ints, joined, obj, pair, quoted
 from certificates.c_minus_2.bigq_certificate_incidence import bigq_c_minus_2_certificate_incidence
 from c1.wake.misiurewicz_prefix_graph import (
     RATIONAL_RAY_LANDING,
@@ -42,53 +43,6 @@ from certificates.misiurewicz_catalogue import (
 
 comptime MAX_PERIOD = 5
 comptime MAX_PREPERIOD = 3
-
-
-# --- JSON, written by hand because the objects are small and flat ---------------
-
-
-def quoted(s: String) -> String:
-    return '"' + s + '"'
-
-
-def flag(b: Bool) -> String:
-    return "true" if b else "false"
-
-
-def ints(xs: List[Int]) -> String:
-    var out = String("[")
-    for i in range(len(xs)):
-        if i > 0:
-            out += ","
-        out += String(xs[i])
-    out += "]"
-    return out^
-
-
-def pair(a: Int, b: Int) -> String:
-    return "[" + String(a) + "," + String(b) + "]"
-
-
-def field(name: String, value: String) -> String:
-    return quoted(name) + ":" + value
-
-
-def joined(parts: List[String], open: String, close: String) -> String:
-    var out = open
-    for i in range(len(parts)):
-        if i > 0:
-            out += ","
-        out += parts[i]
-    out += close
-    return out^
-
-
-def obj(parts: List[String]) -> String:
-    return joined(parts, "{", "}")
-
-
-def arr(parts: List[String]) -> String:
-    return joined(parts, "[", "]")
 
 
 # --- the catalogue: the identity against the enumeration ------------------------

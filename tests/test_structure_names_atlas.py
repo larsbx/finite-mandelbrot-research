@@ -118,3 +118,48 @@ def test_doc_passes_terminology_audit() -> None:
         [sys.executable, "tools/audit_terminology.py"], cwd=ROOT, capture_output=True, text=True, check=False,
     )
     assert result.returncode == 0, result.stdout
+
+
+# Relations between entries: complex conjugation and tuning images.
+
+def test_declared_relations_are_present() -> None:
+    assert BY_ID["bulb-2/3"]["conjugate_of"] == "bulb-1/3"
+    assert BY_ID["c-minus-i"]["conjugate_of"] == "c-i"
+    assert BY_ID["co-rabbit"]["conjugate_of"] == "douady-rabbit"
+    assert BY_ID["scepter-valley"]["tuning_of"] == {"image_of": "seahorse-valley", "by": "bulb-1/2"}
+    assert BY_ID["double-spiral-valley"]["tuning_of"] == {"image_of": "elephant-valley", "by": "bulb-1/2"}
+
+
+def test_conjugation_maps_angles_to_their_negatives() -> None:
+    F = Fraction
+    assert sn.conjugate_angles([F(1, 7), F(2, 7)]) == [F(5, 7), F(6, 7)]
+    assert sn.conjugate_angles([F(0)]) == [F(0)]
+
+
+@pytest.mark.parametrize(
+    "entry_id, wrong",
+    [("bulb-2/3", "bulb-1/4"), ("c-minus-i", "tip"), ("co-rabbit", "basilica"), ("bulb-2/3", "no-such-entry")],
+)
+def test_wrong_conjugate_is_refused(entry_id: str, wrong: str) -> None:
+    assert sn.check_entry({**BY_ID[entry_id], "conjugate_of": wrong}, BY_ID) != []
+
+
+def test_a_component_is_not_its_own_conjugate_unless_real() -> None:
+    assert sn.check_entry({**BY_ID["bulb-1/3"], "conjugate_of": "bulb-1/3"}, BY_ID) != []
+
+
+def test_tuning_image_terms_are_satellites_of_the_tuning_component() -> None:
+    """Each tuned term of the image has period n q, one kneading sequence on both
+    rays, and internal address that of the tuning component extended by n q --
+    read off the kneading sequence, independent of how the angles were tuned."""
+    terms = sn.tuning_image_terms(BY_ID["seahorse-valley"], BY_ID["bulb-1/2"], BY_ID)
+    assert terms and all(t["address"] == [1, 2, 2 * t["rotation"].denominator] for t in terms)
+
+
+@pytest.mark.parametrize(
+    "wrong",
+    [{"image_of": "seahorse-valley", "by": "bulb-1/3"}, {"image_of": "triple-spiral-valley", "by": "bulb-1/2"},
+     {"image_of": "no-such-valley", "by": "bulb-1/2"}],
+)
+def test_wrong_tuning_image_is_refused(wrong: dict) -> None:
+    assert sn.check_entry({**BY_ID["scepter-valley"], "tuning_of": wrong}, BY_ID) != []

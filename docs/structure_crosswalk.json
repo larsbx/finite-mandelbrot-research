@@ -121,6 +121,14 @@
     {
       "id": "boundary-of",
       "name": "a boundary parameter lies on its `parent`"
+    },
+    {
+      "id": "conjugate-of",
+      "name": "the complex conjugate of `conjugate_of`: angles negated, real data equal"
+    },
+    {
+      "id": "tuning-image-of",
+      "name": "a region is the image of `tuning_of.image_of` under tuning by `tuning_of.by`"
     }
   ],
   "nodes": [
@@ -427,7 +435,8 @@
           1,
           2,
           1
-        ]
+        ],
+        "conjugate_of": "bulb-1/3"
       }
     },
     {
@@ -682,7 +691,8 @@
         "parameter": [
           "0",
           "-1"
-        ]
+        ],
+        "conjugate_of": "c-i"
       }
     },
     {
@@ -738,7 +748,13 @@
       "names": [
         "Seahorse Valley"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/2"
+        }
+      }
     },
     {
       "id": "double-spiral-valley",
@@ -747,7 +763,17 @@
       "names": [
         "Double Spiral Valley"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "bulb-1/2",
+          "rotation": "0/1"
+        },
+        "tuning_of": {
+          "image_of": "elephant-valley",
+          "by": "bulb-1/2"
+        }
+      }
     },
     {
       "id": "elephant-valley",
@@ -756,7 +782,13 @@
       "names": [
         "Elephant Valley"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "0/1"
+        }
+      }
     },
     {
       "id": "triple-spiral-valley",
@@ -765,7 +797,13 @@
       "names": [
         "Triple Spiral Valley"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/3"
+        }
+      }
     },
     {
       "id": "quad-spiral-valley",
@@ -774,7 +812,13 @@
       "names": [
         "Quad Spiral Valley"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/4"
+        }
+      }
     },
     {
       "id": "scepter-valley",
@@ -784,7 +828,17 @@
         "Scepter Valley",
         "Seahorse Valley West"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "accumulation": {
+          "parent": "bulb-1/2",
+          "rotation": "1/2"
+        },
+        "tuning_of": {
+          "image_of": "seahorse-valley",
+          "by": "bulb-1/2"
+        }
+      }
     },
     {
       "id": "cauliflower",
@@ -832,7 +886,10 @@
         "co-rabbit",
         "anti-rabbit"
       ],
-      "name_status": "folk"
+      "name_status": "folk",
+      "key": {
+        "conjugate_of": "douady-rabbit"
+      }
     },
     {
       "id": "airplane",
@@ -1236,6 +1293,140 @@
         ]
       },
       "note": "The package is valid at every half-width and the certificate is still not emitted; proves_c1 is false."
+    },
+    {
+      "id": "fmr-streams-elephant-valley",
+      "class": "kernel",
+      "label": "limbs 1/(n+1) of the main cardioid, toward the cusp",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"elephant-valley\", \"main-cardioid\", 1, zero, zero, 0, 1",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "0/1"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-seahorse-valley",
+      "class": "kernel",
+      "label": "limbs n/(2n+1) and (n+1)/(2n+1) of the main cardioid, toward the 1/2 root",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"seahorse-valley\", \"main-cardioid\", 1, zero, zero, 1, 2",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/2"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-triple-spiral-valley",
+      "class": "kernel",
+      "label": "main-cardioid limbs toward the 1/3 root",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"triple-spiral-valley\", \"main-cardioid\", 1, zero, zero, 1, 3",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/3"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-quad-spiral-valley",
+      "class": "kernel",
+      "label": "main-cardioid limbs toward the 1/4 root",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"quad-spiral-valley\", \"main-cardioid\", 1, zero, zero, 1, 4",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "main-cardioid",
+          "rotation": "1/4"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-double-spiral-valley",
+      "class": "kernel",
+      "label": "limbs 1/(n+1) of the 1/2-bulb toward its root: the elephant stream tuned by (1/3, 2/3)",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"double-spiral-valley\", \"bulb-1/2\", 2, half_lo, half_hi, 0, 1",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "bulb-1/2",
+          "rotation": "0/1"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-scepter-valley",
+      "class": "kernel",
+      "label": "1/2-bulb limbs toward its 1/2 root: the seahorse stream tuned by (1/3, 2/3)",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "\"scepter-valley\", \"bulb-1/2\", 2, half_lo, half_hi, 1, 2",
+      "exactness": "exact",
+      "emits": "structure-streams:valleys",
+      "datum": {
+        "accumulation": {
+          "parent": "bulb-1/2",
+          "rotation": "1/2"
+        }
+      }
+    },
+    {
+      "id": "fmr-streams-golden-mean",
+      "class": "kernel",
+      "label": "golden-mean convergent limbs F_n/F_{n+1}, q <= 34, consecutive pairs Farey-adjacent",
+      "relation": "computes",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/entrypoints/structure_streams.mojo",
+      "anchor": "def convergents_section() raises -> String:",
+      "exactness": "exact",
+      "emits": "structure-streams:convergents",
+      "datum": {
+        "convergents": [
+          "1/2",
+          "2/3",
+          "3/5",
+          "5/8",
+          "8/13"
+        ]
+      },
+      "note": "The Siegel parameter is the limit of these limbs and has no finite key; that bounded type gives a Siegel disk is the imported theorem (Siegel 1942)."
+    },
+    {
+      "id": "fmr-kernel-limb-streams",
+      "class": "kernel",
+      "label": "main-cardioid limbs read off the rotation itinerary; limbs elsewhere by tuning",
+      "relation": "names",
+      "repo": "larsbx/finite-mandelbrot-research",
+      "path": "kernel/mojo/dynamics/limb_streams.mojo",
+      "anchor": "def limb_streams_smoke() -> Bool:",
+      "exactness": "exact",
+      "note": "Pinned in the smoke suite: 1/2, 1/3, 2/3, 1/4, 2/5, 3/8 and the 1/2-bulb's 1/2- and 1/3-limbs."
     },
     {
       "id": "fmr-kernel-catalogue-smoke-tip",
@@ -1778,7 +1969,7 @@
     {
       "id": "bulbs-center-2/3",
       "class": "data",
-      "label": "certified centre box of B_{2/3}",
+      "label": "certified centre box of B_{2/3}, the co-rabbit parameter",
       "relation": "certifies",
       "repo": "larsbx/mandelbrot-bulbs-and-ford-circles-research",
       "path": "experiments/data/center_certificates.json",
@@ -2322,6 +2513,11 @@
       "target": "main-cardioid"
     },
     {
+      "source": "bulb-2/3",
+      "relation": "conjugate-of",
+      "target": "bulb-1/3"
+    },
+    {
       "source": "bulb-1/4",
       "relation": "satellite-of",
       "target": "main-cardioid"
@@ -2345,6 +2541,11 @@
       "source": "c-i",
       "relation": "in-limb-of",
       "target": "bulb-1/3"
+    },
+    {
+      "source": "c-minus-i",
+      "relation": "conjugate-of",
+      "target": "c-i"
     },
     {
       "source": "c-minus-i",
@@ -2382,6 +2583,11 @@
       "target": "bulb-1/2"
     },
     {
+      "source": "double-spiral-valley",
+      "relation": "tuning-image-of",
+      "target": "elephant-valley"
+    },
+    {
       "source": "elephant-valley",
       "relation": "region-at",
       "target": "main-cardioid"
@@ -2417,6 +2623,11 @@
       "target": "bulb-1/2.1/2"
     },
     {
+      "source": "scepter-valley",
+      "relation": "tuning-image-of",
+      "target": "seahorse-valley"
+    },
+    {
       "source": "cauliflower",
       "relation": "julia-set-of",
       "target": "main-cardioid"
@@ -2440,6 +2651,11 @@
       "source": "co-rabbit",
       "relation": "julia-set-of",
       "target": "bulb-2/3"
+    },
+    {
+      "source": "co-rabbit",
+      "relation": "conjugate-of",
+      "target": "douady-rabbit"
     },
     {
       "source": "airplane",
@@ -2527,6 +2743,11 @@
       "target": "kokopelli-component"
     },
     {
+      "source": "fmr-emitter-kneading-kokopelli",
+      "relation": "contains",
+      "target": "kokopelli"
+    },
+    {
       "source": "fmr-emitter-catalogue-tip",
       "relation": "contains",
       "target": "tip"
@@ -2550,6 +2771,71 @@
       "source": "fmr-emitter-incidence-tip",
       "relation": "certifies",
       "target": "tip"
+    },
+    {
+      "source": "fmr-streams-elephant-valley",
+      "relation": "computes",
+      "target": "elephant-valley"
+    },
+    {
+      "source": "fmr-streams-seahorse-valley",
+      "relation": "computes",
+      "target": "seahorse-valley"
+    },
+    {
+      "source": "fmr-streams-triple-spiral-valley",
+      "relation": "computes",
+      "target": "triple-spiral-valley"
+    },
+    {
+      "source": "fmr-streams-quad-spiral-valley",
+      "relation": "computes",
+      "target": "quad-spiral-valley"
+    },
+    {
+      "source": "fmr-streams-double-spiral-valley",
+      "relation": "computes",
+      "target": "double-spiral-valley"
+    },
+    {
+      "source": "fmr-streams-scepter-valley",
+      "relation": "computes",
+      "target": "scepter-valley"
+    },
+    {
+      "source": "fmr-streams-golden-mean",
+      "relation": "computes",
+      "target": "golden-mean-siegel"
+    },
+    {
+      "source": "fmr-streams-golden-mean",
+      "relation": "computes",
+      "target": "siegel-disk"
+    },
+    {
+      "source": "fmr-kernel-limb-streams",
+      "relation": "names",
+      "target": "bulb-1/2"
+    },
+    {
+      "source": "fmr-kernel-limb-streams",
+      "relation": "names",
+      "target": "bulb-1/3"
+    },
+    {
+      "source": "fmr-kernel-limb-streams",
+      "relation": "names",
+      "target": "bulb-2/3"
+    },
+    {
+      "source": "fmr-kernel-limb-streams",
+      "relation": "names",
+      "target": "bulb-1/4"
+    },
+    {
+      "source": "fmr-kernel-limb-streams",
+      "relation": "names",
+      "target": "bulb-1/2.1/2"
     },
     {
       "source": "fmr-kernel-catalogue-smoke-tip",
@@ -2740,6 +3026,11 @@
       "source": "bulbs-center-2/3",
       "relation": "certifies",
       "target": "bulb-2/3"
+    },
+    {
+      "source": "bulbs-center-2/3",
+      "relation": "certifies",
+      "target": "co-rabbit"
     },
     {
       "source": "bulbs-center-1/4",

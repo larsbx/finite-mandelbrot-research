@@ -67,6 +67,22 @@ def test_derived_atlas_edges() -> None:
     assert ("seahorse-valley", "region-at", "bulb-1/2") in edges
     assert ("c-i", "in-limb-of", "bulb-1/3") in edges
     assert ("golden-mean-siegel", "boundary-of", "main-cardioid") in edges
+    assert ("bulb-2/3", "conjugate-of", "bulb-1/3") in edges
+    assert ("co-rabbit", "conjugate-of", "douady-rabbit") in edges
+    assert ("scepter-valley", "tuning-image-of", "seahorse-valley") in edges
+    assert ("double-spiral-valley", "tuning-image-of", "elephant-valley") in edges
+
+
+def test_every_atlas_instance_meets_the_code() -> None:
+    """Each named structure other than a class name has at least one occurrence."""
+    met = {a for o in OCCURRENCES for a in o["atlas"]}
+    assert {i for i, e in ATLAS.items() if e["kind"] != "class"} <= met
+
+
+def test_accumulation_datum_is_compared_exactly() -> None:
+    occ = _occ(atlas=["scepter-valley"], datum={"accumulation": {"parent": "bulb-1/2", "rotation": "2/4"}})
+    assert cw.datum_errors(occ, ATLAS) == []
+    assert cw.datum_errors({**occ, "datum": {"accumulation": {"parent": "main-cardioid", "rotation": "1/2"}}}, ATLAS) != []
 
 
 # Negative controls: the checks must refuse what is wrong.
