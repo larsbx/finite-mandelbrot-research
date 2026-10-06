@@ -17,8 +17,8 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from source_tokens import mask_comments_and_strings  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "vendor" / "python"))
+from claim_governance.lexing import mask_comments_and_strings  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_REL = "docs/rational-interval-arithmetic-spec.md"

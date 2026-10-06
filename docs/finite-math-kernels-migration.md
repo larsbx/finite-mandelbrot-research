@@ -73,6 +73,15 @@ denominators past `2^30`; and `catalogue_count` counts the addresses of
 *exact* type `(l, k)` by Moebius inversion, which `type_count`, counting every
 address with `2^(l+k) t = 2^l t`, is not.
 
+The lexical audits (`tools/audit_no_trig.py`, `tools/audit_no_points.py`,
+`tools/audit_exact_arithmetic.py`) and the source-reading tests mask comments
+and strings with the vendored `claim_governance.lexing.mask_comments_and_strings`;
+the local `tools/source_tokens.py` was removed. The two maskers produced
+byte-identical output on every `.py`, `.mojo`, `.md`, `.toml` and `.tex` file
+in the repository when the swap was made. They differ only where the local
+copy mis-lexed: upstream keeps a backslash-continued single-quoted string open
+and does not close a triple-quoted string at an escaped quote.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;

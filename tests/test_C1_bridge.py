@@ -6,7 +6,7 @@ DOC = ROOT / "docs" / "C1_finite_classical_dictionary.md"
 SRC = ROOT / "kernel/mojo/c1/bridge/bridge.mojo"
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "vendor" / "python"))
-from source_tokens import mask_comments_and_strings
+from claim_governance.lexing import mask_comments_and_strings
 
 
 def read(path: Path) -> str:
