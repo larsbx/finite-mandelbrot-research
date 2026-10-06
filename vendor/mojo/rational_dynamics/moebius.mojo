@@ -8,9 +8,11 @@
 # number theory reads it through Moebius inversion over the divisors of
 # 2^k - 1 (doubling.exact_type_count).
 #
-# Mirrors `moebius` of the Python plane `oracles/rational_dynamics_py/arithmetic.py`,
-# which is its independent reference. Machine `Int` in, machine `Int` out: the
-# value is -1, 0 or 1 and trial division never forms a product past `n`.
+# Mirrors `moebius` of the Python plane `oracles/rational_dynamics_py/moebius_function.py`,
+# which is its independent reference. This is the one Mojo implementation:
+# finite_polynomial.moebius_function re-exports it, also as `mobius_mu`.
+# Machine `Int` in, machine `Int` out: the value is -1, 0 or 1 and trial
+# division never forms a product past `n`.
 
 
 def moebius(n: Int) raises -> Int:
