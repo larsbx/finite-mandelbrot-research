@@ -23,7 +23,26 @@ The same pin also vendors the monorepo's `substitution_dynamics` tuning,
 directive-prefix, and column-coincidence modules under
 `vendor/mojo/substitution_dynamics/`, consumed by `kernel/mojo/c1/residual/residual_directive_carrier.mojo`
 (`docs/C1_residual_directive_carrier.md`); the balanced-pair and automaton
-modules are not vendored.
+modules are not vendored. `continuation_last_letter` in that file is a thin
+adapter over the vendored closed form `continuation_twist`
+(`vendor/mojo/substitution_dynamics/tuning.mojo`; letter `0` exactly when the
+twist is on): its brute-force body, which built both continuations and kept the
+one whose internal address contains the period, was removed. The two agreed on
+every 0/1 word of length at most 22 (8,388,607 words, the empty word refused by
+both), on every accepted kneading prefix of `num/(2^p - 1)` for `p <= 20`
+(2,097,110), and on 780,000 random words of length 23 to 61 and 59,663 random
+accepted addresses of period 21 to 62. The adapter keeps the local signature
+and refuses the empty prefix, as before. It also refuses any letter outside
+`{0, 1}`: the brute force answered about half such words and refused the rest,
+where upstream refuses none; no caller passes one, since every prefix comes
+from `checked_kneading_prefix`. `internal_address`, its `_rho`, and
+`checked_kneading_prefix` stay local: upstream ships no internal address and no
+angle-to-kneading reading. The Python mirror
+`reference/python/c1/kneading_reference.py` keeps the brute-force search as the
+independent oracle; it is not a copy of upstream's `continuation_twist` (its
+`rho` and `internal_address` are what upstream's
+`tests/substitution_dynamics/test_tuning_reference.py` uses as its brute-force
+check).
 
 The smoke suite's named reporter is the vendored `mojo_smoke` package
 (`vendor/mojo/mojo_smoke/report.mojo`); it replaced

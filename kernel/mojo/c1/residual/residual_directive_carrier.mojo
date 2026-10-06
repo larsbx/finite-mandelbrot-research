@@ -16,7 +16,7 @@
 from dynamics.angle_tuning import tuned_angle
 from arithmetic.checked_int64_backend import CheckedI64Result, checked_add_i64, checked_mul_i64
 from dynamics.checked_ray_address import checked_double_ray_addr, make_checked_ray_addr
-from substitution_dynamics.tuning import TuningPattern, kneading_prefix
+from substitution_dynamics.tuning import TuningPattern, continuation_twist, kneading_prefix
 
 comptime MAX_CARRIER_PERIOD = 62
 comptime MAX_KNEADING_WORD = 1048576
@@ -105,7 +105,8 @@ def internal_address(nu: List[Int]) -> List[Int]:
 
 
 def _internal_address_contains(nu: List[Int], target: Int) -> Bool:
-    """Whether `target` occurs in the internal address of `nu`."""
+    """Whether `target` occurs in the internal address of `nu`. The smoke reads
+    it as the brute-force characterization the closed form below must meet."""
     var address = internal_address(nu)
     for i in range(len(address)):
         if address[i] == target:
@@ -115,8 +116,8 @@ def _internal_address_contains(nu: List[Int], target: Int) -> Bool:
 
 struct ContinuationResult(ImplicitlyCopyable):
     """The last letter of `A(nu)`, the periodic continuation of `nu_1 ... nu_(n-1) *`
-    whose internal address contains `n`; `rejected` when not exactly one
-    continuation qualifies."""
+    whose internal address contains `n`; `rejected` for an empty prefix or a
+    letter outside `{0, 1}`, the only inputs on which it is not defined."""
 
     var last_letter: Int
     var rejected: Bool
@@ -128,18 +129,21 @@ struct ContinuationResult(ImplicitlyCopyable):
 
 # Regime correspondence: angle-kneading-prefix
 def continuation_last_letter(prefix: List[Int]) -> ContinuationResult:
-    var n = len(prefix) + 1
-    var found = -1
-    for b in range(2):
-        var nu = prefix.copy()
-        nu.append(b)
-        if _internal_address_contains(nu, n):
-            if found >= 0:
-                return ContinuationResult(0, True)
-            found = b
-    if found < 0:
+    """`1 - prefix_(n-S)`, the vendored closed form `continuation_twist` read as
+    a letter (upstream docs/tuning-substitutions-spec.md section 1.3): of the
+    two continuations of a non-empty 0/1 prefix exactly one has `n` in its
+    internal address, and this is its last letter. Fails closed on an empty
+    prefix and on any letter outside `{0, 1}`."""
+    if len(prefix) == 0:
         return ContinuationResult(0, True)
-    return ContinuationResult(found, False)
+    for i in range(len(prefix)):
+        if prefix[i] != 0 and prefix[i] != 1:
+            return ContinuationResult(0, True)
+    try:
+        # twist on means tau(1) = prefix . 0, so the continuation ends in 0.
+        return ContinuationResult(0 if continuation_twist(prefix) else 1, False)
+    except:
+        return ContinuationResult(0, True)
 
 
 struct DirectiveLevel(Copyable, Movable):
@@ -306,8 +310,7 @@ def residual_directive_carrier_smoke() -> Bool:
         return False
 
     # The internal address of the continuation is the classical one: the
-    # basilica is 1 -> 2, the rabbit 1 -> 3, the airplane 1 -> 2 -> 3. It is the
-    # list `_internal_address_contains` reads, so the two cannot disagree.
+    # basilica is 1 -> 2, the rabbit 1 -> 3, the airplane 1 -> 2 -> 3.
     var rabbit_letter = continuation_last_letter(rabbit.prefix)
     var airplane_letter = continuation_last_letter(airplane.prefix)
     var doubling_letter = continuation_last_letter(doubling.prefix)
@@ -329,6 +332,26 @@ def residual_directive_carrier_smoke() -> Bool:
     if internal_address(doubling_nu) != doubling_address:
         return False
     if not _internal_address_contains(rabbit_nu, 3) or _internal_address_contains(rabbit_nu, 2):
+        return False
+    # The closed-form letter is the unique continuation with the period in its
+    # brute-force internal address, for every 0/1 prefix of length at most 10.
+    for length in range(1, 11):
+        for w in range(1 << length):
+            var word = List[Int]()
+            for i in range(length):
+                word.append((w >> i) & 1)
+            var letter = continuation_last_letter(word)
+            if letter.rejected:
+                return False
+            var chosen = word.copy()
+            chosen.append(letter.last_letter)
+            var other = word.copy()
+            other.append(1 - letter.last_letter)
+            if not _internal_address_contains(chosen, length + 1) or _internal_address_contains(other, length + 1):
+                return False
+    var empty_prefix = List[Int]()
+    var off_alphabet: List[Int] = [1, 2]
+    if not (continuation_last_letter(empty_prefix).rejected and continuation_last_letter(off_alphabet).rejected):
         return False
     # Rejections: zero, preperiodic, malformed, out of range.
     if checked_kneading_prefix(0, 1).accepted() or checked_kneading_prefix(1, 2).accepted():

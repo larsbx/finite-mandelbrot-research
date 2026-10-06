@@ -48,7 +48,9 @@ the pipeline, and no way for the two to disagree. A pair is one Int, as
 address without ever building it. `internal_address(nu)` returns it, and the
 membership test reads that list, so the address shown and the address tested
 are the same object. The basilica is 1 → 2, the rabbit 1 → 3, the airplane
-1 → 2 → 3.
+1 → 2 → 3. (The continuation letter itself is now the vendored closed form
+`continuation_twist`; the smoke checks it against this list. See
+`docs/finite-math-kernels-migration.md`.)
 
 **Exact numbers can be read in base ten.** `vendor/mojo/finite_exact/exact_decimal.mojo` renders a
 `BigZ` and a `Q` as decimal digits. Limbs are base `10^9`, so this is
