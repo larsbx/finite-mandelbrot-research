@@ -121,3 +121,13 @@ root = "vendor/mojo"
 "quadratic_orbit/orbit.mojo" = "ce37cada4a11ba57c0f6d3d6008a69846ca3136c07d021a25b082410c1f8392b"
 "quadratic_orbit/preperiodic.mojo" = "5d010196a8f15232e664d48629bbf330747e1380e78e3dbde2e4c58d96073e2e"
 
+[[package]]
+name = "rational_dynamics"
+repository = "larsbx/finite-math-kernels"
+commit = "360bc90c27893900d30718e42d61d14ce255e530"
+root = "vendor/mojo"
+
+[package.files]
+"rational_dynamics/__init__.mojo" = "8daf118ae953fe63a55dbcaf8070205fb0779b3fca3663f4108fb67ae04c81af"
+"rational_dynamics/rational.mojo" = "b2453171973e2e4460bdbb572886b1da8ea6b7aff935796087ede1a68e1abfc6"
+

@@ -6,7 +6,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_bigq_ray_address_is_normalized_fail_closed_and_unbounded():
     src = (ROOT / "kernel/mojo/dynamics/bigq_ray_address.mojo").read_text(encoding="utf-8")
-    assert "from finite_exact.rat_q import Q, q_from_bigz, q_rejected" in src
+    assert "from finite_exact.rat_q import Q, q_from_bigz" in src
+    # The address, its doubling, and its equality are the vendored
+    # rational_dynamics package; this module keeps the [0, 1) contract.
+    assert "from rational_dynamics.rational import (" in src
+    assert "var value: ReducedFraction" in src
+    assert "var doubled = double_mod_one(address.value)" in src
+    assert "fraction_equal(a.value, b.value)" in src
+    assert "def double_mod_one(value: ReducedFraction) -> ReducedFraction:" in (
+        ROOT / "vendor/mojo/rational_dynamics/rational.mojo"
+    ).read_text(encoding="utf-8")
     assert "value.num.sign < 0 or not value.lt(Q.one())" in src
     assert "var beyond_i64 = bigz_add(bigz_from_i64(9223372036854775807)" in src
     assert "bigz_mul(beyond_i64, bigz_from_i64(2))" in src

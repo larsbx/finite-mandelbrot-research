@@ -3,17 +3,31 @@
 #
 # Addresses are exact symbolic fractions modulo one, not measured angles.
 # Rejected Q values and values outside [0, 1) fail closed.
+#
+# The address is the vendored `rational_dynamics` ReducedFraction, and doubling
+# and equality are its `double_mod_one` and `fraction_equal`. This module keeps
+# only the address contract: the input is normalized as a `Q` first (so a
+# negative denominator flips the sign, as before), and anything negative or at
+# least one is refused before it becomes an address.
 
 from finite_exact.bigint_z import BigZ, bigz_add, bigz_from_i64, bigz_mul
-from finite_exact.rat_q import Q, q_from_bigz, q_rejected
+from finite_exact.rat_q import Q, q_from_bigz
+from rational_dynamics.rational import (
+    ReducedFraction,
+    double_mod_one,
+    fraction_equal,
+    fraction_from_i64,
+    reduce_fraction,
+    rejected_fraction,
+)
 
 
 # Regime correspondence: rational-ray-address
 struct BigQRayAddr(Copyable):
-    var value: Q
+    var value: ReducedFraction
     var rejected: Bool
 
-    def __init__(out self, value: Q, rejected: Bool):
+    def __init__(out self, value: ReducedFraction, rejected: Bool):
         self.value = value.copy()
         self.rejected = rejected
 
@@ -41,32 +55,31 @@ struct BigQRayOrbitStatus(Copyable):
 
 
 def rejected_bigq_ray_addr() -> BigQRayAddr:
-    return BigQRayAddr(q_rejected(), True)
+    return BigQRayAddr(rejected_fraction(), True)
 
 
 def make_bigq_ray_addr(num: BigZ, den: BigZ) -> BigQRayAddr:
     var value = q_from_bigz(num, den)
     if value.rejected or value.num.sign < 0 or not value.lt(Q.one()):
         return rejected_bigq_ray_addr()
-    return BigQRayAddr(value, False)
+    var address = reduce_fraction(value.num, value.den)
+    if address.rejected:
+        return rejected_bigq_ray_addr()
+    return BigQRayAddr(address, False)
 
 
 def bigq_ray_addr_equal(a: BigQRayAddr, b: BigQRayAddr) -> Bool:
-    return a.accepted() and b.accepted() and a.value.eq(b.value)
+    return a.accepted() and b.accepted() and fraction_equal(a.value, b.value)
 
 
 def bigq_double_ray_addr(address: BigQRayAddr) -> BigQRayAddr:
     if not address.accepted():
         return rejected_bigq_ray_addr()
-    var doubled = address.value.mul(Q(2, 1))
+    # On an address in [0, 1), doubling modulo one stays in [0, 1).
+    var doubled = double_mod_one(address.value)
     if doubled.rejected:
         return rejected_bigq_ray_addr()
-    if doubled.lt(Q.one()):
-        return BigQRayAddr(doubled, False)
-    var reduced = doubled.sub(Q.one())
-    if reduced.rejected or reduced.num.sign < 0 or not reduced.lt(Q.one()):
-        return rejected_bigq_ray_addr()
-    return BigQRayAddr(reduced, False)
+    return BigQRayAddr(doubled, False)
 
 
 # Regime correspondence: rational-ray-address
@@ -79,7 +92,7 @@ def verify_bigq_one_half_orbit(num: BigZ, den: BigZ) -> BigQRayOrbitStatus:
         return BigQRayOrbitStatus(1, 1, True, False)
     return BigQRayOrbitStatus(
         1, 1, False,
-        start.value.eq(Q(1, 2)) and bigq_ray_addr_equal(tail, zero) and
+        fraction_equal(start.value, fraction_from_i64(1, 2)) and bigq_ray_addr_equal(tail, zero) and
         bigq_ray_addr_equal(repeated, tail),
     )
 

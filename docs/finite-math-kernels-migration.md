@@ -48,6 +48,17 @@ caller passes. `excludes_zero`, the two-valued reading of
 and its `is_intended_tail_pair` intends tail pairs at `ell = 0`, which the
 upstream partition does not.
 
+The BigZ ray address of `kernel/mojo/dynamics/bigq_ray_address.mojo` is the
+vendored `rational_dynamics` `ReducedFraction`, and its doubling and equality
+are `double_mod_one` and `fraction_equal`
+(`vendor/mojo/rational_dynamics/rational.mojo`). `make_bigq_ray_addr` remains a
+thin adapter that keeps the local contract: the input is normalized as a `Q`
+first, so a negative denominator flips the sign as before, and an address
+outside `[0, 1)` is refused, where upstream `reduce_fraction` would accept any
+nonnegative fraction. The Int64 checked addresses of
+`kernel/mojo/dynamics/checked_ray_address.mojo` stay local: upstream has no
+fixed-width equivalent.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;

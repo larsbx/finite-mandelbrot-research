@@ -57,6 +57,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/certificates/c_minus_2/proof_grade_misiurewicz_trivial_fiber_classification.mojo`.
 - `vendor/mojo/quadratic_orbit/collision.mojo`.
 - `vendor/mojo/quadratic_orbit/orbit.mojo`.
+- `vendor/mojo/rational_dynamics/rational.mojo`.
 
 A second compile target, `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`, imports
 `bigint_z`, `rat_q`, and `interval_q` and is executed by `pixi run property`,
