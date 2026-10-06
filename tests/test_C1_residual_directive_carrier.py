@@ -53,6 +53,7 @@ def test_non_claims_return_false_in_mojo():
         block = src[src.index(f"def {name}() -> Bool:"):]
         assert "return False" in block.split("\n\n")[0]
     assert "TuningPattern.dgp" not in src.replace("`TuningPattern.dgp`", "")
+    assert "from substitution_dynamics.internal_address import internal_address" in src
     assert "from substitution_dynamics.tuning import TuningPattern, continuation_twist, kneading_prefix" in src
 
 
@@ -70,7 +71,8 @@ def test_vendored_substitution_kernels_are_pinned():
     manifest = tomllib.loads(text(ROOT / "vendored.toml"))
     packages = {p["name"]: p for p in manifest["package"]}
     assert set(packages["substitution_dynamics"]["files"]) == {
-        "substitution_dynamics/substitution.mojo", "substitution_dynamics/tuning.mojo", "substitution_dynamics/sadic.mojo", "substitution_dynamics/coincidence.mojo"}
+        "substitution_dynamics/substitution.mojo", "substitution_dynamics/tuning.mojo", "substitution_dynamics/sadic.mojo", "substitution_dynamics/coincidence.mojo",
+        "substitution_dynamics/internal_address.mojo"}
     assert len({packages[n]["commit"] for n in ("finite_exact", "claim_governance", "substitution_dynamics")}) == 1
 
 
@@ -91,8 +93,18 @@ def test_period_limit_is_sixty_two_in_reference_and_mojo():
     assert kr.period(F(1, 2**62 - 1)) == 62
     src = text(SRC)
     assert "comptime MAX_CARRIER_PERIOD = 62" in src and "for k in range(MAX_CARRIER_PERIOD):" in src
-    assert "checked_kneading_prefix(1, 92737).accepted()" in src and "checked_mul_i64(p.value" in src
-    assert "comptime MAX_KNEADING_WORD = 1048576" in src and "period.value > MAX_KNEADING_WORD" in src
+    assert "checked_kneading_prefix(1, 92737).accepted()" in src and "checked_mul(p, self.levels[i].pattern.period())" in src
+    assert "comptime MAX_KNEADING_WORD = 1048576" in src and "period > MAX_KNEADING_WORD" in src
+
+
+def test_addresses_are_the_vendored_reduced_fractions():
+    """The carrier and angle tuning read addresses as the vendored
+    rational_dynamics `ReducedFraction`, exact over BigZ; neither imports the
+    retired checked Int64 backend or the checked ray-address primitives."""
+    tuning = text(ROOT / "kernel/mojo/dynamics/angle_tuning.mojo")
+    for path_text in (text(SRC), tuning):
+        assert "checked_int64_backend" not in path_text and "checked_ray_address" not in path_text
+    assert "double_mod_one" in text(SRC) and "double_mod_one" in tuning and "fraction_equal" in tuning
 
 
 def test_every_periodic_angle_has_a_kneading_prefix_of_length_period_minus_one():
@@ -105,11 +117,18 @@ def test_continuation_rule_is_well_defined_for_every_periodic_angle_up_to_period
         assert kr.tuning_pattern(theta) is not None, theta
 
 
-def test_mojo_continuation_letter_is_the_vendored_closed_form():
+def test_mojo_continuation_letter_and_internal_address_are_the_vendored_kernels():
+    """The letter is the vendored closed form, whose boundary (a non-empty 0/1
+    prefix) is the one the letter fails closed on; the internal address is the
+    vendored one, with no local `rho`. The smoke still replays the closed form
+    against the internal address for every prefix of length at most 10."""
     src = text(SRC)
     body = src[src.index("def continuation_last_letter("):src.index("struct DirectiveLevel(")]
     assert "continuation_twist(prefix)" in body and "_internal_address_contains" not in body
-    assert "if len(prefix) == 0:" in body and "prefix[i] != 0 and prefix[i] != 1" in body
+    assert "def _rho(" not in src and "def internal_address(" not in src
+    assert "TuningPattern.continuation(kneading.prefix)" in src
+    named = text(ROOT / "vendor/mojo/substitution_dynamics/internal_address.mojo")
+    assert "def internal_address(nu: List[Int]) raises -> List[Int]:" in named and "Lau and Schleicher" in named
     smoke = src[src.index("def residual_directive_carrier_smoke("):]
     assert "for length in range(1, 11):" in smoke and "_internal_address_contains(other, length + 1)" in smoke
 

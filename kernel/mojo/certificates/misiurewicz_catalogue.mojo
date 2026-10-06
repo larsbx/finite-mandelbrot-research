@@ -20,10 +20,13 @@
 # the divisors of `2^k - 1`. `catalogue_matches_count` checks the identity
 # against the enumeration, which is the round-one angle-count regression.
 #
-# All arithmetic is fixed-width integer arithmetic bounded before use, and the
-# two bounds govern different things. `exact_type` reads a type off any
-# address whose denominator is at most `MAX_CATALOGUE_DENOMINATOR` and refuses
-# every other address; its loop is bounded by that denominator. A catalogue of
+# The doubling-map number theory is the vendored `rational_dynamics.doubling`
+# (upstream finite-math-kernels), exact over BigZ with no cap: its
+# `exact_type` reads the preperiod and the period, and its `exact_type_count`
+# is the counting identity. What stays here is this repository's data policy,
+# two bounds on machine-`Int` addresses, and they govern different things.
+# `exact_type` reads a type off any address whose denominator is at most
+# `MAX_CATALOGUE_DENOMINATOR` and refuses every other address. A catalogue of
 # type `(l, k)` additionally needs both indices at most `MAX_TYPE_INDEX` and
 # needs its own denominator `2^l (2^k - 1)` to stay within the same bound,
 # which is far more restrictive. So an accepted type need not be one this
@@ -40,7 +43,11 @@
 # `KnownTrivialFiberClass`, not a property computed here.
 
 from angle_doubling.angle import type_count
-from finite_exact.integer_gcd import gcd_int
+from rational_dynamics.doubling import exact_type_count
+from rational_dynamics.doubling import exact_type as doubling_type
+from rational_dynamics.integers import bigz_to_int
+from rational_dynamics.moebius import moebius
+from rational_dynamics.rational import fraction_from_i64
 
 comptime MAX_TYPE_INDEX = 20
 comptime MAX_CATALOGUE_DENOMINATOR = 1048576
@@ -80,49 +87,14 @@ def exact_type(num: Int, den: Int) -> MisiurewiczType:
     of that type, which is `catalogueable_type`."""
     if den <= 0 or num < 0 or num >= den or den > MAX_CATALOGUE_DENOMINATOR:
         return rejected_type()
-    var divisor: Int
+    var found = doubling_type(fraction_from_i64(Int64(num), Int64(den)))
+    if found.rejected:
+        return rejected_type()
     try:
-        divisor = gcd_int(num, den)
+        # The period is below the denominator, so it fits; a refusal still fails closed.
+        return MisiurewiczType(found.preperiod, bigz_to_int(found.period), False)
     except:
         return rejected_type()
-    if divisor <= 0:
-        return rejected_type()
-    var reduced = den // divisor
-    var preperiod = 0
-    while reduced % 2 == 0:
-        reduced = reduced // 2
-        preperiod += 1
-    if reduced == 1:
-        # A dyadic address falls onto the fixed point zero.
-        return MisiurewiczType(preperiod, 1, False)
-    var period = 1
-    var power = 2 % reduced
-    while power != 1:
-        power = (power * 2) % reduced
-        period += 1
-        if period > reduced:
-            return rejected_type()
-    return MisiurewiczType(preperiod, period, False)
-
-
-def moebius(n: Int) -> Int:
-    """`mu(n)` for `n >= 1`: zero on a squareful argument, else the sign of the
-    number of prime factors. Returns zero for `n < 1`, which no caller passes."""
-    if n < 1:
-        return 0
-    var rest = n
-    var sign = 1
-    var factor = 2
-    while factor * factor <= rest:
-        if rest % factor == 0:
-            rest = rest // factor
-            if rest % factor == 0:
-                return 0
-            sign = -sign
-        factor += 1
-    if rest > 1:
-        sign = -sign
-    return sign
 
 
 def catalogue_denominator(preperiod: Int, period: Int) -> Int:
@@ -150,15 +122,18 @@ def catalogueable_type(preperiod: Int, period: Int) -> Bool:
 
 # Regime correspondence: misiurewicz-exact-type
 def catalogue_count(preperiod: Int, period: Int) -> Int:
-    """`2^(l-1) sum_{d | k} mu(k/d) (2^d - 1)`, the size the identity predicts.
-    Returns `-1` for a type out of range."""
+    """`2^(l-1) sum_{d | k} mu(k/d) (2^d - 1)`, the size the identity predicts:
+    the vendored `exact_type_count`, which is exact for every type. Returns `-1`
+    for a type out of range, where this module holds no catalogue."""
     if catalogue_denominator(preperiod, period) < 0:
         return -1
-    var total = 0
-    for d in range(1, period + 1):
-        if period % d == 0:
-            total += moebius(period // d) * ((1 << d) - 1)
-    return (1 << (preperiod - 1)) * total
+    var count = exact_type_count(preperiod, period)
+    if count.rejected:
+        return -1
+    try:
+        return bigz_to_int(count.value)
+    except:
+        return -1
 
 
 # Regime correspondence: misiurewicz-exact-type
@@ -269,8 +244,11 @@ def misiurewicz_catalogue_smoke() -> Bool:
                 return False
     if catalogue_count(1, 1) != 1 or catalogue_count(2, 3) != 12 or catalogue_count(3, 3) != 24:
         return False
-    # Moebius values the identity relies on.
-    if moebius(1) != 1 or moebius(2) != -1 or moebius(4) != 0 or moebius(6) != 1 or moebius(30) != -1:
+    # Moebius values the identity relies on (the vendored `moebius`).
+    try:
+        if moebius(1) != 1 or moebius(2) != -1 or moebius(4) != 0 or moebius(6) != 1 or moebius(30) != -1:
+            return False
+    except:
         return False
     # Fail closed: out-of-range addresses, types, and denominators.
     if exact_type(1, 0).accepted() or exact_type(5, 3).accepted() or exact_type(-1, 4).accepted():

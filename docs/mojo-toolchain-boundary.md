@@ -41,6 +41,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/certificates/c_minus_2/bigq_certificate_incidence.mojo`.
 - `vendor/mojo/substitution_dynamics/substitution.mojo`.
 - `vendor/mojo/substitution_dynamics/tuning.mojo`.
+- `vendor/mojo/substitution_dynamics/internal_address.mojo`.
 - `kernel/mojo/c1/residual/residual_directive_carrier.mojo`.
 - `kernel/mojo/c1/separator/separated_density.mojo`.
 - `kernel/mojo/certificates/misiurewicz_catalogue.mojo`.
@@ -50,6 +51,11 @@ The compiler-checked dependency closure currently consists of:
 - `vendor/mojo/quadratic_orbit/collision.mojo`.
 - `vendor/mojo/quadratic_orbit/orbit.mojo`.
 - `vendor/mojo/rational_dynamics/rational.mojo`.
+- `vendor/mojo/rational_dynamics/doubling.mojo`.
+- `vendor/mojo/rational_dynamics/moebius.mojo`.
+- `vendor/mojo/rational_dynamics/multiplicative_order.mojo`.
+- `vendor/mojo/rational_dynamics/carmichael.mojo`.
+- `vendor/mojo/rational_dynamics/integers.mojo`.
 - `vendor/mojo/angle_doubling/angle.mojo`.
 
 A second compile target, `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`, imports

@@ -115,7 +115,7 @@ status = "implemented_tested"
 preserves = ["0/1 itinerary of a periodic address under doubling", "internal-address continuation", "star product of tuning patterns"]
 does_not_inherit = ["parameter-plane shrinking", "a priori bounds", "fibre triviality", "companion address identification", "measured angle"]
 domain_conditions = ["periodic address in the open interval from zero to one with odd reduced denominator", "period at most 62", "checked Int64 arithmetic accepted"]
-symbols = ["kernel/mojo/c1/residual/residual_directive_carrier.mojo::checked_kneading_prefix", "kernel/mojo/c1/residual/residual_directive_carrier.mojo::continuation_last_letter", "kernel/mojo/c1/residual/residual_directive_carrier.mojo::checked_directive_level"]
+symbols = ["kernel/mojo/c1/residual/residual_directive_carrier.mojo::kneading_prefix_of", "kernel/mojo/c1/residual/residual_directive_carrier.mojo::checked_kneading_prefix", "kernel/mojo/c1/residual/residual_directive_carrier.mojo::continuation_last_letter", "kernel/mojo/c1/residual/residual_directive_carrier.mojo::checked_directive_level"]
 evidence = ["tests/test_C1_residual_directive_carrier.py", "docs/C1_residual_directive_carrier.md", "reference/python/c1/kneading_reference.py"]
 proof_boundary = "A directive prefix encodes finitely many renormalization levels; it does not decide residual membership or same-fibre relations."
 
