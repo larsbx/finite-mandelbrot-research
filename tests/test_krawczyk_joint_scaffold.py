@@ -56,9 +56,11 @@ def test_bigq_krawczyk_replay_is_typed_and_fail_closed(mojo_smoke):
 def test_krawczyk_formula_is_present():
     src = read(KRAW)
     assert "K(beta)=m-A P(m)+(1-A P'(beta))(beta-m)" in src
-    assert "one_minus_a_dp" in src
-    assert "beta_minus_m" in src
-    assert "image.strict_subset_of(beta)" in src
+    # The operator and the strict-interior test are the vendored root_isolation kernel.
+    assert "from root_isolation import centre, krawczyk_image, strictly_inside" in src
+    assert "var m = centre(beta)" in src
+    assert "krawczyk_image(beta, m, a, eval_p21(m), eval_p21_derivative(beta))" in src
+    assert "strictly_inside(image, beta)" in src
 
 
 def test_p41_remains_not_accepted_until_final_inclusion_lands():

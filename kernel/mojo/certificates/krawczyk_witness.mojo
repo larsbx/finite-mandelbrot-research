@@ -6,6 +6,10 @@
 #
 # This module is finite-regime only: exact polynomial data, dyadic rational
 # boxes, and interval inclusion checks. It contains no analytic trig primitives.
+# The Krawczyk operator (Krawczyk 1969) and the Krawczyk-Moore strict-interior
+# test (Moore 1977) are the vendored root_isolation
+# kernel (finite-math-kernels docs/root-isolation-spec.md); this module
+# supplies P_{2,1}, its box and its preconditioner.
 #
 # Status:
 # - P_{2,1}=C(C+2) has a native interval Krawczyk computation.
@@ -17,6 +21,7 @@ from finite_exact.bigint_z import bigz_from_i64, bigz_mul
 from finite_exact.rat_q import Q, q_from_bigz, q_rejected
 from arithmetic.rat_backend_plan import current_q_backend_status, q_backend_blocks_proof_acceptance
 from polynomial.poly_interval_eval import eval_p21, eval_p21_derivative, eval_p41, eval_p41_derivative
+from root_isolation import centre, krawczyk_image, strictly_inside
 
 
 struct KrawczykWitnessStatus:
@@ -58,16 +63,8 @@ struct BigQKrawczykResult(Copyable):
         return self.contraction_verified and not self.rejected
 
 
-def complex_one() -> ComplexIQ:
-    return ComplexIQ.singleton(Q.one(), Q.zero())
-
-
 def complex_minus_half() -> ComplexIQ:
     return ComplexIQ.singleton(Q(-1, 2), Q.zero())
-
-
-def complex_minus_two_point() -> ComplexIQ:
-    return ComplexIQ.singleton(Q(-2, 1), Q.zero())
 
 
 # Regime correspondence: rational-box-half-width
@@ -84,13 +81,11 @@ def c_minus_2_box(half_width_den_power: Int) -> ComplexIQ:
 
 def p21_krawczyk_image(beta: ComplexIQ) -> ComplexIQ:
     # K(beta)=m-A P(m)+(1-A P'(beta))(beta-m)
-    # for m=-2 and A=-1/2.
-    var m = complex_minus_two_point()
+    # for m the exact centre of beta (-2 for c_minus_2_box) and A=-1/2, the
+    # exact inverse of P'(-2) = -2. Any point A is admissible (spec section 4).
+    var m = centre(beta)
     var a = complex_minus_half()
-    var p_m = eval_p21(m)
-    var beta_minus_m = beta.sub(m)
-    var one_minus_a_dp = complex_one().sub(a.mul(eval_p21_derivative(beta)))
-    return m.sub(a.mul(p_m)).add(one_minus_a_dp.mul(beta_minus_m))
+    return krawczyk_image(beta, m, a, eval_p21(m), eval_p21_derivative(beta))
 
 
 # Regime correspondence: rational-box-krawczyk-replay
@@ -99,7 +94,7 @@ def verify_bigq_p21_krawczyk_c_minus_2(half_width_den_power: Int) -> BigQKrawczy
     var image = p21_krawczyk_image(beta)
     if not beta.accepted() or not image.accepted():
         return BigQKrawczykResult(False, True)
-    var strict = image.strict_subset_of(beta)
+    var strict = strictly_inside(image, beta)
     if strict.rejected:
         return BigQKrawczykResult(False, True)
     return BigQKrawczykResult(strict.value, False)
