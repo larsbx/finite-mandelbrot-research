@@ -62,8 +62,6 @@ VENDORED_FACADES = frozenset({
     "vendor/mojo/finite_exact/closed_interval.mojo",
     "vendor/mojo/finite_exact/field.mojo",
     "vendor/mojo/finite_exact/fp.mojo",
-    "vendor/mojo/finite_polynomial/coefficient_ring.mojo",
-    "vendor/mojo/finite_polynomial/taylor_model.mojo",
 })
 
 POLICY = Policy(
