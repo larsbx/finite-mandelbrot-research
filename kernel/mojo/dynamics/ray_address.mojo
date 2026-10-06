@@ -1,5 +1,7 @@
-# Canonical finite rational-ray address value types.
-# Neither type represents a measured angle.
+# Canonical finite rational-ray address value type.
+# It does not represent a measured angle. Doubling is not defined here: the
+# doubling map on addresses is the vendored `rational_dynamics.double_mod_one`
+# (exact, BigZ-backed), used through `dynamics/bigq_ray_address.mojo`.
 
 from finite_exact.integer_gcd import gcd_int
 
@@ -26,9 +28,6 @@ struct RayAddr(ImplicitlyCopyable):
         except:
             return False
 
-    def doubled(self) -> Self:
-        return Self((2 * self.num) % self.den, self.den)
-
 
 def same_ray_addr(a: RayAddr, b: RayAddr) -> Bool:
     return a.num == b.num and a.den == b.den
@@ -40,15 +39,3 @@ def ray_addr_before(a: RayAddr, b: RayAddr) -> Bool:
     if a.den > b.den:
         return False
     return a.num < b.num
-
-
-struct RayAddr64(ImplicitlyCopyable):
-    var num: Int64
-    var den: Int64
-
-    def __init__(out self, num: Int64, den: Int64):
-        self.num = num
-        self.den = den
-
-    def doubled(self) -> Self:
-        return Self((2 * self.num) % self.den, self.den)

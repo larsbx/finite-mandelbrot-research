@@ -152,10 +152,10 @@ def test_bigz_interval_layer_enforces_spec_fail_closed_contracts():
 
 def test_interval_migration_does_not_enable_certificate_or_c1_acceptance():
     adapter = read(ROOT / "kernel/mojo/arithmetic/bigint_adapter.mojo")
-    gate = read(ROOT / "kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo")
+    gate = read(ROOT / "kernel/mojo/certificates/c_minus_2/bigq_finite_certificate_gate.mojo")
     ledger = read(ROOT / "kernel/mojo/c1/proof/final_proof_block_ledger.mojo")
     assert "not status.allows_certificate_acceptance" in adapter
-    assert "checked.checked_width_accepted() and not checked.proof_grade_accepted()" in gate
+    assert "not status.theorem_tags_accepted() and not status.certificate_accepted()" in gate
     assert 'ProofBlockStatus("ResidualClosureNoMissingLinks", False, False, True, False, True)' in ledger
 
 

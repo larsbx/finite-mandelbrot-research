@@ -26,8 +26,8 @@
 # tag `HarmonicMeasureAlmostEveryFibreTrivial` in
 # kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo.
 
-from dynamics.checked_ray_address import make_checked_ray_addr
-from finite_exact.rat_q import Q
+from finite_exact.rat_q import Q, q_from_bigz
+from rational_dynamics.rational import fraction_from_i64
 
 
 struct SeparatedDensityResult(Copyable, Movable):
@@ -61,10 +61,12 @@ def rejected_density() -> SeparatedDensityResult:
 
 def _address(num: Int64, den: Int64) raises -> Q:
     """A normalized ray address in `[0, 1)` as an exact rational."""
-    var addr = make_checked_ray_addr(num, den)
-    if addr.rejected:
+    # `fraction_from_i64` refuses a negative numerator or a non-positive
+    # denominator; an address is also below one.
+    var addr = fraction_from_i64(num, den)
+    if addr.rejected or num >= den:
         raise Error("endpoint is not a normalized ray address")
-    var value = Q(addr.num, addr.den)
+    var value = q_from_bigz(addr.num, addr.den)
     if not value.accepted():
         raise Error("endpoint is not an accepted rational")
     return value^

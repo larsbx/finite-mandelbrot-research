@@ -6,7 +6,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_ray_address_value_types_are_centralized():
     canonical = (ROOT / "kernel/mojo/dynamics/ray_address.mojo").read_text(encoding="utf-8")
     assert "struct RayAddr(" in canonical
-    assert "struct RayAddr64(" in canonical
+    # Doubling is the vendored rational_dynamics map, not a local Int copy.
+    assert "struct RayAddr64(" not in canonical
+    assert "def doubled(" not in canonical
     for relative in [
         "kernel/mojo/c1/separator/separation_grammar.mojo",
         "kernel/mojo/c1/separator/separator_codes.mojo",
