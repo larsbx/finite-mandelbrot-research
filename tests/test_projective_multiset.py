@@ -95,7 +95,7 @@ def test_first_hensel_step_is_replayed_without_claiming_full_lift():
     source = read(BRIDGE_SOURCE)
     bridge = read(BRIDGE)
     assert "struct HenselStepCertificate" in source
-    assert "def inverse_mod_prime" in source
+    assert "hensel_step(relation_mod_p2, base.residue, prime)" in source
     assert "def verify_hensel_step" in source
     assert "correction_digit" in source
     assert "lifted_relation_holds" in source

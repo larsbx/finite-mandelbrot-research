@@ -18,11 +18,8 @@ from polynomial.poly_z import (
     raw_return_poly,
     sub,
 )
-from dynamics.critical_relation_bridge import (
-    bounded_prime,
-    bridge_residue,
-    inverse_mod_prime,
-)
+from dynamics.critical_relation_bridge import bounded_prime, poly_mod
+from finite_polynomial.polynomial_fp import PolyFp, poly_fp_gcd, poly_fp_rem, prime_field
 
 
 def r41_cubic_factor() -> PolyZ:
@@ -35,47 +32,20 @@ def r41_cubic_factor() -> PolyZ:
     return cubic^
 
 
-def reduce_poly_mod_prime(poly: PolyZ, prime: Int) -> PolyZ:
-    var out = PolyZ()
+def reduce_poly_mod_prime(poly: PolyZ, prime: Int) raises -> PolyFp:
+    """The image of poly in F_p[C]; a prime past the bridge bound raises."""
     if not bounded_prime(prime):
-        return out^
-    for i in range(poly.degree + 1):
-        out.coeffs[i] = bridge_residue(poly.coefficient(i), prime)
-    out.normalize()
-    return out^
+        raise Error("not a bounded prime: " + String(prime))
+    return poly_mod(poly, prime_field(prime))
 
 
 def remainder_mod_prime(
     dividend: PolyZ, divisor: PolyZ, prime: Int
-) -> PolyZ:
-    var remainder = reduce_poly_mod_prime(dividend, prime)
-    var reduced_divisor = reduce_poly_mod_prime(divisor, prime)
-    if reduced_divisor.is_zero():
-        return remainder^
-    var inverse_lead = inverse_mod_prime(
-        reduced_divisor.coefficient(reduced_divisor.degree), prime,
+) raises -> PolyFp:
+    return poly_fp_rem(
+        reduce_poly_mod_prime(dividend, prime),
+        reduce_poly_mod_prime(divisor, prime),
     )
-    if inverse_lead < 0:
-        return remainder^
-    while (
-        not remainder.is_zero() and
-        remainder.degree >= reduced_divisor.degree
-    ):
-        var shift = remainder.degree - reduced_divisor.degree
-        var scale = bridge_residue(
-            remainder.coefficient(remainder.degree) * inverse_lead,
-            prime,
-        )
-        for i in range(reduced_divisor.degree + 1):
-            var index = i + shift
-            remainder.coeffs[index] = bridge_residue(
-                remainder.coefficient(index) -
-                    scale * reduced_divisor.coefficient(i),
-                prime,
-            )
-        remainder.normalize()
-    return remainder^
-
 
 
 def remainder_monic_over_integers(
@@ -99,17 +69,13 @@ def remainder_monic_over_integers(
     return remainder^
 
 def gcd_degree_mod_prime(a: PolyZ, b: PolyZ, prime: Int) -> Int:
-    if not bounded_prime(prime):
+    """deg gcd(a mod p, b mod p); -1 for a refused prime or when both vanish."""
+    try:
+        return poly_fp_gcd(
+            reduce_poly_mod_prime(a, prime), reduce_poly_mod_prime(b, prime),
+        ).degree()
+    except:
         return -1
-    var left = reduce_poly_mod_prime(a, prime)
-    var right = reduce_poly_mod_prime(b, prime)
-    while not right.is_zero():
-        var next = remainder_mod_prime(left, right, prime)
-        left = right.copy()
-        right = next.copy()
-    if left.is_zero():
-        return -1
-    return left.degree
 
 
 def factor_is_squarefree_mod_prime(factor: PolyZ, prime: Int) -> Bool:
@@ -232,9 +198,13 @@ def r41_algebraic_root_certificate_smoke() -> Bool:
     # A remainder of 5 is zero modulo 5 but nonzero in Z[C].  This control
     # would have passed the former modular membership predicate.
     var false_membership = add(mul(cubic, constant(1)), constant(5))
-    var modular_false_positive = remainder_mod_prime(
-        false_membership, cubic, 5,
-    ).is_zero()
+    var modular_false_positive = False
+    try:
+        modular_false_positive = remainder_mod_prime(
+            false_membership, cubic, 5,
+        ).is_zero()
+    except:
+        pass
     var exact_negative_control = not remainder_monic_over_integers(
         false_membership, cubic,
     ).is_zero()
