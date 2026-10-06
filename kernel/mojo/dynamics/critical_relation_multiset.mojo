@@ -22,6 +22,7 @@ from polynomial.poly_z import (
     variable,
 )
 from dynamics.critical_relation_bridge import synthetic_divide_monic_linear
+from finite_exact.bigint_z import BigZ, bigz_add, bigz_eq, bigz_from_i64, bigz_mul, bigz_zero
 
 
 struct CriticalRelationDivisorMultiset(ImplicitlyCopyable):
@@ -98,11 +99,14 @@ def bounded_integer_root_multiplicity(poly: PolyZ, root: Int) -> Int:
     return multiplicity
 
 
-def integer_orbit_value(parameter: Int, depth: Int) -> Int:
-    var value = 0
+def integer_orbit_value(parameter: Int, depth: Int) -> BigZ:
+    """Q_depth(parameter) over Z. The orbit grows doubly exponentially (c = 2
+    passes Int at depth 7), so it is BigZ and never wraps."""
+    var c = bigz_from_i64(Int64(parameter))
+    var value = bigz_zero()
     for _ in range(depth):
-        value = value * value + parameter
-    return value
+        value = bigz_add(bigz_mul(value, value), c)
+    return value^
 
 
 def integer_exact_minimal_collision_pattern(
@@ -114,7 +118,7 @@ def integer_exact_minimal_collision_pattern(
     for left in range(horizon + 1):
         var left_value = integer_orbit_value(parameter, left)
         for right in range(left + 1, horizon + 1):
-            var equal = left_value == integer_orbit_value(parameter, right)
+            var equal = bigz_eq(left_value, integer_orbit_value(parameter, right))
             var intended = left == ell and right == horizon
             if equal != intended:
                 return False

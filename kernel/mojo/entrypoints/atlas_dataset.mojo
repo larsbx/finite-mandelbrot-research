@@ -11,7 +11,8 @@
 # Each section is the module that owns the object, asked for its own answer:
 #
 #   counts, catalogues  misiurewicz_catalogue
-#   kneading            C1_residual_directive_carrier
+#   kneading            C1_residual_directive_carrier (internal addresses: the
+#                       vendored substitution_dynamics.tuning)
 #   tunings             angle_tuning
 #   graphs              C1_misiurewicz_prefix_graph
 #   density             C1_separated_density
@@ -19,7 +20,7 @@
 #
 # Usage: pixi run atlas-dataset > dataset.json
 
-from dynamics.angle_tuning import angle_period, binary_block, tuned_angle
+from dynamics.angle_tuning import address_period, angle_period, binary_block, tuned_angle
 from certificates.c_minus_2.bigq_certificate_incidence import bigq_c_minus_2_certificate_incidence
 from c1.wake.misiurewicz_prefix_graph import (
     RATIONAL_RAY_LANDING,
@@ -30,10 +31,10 @@ from c1.wake.misiurewicz_prefix_graph import (
 from c1.residual.residual_directive_carrier import (
     checked_kneading_prefix,
     continuation_last_letter,
-    internal_address,
 )
 from c1.separator.separated_density import separated_pair_density
-from finite_exact.exact_decimal import q_decimal
+from finite_exact.exact_decimal import bigz_decimal, q_decimal
+from substitution_dynamics.internal_address import internal_address
 from certificates.misiurewicz_catalogue import (
     catalogue,
     catalogue_count,
@@ -156,11 +157,16 @@ def kneading_section() -> String:
             if not block.rejected:
                 for i in range(len(block.digits)):
                     digits += String(block.digits[i])
+            var address = String("null")
+            try:
+                address = ints(internal_address(continued))
+            except:
+                pass
             var row = List[String]()
             row.append(field("theta", pair(num, den)))
             row.append(field("period", String(kneading.period)))
             row.append(field("nu", quoted(nu + "*")))
-            row.append(field("address", ints(internal_address(continued))))
+            row.append(field("address", address))
             row.append(field("twist", twist))
             row.append(field("block", quoted(digits)))
             rows.append(obj(row))
@@ -183,8 +189,8 @@ def tuning_row(name: String, lo_num: Int, lo_den: Int, hi_num: Int, hi_den: Int,
         row.append(field("tuned", "null"))
         row.append(field("period", "null"))
     else:
-        row.append(field("tuned", pair(Int(tuned.num), Int(tuned.den))))
-        row.append(field("period", String(angle_period(tuned.num, tuned.den))))
+        row.append(field("tuned", "[" + bigz_decimal(tuned.num) + "," + bigz_decimal(tuned.den) + "]"))
+        row.append(field("period", String(address_period(tuned))))
     return obj(row)
 
 

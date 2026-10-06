@@ -24,6 +24,8 @@ C = -2 has orbit 0 -> -2 -> 2 -> 2
 Therefore the unique exact-type target compatible with the imported
 correspondence is `c=-2`.
 
+> Since retired: the checked Int64 localization, ray-address orbit and landing adapter named below were deleted; the source-scope checks now consume the BigZ/Q replay (`certificates/c_minus_2/bigq_landing_target_adapter.mojo`), which reproduces their verdicts exactly. See `docs/rational-interval-arithmetic-spec.md` 6.2.
+
 ## What changed from the checked-width adapter
 
 The previous `checked_landing_target_adapter.mojo` correctly established a

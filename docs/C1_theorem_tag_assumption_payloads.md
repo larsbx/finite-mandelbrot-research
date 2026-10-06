@@ -153,20 +153,21 @@ No generic boundary tag is allowed as an instance.
 
 ## First source-specific instances
 
-`kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo` binds the checked c=-2 finite data
-to two explicit bibliography records:
+`kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo` binds the c=-2 finite data, replayed
+on BigZ/Q (`kernel/mojo/certificates/c_minus_2/bigq_landing_target_adapter.mojo`: Krawczyk
+localization and the five forbidden-collision exclusions on `beta_c_minus_2` at half-width
+`2^-8`, and the `1/2` address orbit), to two explicit bibliography records:
 
 - `SchleicherRationalParameterRays`, covering preperiodic rational parameter
-  rays. The `1/2` address has checked preperiod 1 and period 1. The finite
-  adapter verifies `R_{2,1}=C^3(C+2)`, the squarefree factorization
-  `P_{2,1}=C(C+2)`, and that `C=0` is lower type, leaving the localized `C=-2`
-  root as the unique exact-type target. The association is accepted at checked
-  width but remains inadmissible as a final import until replayed on a
-  proof-grade backend.
+  rays. The `1/2` address has replayed preperiod 1 and period 1. Final import
+  admissibility comes from the proof-grade landing association, which verifies
+  `R_{2,1}=C^3(C+2)` exactly, that `C=0` is lower type, and that `C=-2` has
+  exact type `(2,1)`.
 - `SchleicherFibersLC`, covering trivial fibers at Misiurewicz parameters. The
-  checked-width `(ell, period) = (2, 1)` classification matches the source
-  scope, but final import remains inadmissible until localization is replayed
-  on a proof-grade unbounded backend.
+  `(ell, period) = (2, 1)` source scope is matched against the same replay;
+  final import comes from the proof-grade class-specific classification.
 
-These are checked-width payload instances, not completed theorem imports. The
-`TheoremTagPayloadInstances` proof block therefore remains open.
+The source-scope checks first ran on a checked Int64 path, since retired; the
+BigZ/Q replay reproduces its verdicts exactly. These payload instances are not
+a C1 proof, and the `TheoremTagPayloadInstances` proof block keeps the status
+the ledger gives it.

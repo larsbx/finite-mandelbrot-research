@@ -13,8 +13,15 @@
 # It does not construct an infinite Hensel lift, identify a
 # characteristic-zero factor, choose a complex embedding, or localize a
 # parameter root.
+#
+# Arithmetic modulo p and p^2 (evaluation, the primality check, the Hensel
+# step) is the vendored finite_polynomial.polynomial_fp, whose moduli stay
+# below 2^31 so no product of residues can wrap.
 
 from polynomial.poly_z import PolyZ, critical_orbit_poly, derivative, sub, mul, monic_linear, equal_poly
+from finite_field_orbit.census import step
+from finite_polynomial import hensel_step, is_prime
+from finite_polynomial.polynomial_fp import Modulus, PolyFp, poly_fp_eval
 
 comptime MAX_BRIDGE_PRIME = 1048576
 # PolyZ coefficients are Int and wrap silently: Q_7 peaks at 35 bits, Q_8 at
@@ -177,57 +184,36 @@ def bridge_residue(value: Int, prime: Int) -> Int:
 
 
 def bounded_prime(prime: Int) -> Bool:
-    if prime < 2 or prime > MAX_BRIDGE_PRIME:
+    try:
+        return prime <= MAX_BRIDGE_PRIME and is_prime(prime)
+    except:
         return False
-    if prime == 2:
-        return True
-    if prime % 2 == 0:
-        return False
-    var divisor = 3
-    while divisor <= prime // divisor:
-        if prime % divisor == 0:
-            return False
-        divisor += 2
-    return True
 
 
-def eval_poly_mod(poly: PolyZ, value: Int, prime: Int) -> Int:
-    var out = 0
-    var x = bridge_residue(value, prime)
-    for offset in range(poly.degree + 1):
-        var index = poly.degree - offset
-        out = bridge_residue(out * x + bridge_residue(poly.coefficient(index), prime), prime)
-    return out
+def poly_mod(poly: PolyZ, modulus: Modulus) -> PolyFp:
+    """The image of an Int-coefficient PolyZ in (Z/m)[C]."""
+    var coefficients = List[Int](capacity=poly.degree + 1)
+    for i in range(poly.degree + 1):
+        coefficients.append(poly.coefficient(i))
+    return PolyFp(modulus, coefficients^)
 
 
-def inverse_mod_prime(value: Int, prime: Int) -> Int:
-    """Extended Euclidean inverse; returns -1 when no inverse exists."""
-    var old_r = prime
-    var r = bridge_residue(value, prime)
-    var old_t = 0
-    var t = 1
-    while r != 0:
-        var quotient = old_r // r
-        var next_r = old_r - quotient * r
-        old_r = r
-        r = next_r
-        var next_t = old_t - quotient * t
-        old_t = t
-        t = next_t
-    if old_r != 1:
-        return -1
-    return bridge_residue(old_t, prime)
+def eval_poly_mod(poly: PolyZ, value: Int, modulus: Int) raises -> Int:
+    """poly(value) mod m; a modulus outside [2, 2^31) raises."""
+    return poly_fp_eval(poly_mod(poly, Modulus(modulus)), value)
 
 
 def orbit_value_mod(parameter: Int, depth: Int, prime: Int) -> Int:
+    """Q_depth(parameter) mod p, stepping with the vendored census `step`,
+    which is exact in UInt64 for every 2 <= p < 2^32."""
     var value = 0
     var c = bridge_residue(parameter, prime)
     for _ in range(depth):
-        value = bridge_residue(value * value + c, prime)
+        value = step(value, c, prime)
     return value
 
 
-def reduction_commutes_through(parameter: Int, horizon: Int, prime: Int) -> Bool:
+def reduction_commutes_through(parameter: Int, horizon: Int, prime: Int) raises -> Bool:
     for depth in range(horizon + 1):
         var polynomial_value = eval_poly_mod(critical_orbit_poly(depth), parameter, prime)
         if polynomial_value != orbit_value_mod(parameter, depth, prime):
@@ -265,21 +251,24 @@ def verify_simple_residue_root(
     var relation = sub(q_later, q_earlier)
     var relation_derivative = derivative(relation)
     var residue = bridge_residue(parameter, prime)
-    var commutes = reduction_commutes_through(residue, ell + k, prime)
-    var relation_holds = eval_poly_mod(relation, residue, prime) == 0
-    var exclusions = exact_minimal_collision_pattern(residue, ell, k, prime)
-    var simple = eval_poly_mod(relation_derivative, residue, prime) != 0
-    return SimpleResidueRootCertificate(
-        prime,
-        residue,
-        ell,
-        k,
-        commutes,
-        relation_holds,
-        exclusions,
-        simple,
-        False,
-    )
+    try:
+        var commutes = reduction_commutes_through(residue, ell + k, prime)
+        var relation_holds = eval_poly_mod(relation, residue, prime) == 0
+        var exclusions = exact_minimal_collision_pattern(residue, ell, k, prime)
+        var simple = eval_poly_mod(relation_derivative, residue, prime) != 0
+        return SimpleResidueRootCertificate(
+            prime,
+            residue,
+            ell,
+            k,
+            commutes,
+            relation_holds,
+            exclusions,
+            simple,
+            False,
+        )
+    except:
+        return rejected_simple_root_certificate()
 
 
 def rejected_hensel_step() -> HenselStepCertificate:
@@ -300,32 +289,24 @@ def verify_hensel_step(
     if not base.accepted():
         return rejected_hensel_step()
     var relation = sub(critical_orbit_poly(ell + k), critical_orbit_poly(ell))
-    var relation_derivative = derivative(relation)
-    var modulus_squared = prime * prime
-    var relation_at_base = eval_poly_mod(relation, base.residue, modulus_squared)
-    if relation_at_base % prime != 0:
+    try:
+        var relation_mod_p2 = poly_mod(relation, Modulus(prime * prime))
+        # hensel_step refuses a non-root and a root whose derivative vanishes.
+        var step = hensel_step(relation_mod_p2, base.residue, prime)
+        return HenselStepCertificate(
+            step.prime,
+            step.base,
+            step.digit,
+            step.lifted,
+            step.modulus,
+            base.accepted(),
+            step.lifted % prime == base.residue,
+            poly_fp_eval(relation_mod_p2, step.lifted) == 0,
+            base.derivative_nonzero,
+            False,
+        )
+    except:
         return rejected_hensel_step()
-    var quotient_mod_prime = (relation_at_base // prime) % prime
-    var derivative_mod_prime = eval_poly_mod(relation_derivative, base.residue, prime)
-    var inverse = inverse_mod_prime(derivative_mod_prime, prime)
-    if inverse < 0:
-        return rejected_hensel_step()
-    var correction = bridge_residue(-quotient_mod_prime * inverse, prime)
-    var lifted = base.residue + prime * correction
-    var congruent = lifted % prime == base.residue
-    var lifted_relation = eval_poly_mod(relation, lifted, modulus_squared) == 0
-    return HenselStepCertificate(
-        prime,
-        base.residue,
-        correction,
-        lifted,
-        modulus_squared,
-        base.accepted(),
-        congruent,
-        lifted_relation,
-        derivative_mod_prime != 0,
-        False,
-    )
 
 
 def bounded_relation_coefficients(poly: PolyZ) -> Bool:
@@ -386,7 +367,11 @@ def verify_linear_factor_provenance(
     var remainder = division.remainder
     var factor = monic_linear(-integer_root)
     var recomposed = mul(factor, quotient)
-    var derivative_value = eval_poly_mod(derivative(relation), integer_root, prime)
+    var derivative_value: Int
+    try:
+        derivative_value = eval_poly_mod(derivative(relation), integer_root, prime)
+    except:
+        return rejected_linear_factor_provenance()
     return LinearFactorProvenance(
         integer_root,
         factor.degree,

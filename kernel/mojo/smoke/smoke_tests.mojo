@@ -37,23 +37,14 @@ from c1.separator.separated_density import separated_density_smoke
 from certificates.misiurewicz_catalogue import misiurewicz_catalogue_smoke
 from c1.wake.misiurewicz_prefix_graph import misiurewicz_prefix_graph_smoke
 from finite_exact.integer_gcd import gcd_int, gcd_i64, gcd_i64_or_one
-from dynamics.ray_address import RayAddr, RayAddr64, same_ray_addr, ray_addr_before
+from dynamics.ray_address import RayAddr, same_ray_addr, ray_addr_before
+from rational_dynamics.rational import double_mod_one, fraction_equal, fraction_from_i64
 from arithmetic.rational_trig import demo_spread_orthogonal_axes, demo_ray_addr_doubling_half
 from theorem_kernel.alignment_audit_status import AlignmentPolicy, canonical_alignment_policy, alignment_policy_valid
 from theorem_kernel.mojo_optimization_contract import OptimizationPolicy, canonical_optimization_policy, optimization_policy_valid
 from c1.proof.final_proof_object_skeleton import C1FinalProofObject, FinalProofAcceptancePolicy, canonical_final_proof_acceptance_policy, final_proof_acceptance_policy_valid, accepts_c1_final_proof_object, rejects_missing_link_final_exit, skeleton_alone_proves_c1
-from arithmetic.checked_int64_backend import checked_i64_boundary_smoke
-from arithmetic.checked_q import checked_q_smoke
-from arithmetic.checked_interval_q import checked_iq_smoke
-from arithmetic.checked_complex_interval import checked_complex_horner_smoke
-from certificates.checked_interval_exclusion import checked_interval_exclusion_smoke
-from certificates.checked_krawczyk_witness import checked_krawczyk_smoke
 from arithmetic.cert_backend import cert_backend_smoke
-from certificates.certificate_arithmetic_migration_gate import certificate_arithmetic_migration_smoke
-from dynamics.checked_ray_address import checked_ray_address_smoke
-from certificates.c_minus_2.checked_finite_certificate_gate import checked_finite_certificate_gate_smoke
 from c1.theorem_tags.theorem_tag_payload_instances import theorem_tag_payload_instances_smoke
-from certificates.c_minus_2.checked_landing_target_adapter import checked_landing_target_adapter_smoke
 from finite_exact.exact_decimal import exact_decimal_smoke
 from finite_exact.bigint_z import bigint_z_phase_one_smoke, bigint_z_phase_two_smoke, bigint_z_phase_three_smoke, bigz_long_division_smoke
 from arithmetic.bigint_adapter import bigint_adapter_phase_one_smoke, bigint_adapter_phase_two_smoke, bigint_adapter_complete_smoke
@@ -189,15 +180,13 @@ def test_canonical_gcd_helpers() raises -> Bool:
 def test_canonical_ray_addresses() -> Bool:
     var one_third = RayAddr(1, 3)
     var one_half = RayAddr(1, 2)
-    var doubled = one_third.doubled()
-    var doubled64 = RayAddr64(1, 2).doubled()
     return (
         one_third.normalized() and
         not RayAddr(2, 4).normalized() and
-        doubled.num == 2 and doubled.den == 3 and
+        fraction_equal(double_mod_one(fraction_from_i64(1, 3)), fraction_from_i64(2, 3)) and
         ray_addr_before(one_half, one_third) and
         same_ray_addr(one_third, RayAddr(1, 3)) and
-        doubled64.num == 0 and doubled64.den == 2
+        fraction_equal(double_mod_one(fraction_from_i64(1, 2)), fraction_from_i64(0, 1))
     )
 
 
@@ -206,7 +195,7 @@ def test_canonical_rational_geometry() -> Bool:
     var doubled_half = demo_ray_addr_doubling_half()
     return (
         spread_value.eq(Q.one()) and
-        doubled_half.num == 0 and doubled_half.den == 2
+        fraction_equal(doubled_half, fraction_from_i64(0, 1))
     )
 
 
@@ -322,16 +311,7 @@ def run_smoke_tests() raises -> Bool:
     _ = report.record("alignment policy data", test_alignment_policy_data())
     _ = report.record("optimization policy data", test_optimization_policy_data())
     _ = report.record("final proof object policy data", test_final_proof_object_policy_data())
-    _ = report.record("checked i64 boundary", checked_i64_boundary_smoke())
-    _ = report.record("checked Q", checked_q_smoke())
-    _ = report.record("checked interval Q", checked_iq_smoke())
-    _ = report.record("checked complex Horner", checked_complex_horner_smoke())
-    _ = report.record("checked interval exclusion", checked_interval_exclusion_smoke())
-    _ = report.record("checked Krawczyk", checked_krawczyk_smoke())
     _ = report.record("certificate backend", cert_backend_smoke())
-    _ = report.record("certificate arithmetic migration", certificate_arithmetic_migration_smoke())
-    _ = report.record("checked ray address", checked_ray_address_smoke())
-    _ = report.record("checked finite certificate gate", checked_finite_certificate_gate_smoke())
     _ = report.record("theorem tag payload instances", theorem_tag_payload_instances_smoke())
     _ = report.record("residual directive carrier", residual_directive_carrier_smoke())
     _ = report.record("exact angle tuning", angle_tuning_smoke())
@@ -339,7 +319,6 @@ def run_smoke_tests() raises -> Bool:
     _ = report.record("carrier density profile", carrier_density_profile_smoke())
     _ = report.record("Misiurewicz exact-type catalogue", misiurewicz_catalogue_smoke())
     _ = report.record("Misiurewicz prefix graph", misiurewicz_prefix_graph_smoke())
-    _ = report.record("checked landing target adapter", checked_landing_target_adapter_smoke())
     _ = report.record("bigint Z phase one", bigint_z_phase_one_smoke())
     _ = report.record("bigint adapter phase one", bigint_adapter_phase_one_smoke())
     _ = report.record("bigint Z phase two", bigint_z_phase_two_smoke())
