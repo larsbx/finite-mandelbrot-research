@@ -101,6 +101,44 @@ in the repository when the swap was made. They differ only where the local
 copy mis-lexed: upstream keeps a backslash-continued single-quoted string open
 and does not close a triple-quoted string at an escaped quote.
 
+`tools/audit_exact_arithmetic.py` is a policy over the vendored
+`exact_arithmetic_audit` engine (`vendor/python/exact_arithmetic_audit/`),
+unified upstream from this repository's audit and finite-julia-set-research's.
+The policy reproduces the former audit (the section 6.2 binding table, the
+fourteen required headings, any class admitted, the four vendored facades
+exempt from the citation check), and gains the engine's stricter checks: a
+`DType.float*` dtype is a C1 hit, only list items of
+`tools/exact_arithmetic_allowlist.md` grant a quarantine, and the
+specification must name this repository (as `larsbx/finite-mandlebrot-research`,
+its spelling there). None of these reports anything on this tree. Arithmetic
+consumers are still the modules that import `rat_q`, `rational`, `closed_q` or
+`closed_interval`: reading any `finite_exact` import would also demand rows
+for seven modules that use only `integer_gcd`, `bigint_z` or `exact_decimal`
+(`kernel/mojo/arithmetic/big_int_boundary.mojo`,
+`kernel/mojo/certificates/c_minus_2/bigq_landing_target_adapter.mojo`,
+`kernel/mojo/certificates/certificate_sets.mojo`,
+`kernel/mojo/certificates/misiurewicz_catalogue.mojo`,
+`kernel/mojo/dynamics/ray_address.mojo`,
+`kernel/mojo/entrypoints/atlas_dataset.mojo`,
+`vendor/mojo/rational_dynamics/rational.mojo`), none of which consumes the
+`Q` or `IQ` layer the binding table governs.
+
+The interval exclusion oracle
+`reference/python/interval/interval_exclusion_reference.py` computes over the
+vendored `closed_interval` package (`vendor/python/closed_interval/`), the
+Python twin of `closed_q`; its local `I` and `CI` classes were removed. Their
+complex square was the expanded product `mul(self)`, looser than the sharp
+square of the vendored Mojo `closed_q` whenever a coordinate interval contains
+`0`. No recorded result moved: the pinned verdicts (`c = -2`, horizon 3: 5/5;
+`M_{4,1}`, horizon 6: 18/18), the `c = -2` box at horizon 4 (5/7, failing
+`(0, 4)` and `(1, 4)`), and every box math-vizops's atlas chooses and decides
+from the current `pixi run atlas-dataset` output are identical under both
+squares. `excluded_count`, `dyadic_box`, `c_minus_2_box` and `m41_box` keep
+their signatures, and a box still exposes `re.lo`, `re.hi`, `im.lo` and
+`im.hi`. A reversed interval is now a rejected value that poisons every
+operation, as in `closed_q`, rather than a `ValueError`; a rejected
+difference box excludes nothing.
+
 This changes ownership, not mathematical semantics:
 
 - `BigZ` and `Q` remain exact, unbounded, and fail closed;

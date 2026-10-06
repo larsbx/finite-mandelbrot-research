@@ -48,10 +48,17 @@ def test_lexical_audits_use_the_vendored_masker():
     # The masker is the vendored claim_governance one (pinned in vendored.toml);
     # the former local copy, tools/source_tokens.py, is gone.
     assert not (ROOT / "tools" / "source_tokens.py").exists()
-    for audit in ("audit_no_trig.py", "audit_no_points.py", "audit_exact_arithmetic.py"):
-        src = (ROOT / "tools" / audit).read_text(encoding="utf-8")
+    # The exact-arithmetic audit is a policy over the vendored engine, which
+    # masks with the same vendored lexer.
+    sources = [ROOT / "tools" / audit for audit in ("audit_no_trig.py", "audit_no_points.py")]
+    sources.append(ROOT / "vendor" / "python" / "exact_arithmetic_audit" / "audit.py")
+    for path in sources:
+        src = path.read_text(encoding="utf-8")
         assert "from claim_governance.lexing import mask_comments_and_strings" in src
         assert "source_tokens" not in src
+    policy = (ROOT / "tools" / "audit_exact_arithmetic.py").read_text(encoding="utf-8")
+    assert "from exact_arithmetic_audit import" in policy
+    assert "source_tokens" not in policy
 
 
 def test_vendored_masker_keeps_a_backslash_continued_string_open():
