@@ -190,11 +190,81 @@ def anchor_errors(occ: dict, root: Path) -> list[str]:
     return errors
 
 
+def _q(pair) -> Fraction:
+    return Fraction(pair[0], pair[1])
+
+
+def _datum_rationals(datum: dict) -> set[Fraction]:
+    values = [v for k in ANGLE_SETS + ("root_parameter",) if k in datum for v in (datum[k] if isinstance(datum[k], list) else [datum[k]])]
+    values += [v for level in datum.get("levels", []) for v in level]
+    return {Fraction(v) for v in values}
+
+
+def _tunings(rows: list, datum: dict) -> bool:
+    seen = {_q(r[f]) for r in rows for f in ("lo", "hi", "theta", "tuned") if r.get(f)}
+    pairs = {(_q(r["lo"]), _q(r["hi"])) for r in rows}
+    root = datum.get("root_angles")
+    return _datum_rationals(datum) <= seen and (root is None or tuple(sorted(Fraction(a) for a in root)) in pairs)
+
+
+def _kneading(rows: list, datum: dict) -> bool:
+    return all(
+        any(_q(r["theta"]) == Fraction(a) and r["address"] == datum.get("internal_address", r["address"])
+            and r["period"] == datum.get("period", r["period"]) for r in rows)
+        for a in datum.get("root_angles", [])
+    ) and bool(datum.get("root_angles"))
+
+
+def _catalogues(rows: list, datum: dict) -> bool:
+    l, k = datum["angle_type"]
+    found = {Fraction(a, r["den"]) for r in rows if (r["l"], r["k"]) == (l, k) for a in r["addresses"]}
+    return any((r["l"], r["k"]) == (l, k) for r in rows) and {Fraction(a) for a in datum.get("angles", [])} <= found
+
+
+def _incidence(rows: list, datum: dict) -> bool:
+    types = {(r["ray_preperiod"], r["ray_period"]) for r in rows}
+    return bool(datum.get("angles")) and all(sn.exact_type(Fraction(a)) in types for a in datum["angles"])
+
+
+def _valleys(rows: list, datum: dict, atlas_ids: list[str]) -> bool:
+    acc = datum["accumulation"]
+    return any(r["id"] in atlas_ids and r["parent"] == acc["parent"] and _q(r["rotation"]) == Fraction(acc["rotation"]) for r in rows)
+
+
+def _convergents(rows: list, datum: dict) -> bool:
+    limbs = {_q(t["limb"]) for r in rows for t in r["terms"]}
+    return {Fraction(c) for c in datum["convergents"]} <= limbs
+
+
+EMITTED = {
+    "atlas-dataset:tunings": lambda rows, o: _tunings(rows, o.get("datum", {})),
+    "atlas-dataset:kneading": lambda rows, o: _kneading(rows, o.get("datum", {})),
+    "atlas-dataset:catalogues": lambda rows, o: _catalogues(rows, o.get("datum", {})),
+    "atlas-dataset:incidence": lambda rows, o: _incidence(rows, o.get("datum", {})),
+    "structure-streams:valleys": lambda rows, o: _valleys(rows, o.get("datum", {}), o["atlas"]),
+    "structure-streams:convergents": lambda rows, o: _convergents(rows, o.get("datum", {})),
+}
+
+
+def emitted_errors(occ: dict, outputs: dict[str, dict]) -> list[str]:
+    """An occurrence that `emits` into an emitter section must find its datum in that section of the
+    emitter's actual output: the anchor names the code, the output is what the code says."""
+    if "emits" not in occ:
+        return []
+    emitter, section = occ["emits"].split(":", 1)
+    check = EMITTED.get(occ["emits"])
+    if check is None or emitter not in outputs or section not in outputs[emitter]:
+        return [f"{occ['id']}: no output section {occ['emits']}"]
+    return [] if check(outputs[emitter][section], occ) else [f"{occ['id']}: datum not in the emitted {occ['emits']}"]
+
+
 def table_errors(table: dict, atlas: dict[str, dict]) -> list[str]:
     errors = [] if table.get("format") == TABLE_FORMAT else [f"format is {table.get('format')!r}"]
     ids = [o["id"] for o in table["occurrence"]]
     errors += [f"duplicate occurrence id {i}" for i in sorted({i for i in ids if ids.count(i) > 1})]
     errors += [f"occurrence id {i} collides with an atlas id" for i in ids if i in atlas]
+    errors += [f"{o['id']}: emits {o['emits']!r} is not a checked section" for o in table["occurrence"]
+               if "emits" in o and o["emits"] not in EMITTED]
     for o in table["occurrence"]:
         errors += [f"{o['id']}: {f} {o[f]!r} is not declared" for f, allowed in
                    (("relation", OCCURRENCE_RELATIONS), ("plane", PLANES), ("exactness", EXACTNESS))

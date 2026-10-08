@@ -6,7 +6,10 @@ The surface joins `schemas/structure_names.toml` and
 classes and relations, for consumers such as `larsbx/math-vizops` to draw
 without deriving anything. The checks live in
 `reference/python/atlas/structure_crosswalk_reference.py`; this script refuses
-to write a graph those checks reject.
+to write a graph those checks reject, including any anchor in this repository
+that no longer occurs in its file. (Anchors in sibling repositories need their
+checkouts, and emitter sections need the Mojo toolchain; both are checked by
+tests/test_structure_crosswalk.py.)
 
 Usage: make_structure_crosswalk.py [--check]
 """
@@ -25,6 +28,7 @@ from reference.python.atlas import structure_crosswalk_reference as cw  # noqa: 
 def main(argv: list[str]) -> int:
     table, atlas = cw.load(), cw.atlas_by_id()
     errors = cw.table_errors(table, atlas) + [m for o in table["occurrence"] for m in cw.datum_errors(o, atlas)]
+    errors += [m for o in table["occurrence"] if o["repo"] == cw.REPOSITORY for m in cw.anchor_errors(o, cw.ROOT)]
     if errors:
         print("refused:\n  " + "\n  ".join(errors))
         return 1

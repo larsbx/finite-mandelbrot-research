@@ -147,3 +147,59 @@ def test_surface_declares_its_vocabulary_and_carries_no_float() -> None:
     assert {e["relation"] for e in surface["edges"]} <= relations
     nodes = {n["id"] for n in surface["nodes"]}
     assert all(e["source"] in nodes and e["target"] in nodes for e in surface["edges"])
+
+
+# Emitted sections: the datum must be in what the emitter actually prints.
+
+EMITTERS = {
+    "atlas-dataset": "kernel/mojo/entrypoints/atlas_dataset.mojo",
+    "structure-streams": "kernel/mojo/entrypoints/structure_streams.mojo",
+}
+EMITTING = [o for o in OCCURRENCES if "emits" in o]
+
+
+@pytest.fixture(scope="module")
+def outputs() -> dict:
+    sys.path.insert(0, str(ROOT / "tools"))
+    from mojo_include import mojo_run
+
+    found = {}
+    for name, entry in EMITTERS.items():
+        result = subprocess.run(mojo_run(entry), cwd=ROOT, capture_output=True, text=True, check=False)
+        assert result.returncode == 0, result.stdout + result.stderr
+        found[name] = json.loads(result.stdout)
+    return found
+
+
+@pytest.mark.parametrize("occ", EMITTING, ids=lambda o: o["id"])
+def test_emitted_datum_is_in_the_emitter_output(outputs: dict, occ: dict) -> None:
+    assert cw.emitted_errors(occ, outputs) == []
+
+
+def test_every_emitted_section_is_checked() -> None:
+    assert EMITTING and all(o["emits"] in cw.EMITTED for o in EMITTING)
+
+
+@pytest.mark.parametrize(
+    "occ_id, datum",
+    [
+        ("fmr-emitter-tuning-rabbit", {"root_angles": ["1/7", "3/7"]}),
+        ("fmr-emitter-kneading-bulb-1/3", {"root_angles": ["1/7", "2/7"], "internal_address": [1, 4]}),
+        ("fmr-emitter-catalogue-m41", {"angles": ["9/56", "1/6"], "angle_type": [3, 3]}),
+        ("fmr-streams-scepter-valley", {"accumulation": {"parent": "main-cardioid", "rotation": "1/2"}}),
+        ("fmr-streams-golden-mean", {"convergents": ["1/2", "3/4"]}),
+    ],
+)
+def test_emitted_check_refuses_a_datum_the_output_does_not_carry(outputs: dict, occ_id: str, datum: dict) -> None:
+    occ = {**next(o for o in OCCURRENCES if o["id"] == occ_id), "datum": datum}
+    assert cw.emitted_errors(occ, outputs) != []
+
+
+def test_generator_refuses_a_local_anchor_that_is_gone(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    occ = next(o for o in OCCURRENCES if o["repo"] == cw.REPOSITORY and "anchor" in o)
+    broken = {**TABLE, "occurrence": [{**occ, "anchor": "this text is in no file"}]}
+    monkeypatch.setattr(cw, "load", lambda path=cw.TABLE: broken)
+    sys.path.insert(0, str(ROOT / "tools"))
+    import make_structure_crosswalk
+
+    assert make_structure_crosswalk.main(["--check"]) == 1
