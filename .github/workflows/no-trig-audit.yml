@@ -23,6 +23,8 @@ jobs:
         python3 /tmp/estate-audit.py --root .
     - name: Verify vendored package digests
       run: pixi run vendored
+    - name: The polyglot envelope is the rendering of its vendored template
+      run: pixi run polyglot-check
     - name: Audit governed theorem/claim usage
       env:
         PYTHONPATH: vendor/python

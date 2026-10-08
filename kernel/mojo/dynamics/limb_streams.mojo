@@ -13,13 +13,9 @@
 # Everything is a statement about addresses. That the rays land at the root of
 # a component is the imported landing theorem, as in angle_tuning.
 
-from dynamics.angle_tuning import angle_period, tuned_angle
-from dynamics.checked_ray_address import (
-    CheckedRayAddrResult,
-    checked_ray_addr_equal,
-    make_checked_ray_addr,
-    rejected_ray_addr,
-)
+from dynamics.angle_tuning import address, address_period, tuned_angle
+from finite_exact.bigint_z import bigz_mul, bigz_sub
+from rational_dynamics.rational import ReducedFraction, fraction_equal, fraction_from_i64, reduce_fraction, rejected_fraction
 
 #: Largest q read off the rotation directly; 2^q - 1 must fit an Int64 word.
 comptime LIMB_DENOMINATOR_LIMIT = 40
@@ -28,19 +24,28 @@ comptime LIMB_DENOMINATOR_LIMIT = 40
 struct LimbRoots(Copyable, Movable):
     """The root angles theta_- < theta_+ of a limb, or a rejection."""
 
-    var lo: CheckedRayAddrResult
-    var hi: CheckedRayAddrResult
+    var lo: ReducedFraction
+    var hi: ReducedFraction
 
-    def __init__(out self, lo: CheckedRayAddrResult, hi: CheckedRayAddrResult):
-        self.lo = lo
-        self.hi = hi
+    def __init__(out self, var lo: ReducedFraction, var hi: ReducedFraction):
+        self.lo = lo^
+        self.hi = hi^
 
     def accepted(self) -> Bool:
         return self.lo.accepted() and self.hi.accepted()
 
+    def width(self) -> ReducedFraction:
+        """theta_+ - theta_-, exactly."""
+        if not self.accepted():
+            return rejected_fraction()
+        return reduce_fraction(
+            bigz_sub(bigz_mul(self.hi.num, self.lo.den), bigz_mul(self.lo.num, self.hi.den)),
+            bigz_mul(self.lo.den, self.hi.den),
+        )
+
 
 def rejected_limb() -> LimbRoots:
-    return LimbRoots(rejected_ray_addr(), rejected_ray_addr())
+    return LimbRoots(rejected_fraction(), rejected_fraction())
 
 
 def _gcd(a: Int, b: Int) -> Int:
@@ -67,22 +72,22 @@ def main_cardioid_limb(p: Int, q: Int) -> LimbRoots:
         return rejected_limb()
     var den = (Int64(1) << Int64(q)) - 1
     return LimbRoots(
-        make_checked_ray_addr(rotation_word(p - 1, p, q), den),
-        make_checked_ray_addr(rotation_word(p, p, q), den),
+        fraction_from_i64(rotation_word(p - 1, p, q), den),
+        fraction_from_i64(rotation_word(p, p, q), den),
     )
 
 
-def limb_of(parent_lo: CheckedRayAddrResult, parent_hi: CheckedRayAddrResult, p: Int, q: Int) -> LimbRoots:
-    """Root angles of the p/q-limb of the component with root rays parent_lo < parent_hi: the
-    main-cardioid limb tuned by that component. The main cardioid itself is passed as two zero rays."""
-    var limb = main_cardioid_limb(p, q)
-    if not limb.accepted() or parent_lo.rejected or parent_hi.rejected:
+def limb_of(lo_num: Int64, lo_den: Int64, hi_num: Int64, hi_den: Int64, p: Int, q: Int) -> LimbRoots:
+    """Root angles of the p/q-limb of the component with root rays lo_num/lo_den < hi_num/hi_den: the
+    main-cardioid limb tuned by that component. The main cardioid itself is passed as 0/1, 0/1."""
+    if q < 2 or q > LIMB_DENOMINATOR_LIMIT or p < 1 or p >= q or _gcd(p, q) != 1:
         return rejected_limb()
-    if parent_lo.num == 0 and parent_hi.num == 0:
-        return limb^
+    if lo_num == 0 and hi_num == 0:
+        return main_cardioid_limb(p, q)
+    var den = (Int64(1) << Int64(q)) - 1
     return LimbRoots(
-        tuned_angle(parent_lo.num, parent_lo.den, parent_hi.num, parent_hi.den, limb.lo.num, limb.lo.den),
-        tuned_angle(parent_lo.num, parent_lo.den, parent_hi.num, parent_hi.den, limb.hi.num, limb.hi.den),
+        tuned_angle(lo_num, lo_den, hi_num, hi_den, rotation_word(p - 1, p, q), den),
+        tuned_angle(lo_num, lo_den, hi_num, hi_den, rotation_word(p, p, q), den),
     )
 
 
@@ -128,13 +133,10 @@ def farey_stream(a: Int, b: Int, depth: Int, max_den: Int) -> List[FareyTerm]:
 
 
 def _limb_is(limb: LimbRoots, lo_n: Int64, lo_d: Int64, hi_n: Int64, hi_d: Int64) -> Bool:
-    return checked_ray_addr_equal(limb.lo, make_checked_ray_addr(lo_n, lo_d)) and checked_ray_addr_equal(
-        limb.hi, make_checked_ray_addr(hi_n, hi_d)
-    )
+    return fraction_equal(limb.lo, address(lo_n, lo_d)) and fraction_equal(limb.hi, address(hi_n, hi_d))
 
 
 def limb_streams_smoke() -> Bool:
-    var zero = make_checked_ray_addr(0, 1)
     # Main-cardioid limbs: 1/2, 1/3, 2/3, 1/4, 2/5, 3/8.
     if not _limb_is(main_cardioid_limb(1, 2), 1, 3, 2, 3):
         return False
@@ -148,11 +150,9 @@ def limb_streams_smoke() -> Bool:
     if main_cardioid_limb(2, 4).accepted() or main_cardioid_limb(3, 3).accepted() or main_cardioid_limb(1, 41).accepted():
         return False
     # The main cardioid passes through; the 1/2-bulb tunes: its 1/2-limb is 2/5, 3/5, its 1/3-limb 22/63, 25/63.
-    if not _limb_is(limb_of(zero, zero, 1, 3), 1, 7, 2, 7):
+    if not _limb_is(limb_of(0, 1, 0, 1, 1, 3), 1, 7, 2, 7):
         return False
-    var half_lo = make_checked_ray_addr(1, 3)
-    var half_hi = make_checked_ray_addr(2, 3)
-    if not _limb_is(limb_of(half_lo, half_hi, 1, 2), 2, 5, 3, 5) or not _limb_is(limb_of(half_lo, half_hi, 1, 3), 22, 63, 25, 63):
+    if not _limb_is(limb_of(1, 3, 2, 3, 1, 2), 2, 5, 3, 5) or not _limb_is(limb_of(1, 3, 2, 3, 1, 3), 22, 63, 25, 63):
         return False
     # Every main-cardioid wake has width 1/(2^q - 1), and both rays have period q.
     for q in range(2, 15):
@@ -160,10 +160,9 @@ def limb_streams_smoke() -> Bool:
             if _gcd(p, q) != 1:
                 continue
             var limb = main_cardioid_limb(p, q)
-            var den = (Int64(1) << Int64(q)) - 1
-            if (limb.hi.num * limb.lo.den - limb.lo.num * limb.hi.den) * den != limb.lo.den * limb.hi.den:
+            if not fraction_equal(limb.width(), address(1, (Int64(1) << Int64(q)) - 1)):
                 return False
-            if angle_period(limb.lo.num, limb.lo.den) != q or angle_period(limb.hi.num, limb.hi.den) != q:
+            if address_period(limb.lo) != q or address_period(limb.hi) != q:
                 return False
     # Farey streams: 1/2 from below is 1/3, 2/5, 3/7; from above 2/3, 3/5, 4/7. 0 has only the side above.
     var half = farey_stream(1, 2, 3, 14)

@@ -49,9 +49,9 @@ Pinned catalogues, asserted identically on both sides:
 
 ## Bounds and fail-closed behaviour
 
-Every bound is checked before any arithmetic, so no computation here can overflow its fixed-width integers, and a bound reached is a refusal, never an answer: `catalogue_denominator` returns `-1` and `catalogue` the empty list.
+The type and the count are computed by the vendored `rational_dynamics.doubling` (`exact_type`, `exact_type_count`, upstream `larsbx/finite-math-kernels`, pinned in `vendored.toml`), exactly over BigZ with no cap on the order; the bounds below are this repository's data policy on machine-`Int` addresses. Every bound is checked before any arithmetic, so no value here can overflow its fixed-width integers, and a bound reached is a refusal, never an answer: `catalogue_denominator` returns `-1` and `catalogue` the empty list.
 
-The two bounds govern different things, and conflating them is the trap this section exists to close. `exact_type` reads a type off any address whose denominator is at most `MAX_CATALOGUE_DENOMINATOR`, and refuses every other address; its loop is bounded by that denominator. A catalogue of type `(l, k)` needs more: both indices at most `MAX_TYPE_INDEX`, *and* its own denominator `2^l (2^k - 1)` within the same bound, which is far more restrictive.
+The two bounds govern different things, and conflating them is the trap this section exists to close. `exact_type` reads a type off any address whose denominator is at most `MAX_CATALOGUE_DENOMINATOR`, and refuses every other address. A catalogue of type `(l, k)` needs more: both indices at most `MAX_TYPE_INDEX`, *and* its own denominator `2^l (2^k - 1)` within the same bound, which is far more restrictive.
 
 So an accepted type need not be one this module holds a catalogue of, and each bound has a witness well inside the denominator limit:
 

@@ -65,17 +65,33 @@ def test_the_smoke_checks_the_type_against_iterating_the_doubling_map():
 
 
 def test_the_catalogue_denominator_is_the_vendored_type_count():
-    """`2^l (2^k - 1)` is the vendored angle_doubling `type_count`; the type
-    itself stays local, because angle_doubling refuses periods past 64 while
-    `exact_type` reads every period up to its denominator bound (the smoke's
-    `1/107`, of period 106, among them)."""
+    """`2^l (2^k - 1)` is the vendored angle_doubling `type_count`."""
     src = text(SRC)
     assert "from angle_doubling.angle import type_count" in src
     assert "var den = Int(type_count(preperiod, period))" in src
     angle = text(ROOT / "vendor/mojo/angle_doubling/angle.mojo")
     assert "def type_count(l: Int, k: Int) -> Int64:" in angle
     assert "return (Int64(1) << Int64(l)) * ((Int64(1) << Int64(k)) - 1)" in angle
-    assert "return 64" in angle[angle.index("def order_limit"):]
+
+
+def test_the_type_and_the_count_are_the_vendored_uncapped_ones():
+    """The type is the vendored rational_dynamics `exact_type` and the count its
+    `exact_type_count`, both exact over BigZ with no cap on the order (the
+    fixed-width angle_doubling refuses periods past 64, while `exact_type`
+    reads every period up to its denominator bound: the smoke's `1/107`, of
+    period 106, among them). Only the two bounds, this repository's data
+    policy, and the conversion back to machine `Int` stay local."""
+    src = text(SRC)
+    assert "from rational_dynamics.doubling import exact_type as doubling_type" in src
+    assert "from rational_dynamics.doubling import exact_type_count" in src
+    assert "from rational_dynamics.integers import bigz_to_int" in src
+    assert "from rational_dynamics.moebius import moebius" in src
+    assert "def moebius(" not in src and "gcd_int" not in src
+    doubling = text(ROOT / "vendor/mojo/rational_dynamics/doubling.mojo")
+    order = text(ROOT / "vendor/mojo/rational_dynamics/multiplicative_order.mojo")
+    assert "def order_of_two(modulus: BigZ) -> BigZResult:" in order
+    assert "def exact_type_count(l: Int, k: Int) -> BigZResult:" in doubling
+    assert "order_limit" not in doubling + order
 
 
 def test_the_mojo_catalogue_case_passes(mojo_smoke):

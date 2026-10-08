@@ -27,15 +27,13 @@ def test_int64_demo_backend_not_certificate_ready():
     assert "must_reject_certificate_on_int64_demo_backend" in src
 
 
-def test_checked_width_and_proof_grade_are_separate_gates():
-    src = read(ROOT / "kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo")
-    assert "def checked_width_accepted" in src
-    assert "def proof_grade_accepted" in src
-    assert "self.backend.certificate_ready()" in src
-    assert "not checked.proof_grade_accepted()" in src
-    assert "not demo.checked_width_accepted()" in src
-    assert "checked_p21_exact_type_exclusions(8)" in src
-    assert "ExactTypeExclusionEvidence(box_name, 5, 5, False)" not in src
+def test_replay_and_certificate_acceptance_are_separate_gates():
+    src = read(ROOT / "kernel/mojo/certificates/c_minus_2/bigq_finite_certificate_gate.mojo")
+    assert "def finite_inputs_accepted" in src
+    assert "def certificate_accepted" in src
+    assert "return self.finite_inputs_accepted() and self.theorem_tags_accepted()" in src
+    assert "not status.theorem_tags_accepted() and not status.certificate_accepted()" in src
+    assert "not ambiguous.finite_inputs_accepted() and not rejected.finite_inputs_accepted()" in src
 
 
 def test_proof_grade_gate_composes_certificate_and_backend():

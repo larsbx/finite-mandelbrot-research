@@ -26,18 +26,8 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/c1/theorem_tags/theorem_tag_assumption_payloads.mojo`.
 - `kernel/mojo/c1/theorem_tags/theorem_tag_import_ledger.mojo`.
 - `kernel/mojo/c1/proof/final_proof_object_skeleton.mojo`.
-- `kernel/mojo/arithmetic/checked_int64_backend.mojo`.
-- `kernel/mojo/arithmetic/checked_q.mojo`.
-- `kernel/mojo/arithmetic/checked_interval_q.mojo`.
-- `kernel/mojo/arithmetic/checked_complex_interval.mojo`.
-- `kernel/mojo/certificates/checked_krawczyk_witness.mojo`.
-- `kernel/mojo/certificates/checked_interval_exclusion.mojo`.
 - `kernel/mojo/arithmetic/cert_backend.mojo`.
-- `kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo`.
-- `kernel/mojo/dynamics/checked_ray_address.mojo`.
-- `kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo`.
 - `kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo`.
-- `kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo`.
 - `vendor/mojo/finite_exact/bigint_z.mojo`.
 - `kernel/mojo/arithmetic/bigint_adapter.mojo`.
 - `vendor/mojo/mojo_smoke/report.mojo`.
@@ -49,6 +39,7 @@ The compiler-checked dependency closure currently consists of:
 - `kernel/mojo/certificates/c_minus_2/bigq_certificate_incidence.mojo`.
 - `vendor/mojo/substitution_dynamics/substitution.mojo`.
 - `vendor/mojo/substitution_dynamics/tuning.mojo`.
+- `vendor/mojo/substitution_dynamics/internal_address.mojo`.
 - `kernel/mojo/c1/residual/residual_directive_carrier.mojo`.
 - `kernel/mojo/c1/separator/separated_density.mojo`.
 - `kernel/mojo/certificates/misiurewicz_catalogue.mojo`.
@@ -58,6 +49,11 @@ The compiler-checked dependency closure currently consists of:
 - `vendor/mojo/quadratic_orbit/collision.mojo`.
 - `vendor/mojo/quadratic_orbit/orbit.mojo`.
 - `vendor/mojo/rational_dynamics/rational.mojo`.
+- `vendor/mojo/rational_dynamics/doubling.mojo`.
+- `vendor/mojo/rational_dynamics/moebius.mojo`.
+- `vendor/mojo/rational_dynamics/multiplicative_order.mojo`.
+- `vendor/mojo/rational_dynamics/carmichael.mojo`.
+- `vendor/mojo/rational_dynamics/integers.mojo`.
 - `vendor/mojo/angle_doubling/angle.mojo`.
 
 A second compile target, `kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`, imports
@@ -68,7 +64,7 @@ This slice checks the preserved polynomial identities, certificate-header
 constraints, the same-box joint-witness gate, imported-theorem-tag acceptance,
 normalized rational arithmetic, rational ordering, interval multiplication,
 coordinate-record quadrance, normalized rational spread, symbolic ray-address
-doubling, and interval Horner evaluation of the squarefree
+doubling through the vendored `rational_dynamics`, and interval Horner evaluation of the squarefree
 localization polynomial, and the exact interval Krawczyk contraction for
 `P_{2,1}` at the dyadic box centered on -2. It also checks the C1 final-ledger
 readiness and final-evidence policy from explicit data, including an unsafe
@@ -88,34 +84,19 @@ negative control that attempts to mark a debug path proof-grade.
 The checked Int64 transition layer rejects boundary overflows, invalid
 denominators, and the known Q_8 coefficient-growth case. It is not a bigint
 backend and is not wired into `Q`, so proof-grade acceptance remains disabled.
-The checked rational transition layer normalizes accepted values and explicitly
-rejects unsafe construction, arithmetic, division, and comparison. Existing
-`Q` and interval consumers remain on the demo path pending rejection-aware
-migration.
-The checked interval transition layer enforces ordered endpoints and propagates
-rational rejection through interval arithmetic, reciprocal, sign, and subset
-queries used by the checked certificate transition path.
-The checked complex interval layer propagates component rejection through
-rank-2 arithmetic, orbit recurrence, and Horner evaluation of `P_{2,1}` and its
-derivative.
-The checked `P_{2,1}` Krawczyk path now distinguishes verified contraction,
-valid non-contraction, and arithmetic rejection. This bounded checked path does
-not satisfy the repository's unbounded proof-grade backend requirement.
-The checked exact-type path evaluates all five forbidden collisions for the
-same c=-2 box. Arithmetic rejection and ambiguous zero containment both reject
-the exclusion result.
-The arithmetic migration gate accepts the checked-width `P_{2,1}` localization
-only when the contraction, computed exact-type exclusions, same-box identity, and
-checked backend all agree. It separately rejects proof-grade acceptance because
-the backend is bounded.
-The checked ray-address path computes the finite `1/2 -> 0 -> 0` doubling orbit
-and rejects malformed or overflowing fixed-width inputs. The checked finite
-certificate gate composes that result with localization but rejects full
-acceptance. Source-specific theorem-tag instances match the checked finite data
-to the Schleicher landing and Misiurewicz-fiber source families. The landing
-adapter derives checked-width target uniqueness from `P_{2,1}=C(C+2)`, rejection
-of the lower-type `C=0` root, and the typed preperiod correspondence. Both
-imports remain rejected finally because the classification backend is bounded.
+The checked Int64 rational stack that used to follow it (checked `Q`, interval
+`Q` and complex interval layers, the checked `P_{2,1}` Krawczyk and exact-type
+exclusion paths, the checked-width localization gate, and the checked c=-2
+landing adapter and finite-certificate gate) is retired. The BigZ replays below
+are the certificates of record: on every half-width the checked stack accepted
+they reproduce its boxes, Krawczyk images and verdicts exactly, and they answer
+where it rejected for overflow.
+The checked ray-address primitives remain for the kneading and tuning kernels
+that import them; they reject malformed or overflowing fixed-width inputs. The
+`1/2 -> 0 -> 0` orbit for c=-2 is the BigZ replay's. Source-specific
+theorem-tag instances match that replay to the Schleicher landing and
+Misiurewicz-fiber source families, and take final import admissibility from the
+proof-grade landing association and trivial-fiber classification.
 The completed `BigZ` integer backend uses dynamic base-`10^9` limbs and executes exact
 signed construction, ring operations, order, quotient/remainder, rejected
 non-divisions, and Euclidean gcd beyond `Int64` magnitude. Phase three adds a

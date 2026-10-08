@@ -44,37 +44,22 @@ Every constructor and operation must normalize. Equality and order may use cross
 
 ## Migration sequence
 
-0. Use `kernel/mojo/arithmetic/checked_int64_backend.mojo` to fail closed during migration. Its
-   compiled Q_8 growth control confirms the present bounded backend cannot
-   complete the intended recurrence. This layer does not itself permit
-   certificate acceptance and `Q` has not yet been migrated to it.
-   `kernel/mojo/arithmetic/checked_q.mojo` now supplies the normalized, rejection-aware rational
-   API over that transition layer. `kernel/mojo/arithmetic/checked_interval_q.mojo` now propagates
-   rejection through the real rational-interval operations.
-   `kernel/mojo/arithmetic/checked_complex_interval.mojo` now carries rejection through rank-2
-   interval arithmetic and `P_{2,1}` Horner evaluation.
-   `kernel/mojo/certificates/checked_krawczyk_witness.mojo` now propagates rejection through strict
-   inclusion and the complete `P_{2,1}` contraction calculation. The next slice
-   `kernel/mojo/certificates/checked_interval_exclusion.mojo` now computes all five forbidden
-   `P_{2,1}` orbit collisions on the same checked c=-2 box and fails closed on
-   arithmetic rejection or ambiguous zero containment.
-   `kernel/mojo/certificates/certificate_arithmetic_migration_gate.mojo` separates checked-width
-   localization acceptance from proof-grade acceptance and binds the checked
-   contraction to that computed exact-type result on the same box. The next
-   slice inventories the remaining downstream predicates in
-   `docs/certificate-predicate-migration-inventory.md`.
-   `kernel/mojo/dynamics/checked_ray_address.mojo` computes the c=-2 rational ray orbit with
-   fixed-width overflow rejection, and `kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo`
-   now proves that checked finite inputs are insufficient for proof-grade use.
-   `kernel/mojo/certificates/c_minus_2/checked_landing_target_adapter.mojo` retains the bounded-width `1/2`
-   to c=-2 association as a migration cross-check. The acceptance-bearing
-   successor `kernel/mojo/certificates/c_minus_2/proof_grade_landing_target_association.mojo` now identifies
-   the target with exact BigZ/Q ray replay, exact BigZ replay of
+0. **Retired:** the checked Int64 transition stack (`checked_q.mojo`,
+   `checked_interval_q.mojo`, `checked_complex_interval.mojo`,
+   `checked_krawczyk_witness.mojo`, `checked_interval_exclusion.mojo`,
+   `certificate_arithmetic_migration_gate.mojo`, and the checked c=-2
+   `checked_landing_target_adapter.mojo` and `checked_finite_certificate_gate.mojo`)
+   carried the c=-2 certificates at bounded width while the integer backend was
+   migrated. Each is replayed exactly by the BigZ/Q path (steps 1 to 5), which
+   is the certificate of record, so the stack is deleted. The acceptance-bearing
+   successor `kernel/mojo/certificates/c_minus_2/proof_grade_landing_target_association.mojo`
+   identifies the target with exact BigZ/Q ray replay, exact BigZ replay of
    `R_{2,1}=C^3(C+2)`, lower-type exclusion of `C=0`, exact type-`(2,1)`
    verification at `C=-2`, and the canonical checked rational-ray theorem
-   import record. The rational landing import is therefore admissible without
-   using the checked-width localization gate. The Misiurewicz trivial-fiber
-   classification remains fail-closed.
+   import record. `kernel/mojo/arithmetic/checked_int64_backend.mojo` and the
+   address primitives of `kernel/mojo/dynamics/checked_ray_address.mojo` are
+   deleted too: the kneading and tuning kernels that imported them now use the
+   vendored `rational_dynamics` doubling over BigZ.
 1. **Selected:** Mojo-native dynamic base-`10^9` limbs in `vendor/mojo/finite_exact/bigint_z.mojo`.
 2. **Complete:** the integer layer implements unbounded signed storage, exact
    add/sub/mul/order, quotient/remainder, rejected non-divisions, Euclidean gcd,

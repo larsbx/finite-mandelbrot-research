@@ -20,6 +20,8 @@ ledgers = "python tools/make_ledger.py"
 ledgers-check = "python tools/make_ledger.py --check"
 crosswalk = "python tools/make_structure_crosswalk.py"
 crosswalk-check = "python tools/make_structure_crosswalk.py --check"
+polyglot = "python vendor/python/polyglot_envelope/render.py"
+polyglot-check = "python vendor/python/polyglot_envelope/render.py --check"
 
 [dependencies]
 # Mojo 1.0.0 release: every Modular package pinned (tests check against pixi.lock).

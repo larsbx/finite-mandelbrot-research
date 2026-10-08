@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CLASSIFICATION = ROOT / "kernel/mojo/certificates/c_minus_2/proof_grade_misiurewicz_trivial_fiber_classification.mojo"
 TAGS = ROOT / "kernel/mojo/c1/theorem_tags/theorem_tag_payload_instances.mojo"
-GATE = ROOT / "kernel/mojo/certificates/c_minus_2/checked_finite_certificate_gate.mojo"
+GATE = ROOT / "kernel/mojo/certificates/c_minus_2/bigq_finite_certificate_gate.mojo"
 SMOKE = ROOT / "kernel/mojo/smoke/smoke_tests.mojo"
 
 
@@ -60,13 +60,12 @@ def test_payload_instance_consumes_classification_without_proof_grade_localizati
     assert "proof_grade_accepted()" not in final
 
 
-def test_complete_certificate_stays_closed_at_incidence_replay_boundary():
+def test_complete_certificate_stays_closed_at_the_bigq_gate():
     gate = read(GATE)
-    assert "def canonical_incidence_replay_accepted(self) -> Bool:\n        return False" in gate
-    assert "self.canonical_incidence_replay_accepted()" in gate
-    assert "status.theorem_tags_accepted()" in gate
-    assert "not status.certificate_accepted()" in gate
-    assert "not status.proof_grade_accepted()" in gate
+    assert "return self.finite_inputs_accepted() and self.theorem_tags_accepted()" in gate
+    assert "status.finite_inputs_accepted()" in gate
+    assert "not status.theorem_tags_accepted() and not status.certificate_accepted()" in gate
+    assert "def proves_c1(self) -> Bool:\n        return False" in gate
 
 
 def test_classification_is_compiler_wired(mojo_smoke):

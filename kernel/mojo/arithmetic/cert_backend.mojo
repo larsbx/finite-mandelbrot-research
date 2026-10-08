@@ -52,18 +52,6 @@ def int64_demo_backend() -> CertIntBackend:
     )
 
 
-def checked_int64_transition_backend() -> CertIntBackend:
-    return CertIntBackend(
-        "CheckedInt64TransitionBackend",
-        False,
-        True,
-        True,
-        False,
-        False,
-        False,
-    )
-
-
 def proof_backend_pending() -> CertIntBackend:
     return CertIntBackend(
         "ProofBackendPending",
@@ -107,9 +95,7 @@ def must_reject_certificate_on_int64_demo_backend() -> Bool:
 
 def cert_backend_smoke() -> Bool:
     var demo = int64_demo_backend()
-    var checked = checked_int64_transition_backend()
     return (
         not demo.checked_execution_ready() and not demo.certificate_ready() and
-        checked.checked_execution_ready() and not checked.certificate_ready() and
         must_reject_certificate_on_int64_demo_backend()
     )
