@@ -51,6 +51,7 @@ from arithmetic.bigint_adapter import bigint_adapter_phase_one_smoke, bigint_ada
 from arithmetic.rat_backend_plan import q_backend_migration_smoke
 from mojo_smoke.report import SmokeReport, smoke_report_smoke
 from dynamics.angle_tuning import angle_tuning_smoke
+from dynamics.limb_streams import limb_streams_smoke
 from dynamics.projective_multiset import projective_multiset_smoke
 from dynamics.critical_relation_bridge import critical_relation_bridge_smoke
 from dynamics.critical_type_census import critical_type_census_smoke
@@ -315,6 +316,7 @@ def run_smoke_tests() raises -> Bool:
     _ = report.record("theorem tag payload instances", theorem_tag_payload_instances_smoke())
     _ = report.record("residual directive carrier", residual_directive_carrier_smoke())
     _ = report.record("exact angle tuning", angle_tuning_smoke())
+    _ = report.record("limb streams by rotation number", limb_streams_smoke())
     _ = report.record("separated density", separated_density_smoke())
     _ = report.record("carrier density profile", carrier_density_profile_smoke())
     _ = report.record("Misiurewicz exact-type catalogue", misiurewicz_catalogue_smoke())

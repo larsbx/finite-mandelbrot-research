@@ -61,6 +61,8 @@ jobs:
         cache: true
     - name: Generated ledger surfaces are current (Mojo mirror, block table, claims, index, TLA+, graph)
       run: python3 tools/make_ledger.py --check
+    - name: Structure crosswalk surface is current (docs/structure_crosswalk.json)
+      run: python3 tools/make_structure_crosswalk.py --check
   reference:
     name: Reference and oracles (non-authoritative)
     runs-on: ubuntu-latest
