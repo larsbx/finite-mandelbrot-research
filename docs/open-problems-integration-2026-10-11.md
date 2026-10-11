@@ -8,8 +8,9 @@ C1 proof status. C1 remains priority zero under
 
 ## Source and review scope
 
-The [supplied survey](sources/mandelbrot-open-problems-survey-2026-10.md) is
-preserved byte-for-byte as an external research input. Original filename:
+The [supplied survey](sources/mandelbrot-open-problems-survey-2026-10.txt) is
+preserved byte-for-byte as a plain-text external research input. The archive
+is not governed project prose; the reviewed integration is. Original filename:
 `Open Problems and Conjectures on the Mandelbrot Set_ A Research-.md`.
 SHA-256: `808e38137448517be73f06f797b79ac636fbfdbca6fb6e23660c6a5e9769e51c`.
 Its October 2026 status assertions, diagrams and estimates are source claims,
