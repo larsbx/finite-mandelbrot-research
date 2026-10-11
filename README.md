@@ -253,3 +253,7 @@ No finite bounded search, renderer, numerical picture, local carrier refinement,
 ## Status
 
 Active research kernel with enforced terminology, rank-2 ontology, C1 proof-status gates, a Mojo-first executable certificate policy, and a Mojo finite theorem-kernel boundary. The multiset bridge currently includes the certified seven-root exact-type divisor `D^{exact}_{4,1} = div_0(F_7)`; embedding selection and localization remain open.
+
+## Research literature intake
+
+The [October 2026 open-problems integration](docs/open-problems-integration-2026-10-11.md) maps the supplied survey to C1 residual closure, the multiset bridge, the existing core-entropy gate and the bulb/Ford companion project. It preserves the source with provenance, records citation corrections and identifies statement-level review obligations. It does not change accepted theorem tags or proof status.
