@@ -121,3 +121,7 @@ Possible use:
 - study reductions of critical-orbit polynomials;
 - analyze orbit statistics;
 - use modular checks for exploratory algebra.
+
+## October 2026 open-problems survey
+
+See [the reviewed integration and source archive](open-problems-integration-2026-10-11.md) for candidate bounded-type and parabolically bounded primitive MLC imports, the corrected Kapiamba citation and the distinction between literature assertions and accepted finite proof objects. No theorem tag is accepted by that intake.
