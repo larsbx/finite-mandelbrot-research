@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 import subprocess
 import tomllib
@@ -41,7 +42,12 @@ def test_ci_executes_both_mojo_compile_paths():
         encoding="utf-8"
     )
     assert "pixi run mojo-build" in workflow
-    assert "pixi run mojo-smoke" in workflow
+    lanes = json.loads((ROOT / "metatest.ci.json").read_text(encoding="utf-8"))["lanes"]
+    smoke = [lane for lane in lanes if lane["id"] == "kernel-smoke-tests"]
+    assert len(smoke) == 1
+    assert smoke[0]["command"] == ["pixi", "run", "mojo-smoke"]
+    assert smoke[0]["level"] == "execution"
+    assert "run: metatest-ci run-manifest --manifest metatest.ci.json --lane kernel-smoke-tests" in workflow
 
 
 def test_smoke_failure_exits_nonzero():
