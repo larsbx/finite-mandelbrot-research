@@ -230,3 +230,22 @@ root = "vendor/mojo"
 "root_isolation/boxes.mojo" = "b4f1f482d142ece1883aa19c2f062321b9c4aec508a3831e735ab8ebb2326589"
 "root_isolation/krawczyk.mojo" = "3e7e983135e88ddf3039fed8d1c6775d80afe41e7e0823c336592164b1d1641f"
 "root_isolation/krawczyk_moore.mojo" = "e7ae89b45907ac47a94632b31f5c90f9de014e78dc2c5e79c5856fa93a31f245"
+
+
+[[package]]
+name = "metatest-ci"
+repository = "larsbx/meta_test"
+commit = "582366dcc735d0855a296a15e4981dc51af056dd"
+root = "vendor"
+
+[package.files]
+"metatest-ci/action.yml" = "06cc3cb5ef9fd46783dbd194bfa3c80008155e0455343428fabe9586749e75a4"
+"metatest-ci/cabal.project" = "124cd2f0cb590811d7668bef1e444eb106d6212ac24c1c2a2fe4ea35112ddf43"
+"metatest-ci/metatest-ci-bundle.cabal" = "bb0d6ef7d6dc748610687b490c6f83a9a46a469db0c5f4e93beafb741d3ff6ae"
+"metatest-ci/PROVENANCE.toml" = "796a371db7b33780ea9532426205d21ddbe018c19be13057caad793a913206bb"
+"metatest-ci/src/MetaTest/Core.hs" = "ca87dc5fb3fadf1d7ead2a1ed08ae9a338549169ffa271210cf118e6e013bc1c"
+"metatest-ci/src/MetaTest/Outcome.hs" = "de970e01d76e06aa1ca4155a5e2867f60a03f577b4c5e52f9f2e58a428e67ea6"
+"metatest-ci/src/MetaTest/Observation.hs" = "5c0a433338a301615293ea88ecca20f2becc322b3edd64364c815c7e1835b7df"
+"metatest-ci/src/MetaTest/Execution.hs" = "d39e9509b0272b02a8e16497731988212f3847e460abd26491f20eea49aec5cb"
+"metatest-ci/src/MetaTest/CI.hs" = "8eed9891f5fbb9693c9812a52d0eb773e798480b97cfbdc227c4f5d131745f56"
+"metatest-ci/app/Main.hs" = "d366b14d2ad642b43db09a578721ac2fbe3ef03cc9265f8ecb3d1ae90cf78f09"
