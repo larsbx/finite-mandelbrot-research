@@ -41,10 +41,21 @@ jobs:
     - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
       with:
         cache: true
+    - name: Set up MetaTest CI
+      uses: ./vendor/metatest-ci
+    - name: Validate MetaTest CI inventory
+      run: metatest-ci validate-manifest metatest.ci.json
     - name: Build the canonical Mojo smoke binary
       run: pixi run mojo-build
-    - name: Run the canonical Mojo finite-core smoke suite
-      run: pixi run mojo-smoke
+    - name: Run the canonical Mojo finite-core smoke suite through MetaTest
+      run: metatest-ci run-manifest --manifest metatest.ci.json --lane kernel-smoke-tests
+    - name: Upload MetaTest kernel-smoke receipt
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: metatest-kernel-smoke-tests
+        path: .metatest/receipts/kernel-smoke-tests.json
+        if-no-files-found: error
     - name: Audit executable core for forbidden analytic primitives
       run: python3 tools/audit_no_trig.py
     - name: Audit executable core for forbidden analytic point APIs
@@ -71,8 +82,19 @@ jobs:
     - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
       with:
         cache: true
-    - name: Run exact-arithmetic property oracle
-      run: pixi run property
+    - name: Set up MetaTest CI
+      uses: ./vendor/metatest-ci
+    - name: Validate MetaTest CI inventory
+      run: metatest-ci validate-manifest metatest.ci.json
+    - name: Run exact-arithmetic property oracle through MetaTest
+      run: metatest-ci run-manifest --manifest metatest.ci.json --lane reference-property-tests
+    - name: Upload MetaTest reference-property receipt
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: metatest-reference-property-tests
+        path: .metatest/receipts/reference-property-tests.json
+        if-no-files-found: error
     - name: Validate exact polynomial reference identities
       run: python3 reference/python/polynomial/poly_reference.py
     - name: Validate interval exclusion reference checks
@@ -97,8 +119,19 @@ jobs:
     - uses: prefix-dev/setup-pixi@d3f436a425481402e6a95a1d1fc10331c708cd9e
       with:
         cache: true
-    - name: Run full tests
-      run: pixi run test
+    - name: Set up MetaTest CI
+      uses: ./vendor/metatest-ci
+    - name: Validate MetaTest CI inventory
+      run: metatest-ci validate-manifest metatest.ci.json
+    - name: Run full tests through MetaTest
+      run: metatest-ci run-manifest --manifest metatest.ci.json --lane integration-tests
+    - name: Upload MetaTest integration receipt
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: metatest-integration-tests
+        path: .metatest/receipts/integration-tests.json
+        if-no-files-found: error
     - name: Recheck vendored package digests after tests
       run: python3 vendor/python/vendoring/check_vendored_sync.py
     needs:
