@@ -65,3 +65,7 @@ Possible split:
 - Lean/Rocq: certificate grammar and integer-polynomial soundness;
 - Rust or Zig: exact dyadic interval verifier;
 - Python/Sage: exploratory computation and example generation only.
+
+## October 2026 literature obligations
+
+The [survey integration](docs/open-problems-integration-2026-10-11.md) adds an ordered literature-review queue under the existing C1 priority: restricted MLC theorem statements and class witnesses, residual coverage and adapters, then algebraic localization and existing companion tracks. New area, arithmetic and higher-degree investigations remain gated by primary-source review.
