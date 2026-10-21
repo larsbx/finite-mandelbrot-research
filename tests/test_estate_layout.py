@@ -20,9 +20,9 @@ def test_estate_manifest_names_canonical_repository():
     assert ESTATE["principles"]["ordering"] == ["authority", "domain", "language"]
 
 
-def test_estate_position_is_a_proposed_research_candidate():
+def test_estate_position_is_an_adopted_research_candidate():
     assert (ESTATE["repo"]["class"], ESTATE["repo"]["layer"], ESTATE["repo"]["band"]) == ("research", 3, "EXPLORE")
-    assert (ESTATE["repo"]["stage"], ESTATE["origin"]["decided_by"]) == ("candidate", "proposed")
+    assert (ESTATE["repo"]["stage"], ESTATE["origin"]["decided_by"]) == ("candidate", "stated")
 
 
 def test_governance_is_a_pinned_dependency_not_a_vendored_copy():
