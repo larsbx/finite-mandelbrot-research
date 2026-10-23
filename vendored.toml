@@ -234,12 +234,12 @@ root = "vendor/mojo"
 [[package]]
 name = "metatest-ci"
 repository = "larsbx/meta_test"
-commit = "1928d139448b01f552e72c82e138a8da428eebc1"
+commit = "9fea58939c4390acdf7a49e80346cec835e53e52"
 root = "vendor"
 
 [package.files]
 "metatest-ci/PROVENANCE.toml" = "796a371db7b33780ea9532426205d21ddbe018c19be13057caad793a913206bb"
-"metatest-ci/action.yml" = "520cd793bf93ace3cf5aebdc8776d16875281002861820b4924c5eeba117b561"
+"metatest-ci/action.yml" = "1c9ba83e7398bad9dec89d3ad73c11bf62c2db86c200c8b944d74a6837b6cb8e"
 "metatest-ci/app/Main.hs" = "d366b14d2ad642b43db09a578721ac2fbe3ef03cc9265f8ecb3d1ae90cf78f09"
 "metatest-ci/cabal.project" = "124cd2f0cb590811d7668bef1e444eb106d6212ac24c1c2a2fe4ea35112ddf43"
 "metatest-ci/metatest-ci-bundle.cabal" = "bb0d6ef7d6dc748610687b490c6f83a9a46a469db0c5f4e93beafb741d3ff6ae"
