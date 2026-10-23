@@ -9,6 +9,7 @@ Mojo-versus-Python comparison when a ``mojo`` binary is available.
 from __future__ import annotations
 
 import shutil
+import json
 import sys
 import tomllib
 from fractions import Fraction
@@ -97,7 +98,12 @@ def test_no_points_audit_has_no_exemptions_and_bans_def_point():
 def test_property_probe_is_wired_into_pixi_ci_and_binding_table():
     manifest = tomllib.loads(text("pixi.toml"))
     assert manifest["tasks"]["property"] == "python reference/python/arithmetic/exact_arithmetic_property_oracle.py"
-    assert "pixi run property" in text(".github/workflows/no-trig-audit.yml")
+    lanes = json.loads(text("metatest.ci.json"))["lanes"]
+    property_lanes = [lane for lane in lanes if lane["id"] == "reference-property-tests"]
+    assert len(property_lanes) == 1
+    assert property_lanes[0]["command"] == ["pixi", "run", "property"]
+    assert property_lanes[0]["level"] == "execution"
+    assert "run: metatest-ci run-manifest --manifest metatest.ci.json --lane reference-property-tests" in text(".github/workflows/no-trig-audit.yml")
     spec = text("docs/rational-interval-arithmetic-spec.md")
     assert "`kernel/mojo/arithmetic/exact_arithmetic_property_probe.mojo`" in spec
     assert "`reference/python/arithmetic/exact_arithmetic_property_oracle.py`" in spec

@@ -28,6 +28,11 @@ pin = "sha256:412a64dea58d709aae21e5a0315b8e7e96488c310a9d999267927ba3d8146a30"
 id = "finite-math-kernels"
 pin = "sha256:b5da9950384147a2495e66bc5c3286a4fbce844e0ab6e045219eaedde61d1e6e"
 
+[[dep]]
+id = "meta_test"
+rev = "9fea58939c4390acdf7a49e80346cec835e53e52"
+pin = "sha256:cd82b0c168125291f3937f74689dcfd86b20110c26dddc6df5a81b3b93ba26b2"
+
 [exports]
 names = []
 
@@ -165,7 +170,7 @@ acceptance_authority = false
 [[language]]
 name = "Haskell"
 authority = "supporting"
-roles = ["semantic_reference"]
+roles = ["semantic_reference", "ci_tooling"]
 acceptance_authority = false
 
 [migration]
